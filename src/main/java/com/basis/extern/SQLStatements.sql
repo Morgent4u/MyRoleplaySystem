@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
 -- Created: 2022-04-02
 -- Author: Nihar
--- Last updatess:
+-- Last updates:
 -- 2022-04-02: Added create database and table functions.
 -- 2022-04-02: Tested the current script.
 

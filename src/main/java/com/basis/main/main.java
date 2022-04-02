@@ -1,6 +1,7 @@
 package com.basis.main;
 
 import com.basis.extern.MySQL;
+import com.basis.extern.UPDSrv;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import org.bukkit.Bukkit;
@@ -62,6 +63,9 @@ public class main extends JavaPlugin
             {
                 //	Event und Befehle anmelden...
 
+                // Test the UPD-Srv:
+                UPDSrv updSrv = new UPDSrv(Sys.of_getMainFilePath());
+                updSrv.of_load();
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 SETTINGS.of_initSystemServices();
