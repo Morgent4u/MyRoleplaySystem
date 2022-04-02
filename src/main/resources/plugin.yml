@@ -1,0 +1,5 @@
+name: MyRoleplaySystem
+version: '${project.version}'
+main: com.basis.main.main
+api-version: 1.18
+authors: [ Nihar ]
