@@ -552,12 +552,15 @@ public class Sys
      */
     public static boolean of_check4SpecificPluginOnServer(String pluginName)
     {
+        Sys.of_sendMessage("Searching for the plugin '"+pluginName+"' on this server...");
+
         if(Bukkit.getPluginManager().getPlugin(pluginName) != null)
         {
+            Sys.of_sendMessage("The plugin '"+pluginName+"' could be found on this server. All required functions has been enabled.");
             return true;
         }
 
-        Sys.of_sendWarningMessage("The plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Function has been disabled for this runtime/uptime only!");
+        Sys.of_sendWarningMessage("The plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Functions has been disabled for this runtime/uptime only!");
         return false;
     }
 

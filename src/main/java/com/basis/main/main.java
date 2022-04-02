@@ -13,6 +13,14 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @Description
  * This class is an extended version of the JavaPlugin and
  * contains for this plugin important functions and instances.
+ *
+ * Hint:
+ * This function is only used to register Bukkit.Events or Bukkit.Commands.
+ * Other important components will be enabled or initializes in the object:
+ * SETTINGS.
+ *
+ * Declared objects in this class will be initialized by the SETTINGS-object!
+ *
  */
 public class main extends JavaPlugin
 {
@@ -55,12 +63,11 @@ public class main extends JavaPlugin
                 //	Event und Befehle anmelden...
 
 
-
-                //	Als letztes die Instanz-Variabeln der Services, Objekte initialisieren.
-                of_initSystemServices();
+                //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
+                SETTINGS.of_initSystemServices();
 
                 //	Statusbericht an die Konsole:
-                of_printStatusReport2Console();
+                SETTINGS.of_printStatusReport2Console();
 
                 //  Alle gespeicherten Debug-Meldungen ausgeben.
                 Sys.of_setDebugMode(useDebugMode);
@@ -80,64 +87,10 @@ public class main extends JavaPlugin
     @Override
     public void onDisable()
     {
+        //  Entladen der Settings-klasse!
+        SETTINGS.of_unload();
+
         //	Ende.
         Sys.of_sendMessage("This plugin has been coded by Nihar! Thank you for using this plugin! :^)");
-    }
-
-    /* ************************* */
-    /* OBJEKT-ANWEISUNGEN */
-    /* ************************* */
-
-    /**
-     * This function initialize objects which are required for this plugin!
-     */
-    private static void of_initSystemServices()
-    {
-        //	Im Anschluss schauen, ob noch andere Komponenten gefordert sind und ob diese zur Verfügung stehen.
-        of_checkExternComponents();
-    }
-
-    /**
-     * This function checks if external components are registered.
-     * For example: if the SETTINGS-object is using the PlaceholderAPI this function
-     * checks if the plugin is on the server.
-     */
-    private static void of_checkExternComponents()
-    {
-        //  TODO: Implement this function!
-    }
-
-    /* ************************* */
-    /* SONSTIGES */
-    /* ************************* */
-
-    /**
-     * This function sends a status report to the console after
-     * successfully loading all objects or required methods for the plugin.
-     */
-    private static void of_printStatusReport2Console()
-    {
-        //	Farbcodes
-        String red = "\u001B[31m";
-        String white = "\u001B[0m";
-        String green = "\u001B[32m";
-        String yellow = "\u001B[33m";
-        String purple = "\u001B[35m";
-        String blue = "\u001B[36m";
-
-        Sys.of_sendMessage("┏╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋");
-        if(Sys.of_isHotfix())
-        {
-            Sys.of_sendMessage(red+"[Hotfix: "+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
-        }
-        else
-        {
-            Sys.of_sendMessage(red+"["+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
-        }
-        Sys.of_sendMessage("Developed by:");
-        Sys.of_sendMessage("»"+purple+" Nihar"+white);
-        Sys.of_sendMessage(blue+"▶ Settings:"+white);
-        SETTINGS.of_sendDebugDetailInformation();
-        Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
     }
 }

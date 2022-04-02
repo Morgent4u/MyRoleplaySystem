@@ -113,19 +113,82 @@ public class Settings extends Objekt
     }
 
     /* ************************* */
-    /* DEBUG - CENTER */
+    /* UNLOADER */
     /* ************************* */
 
     @Override
-    public void of_sendDebugDetailInformation()
+    public void of_unload()
     {
+
+
+
+        //  Nach dem SpielerService etc.
+        if(of_isUsingMySQL() && main.SQL.of_isConnected())
+        {
+            main.SQL.of_closeConnection();
+        }
+    }
+
+    /* ************************* */
+    /* OBJEKT-ANWEISUNGEN */
+    /* ************************* */
+
+    /**
+     * This function initialize objects which are required for this plugin!
+     */
+    public void of_initSystemServices()
+    {
+        //  Initalisierung von Objekten:
+
+
+
+        //	Im Anschluss schauen, ob noch andere Komponenten gefordert sind und ob diese zur Verfügung stehen.
+        of_checkExternComponents();
+    }
+
+    /**
+     * This function checks while start up if
+     * required or softdepends plugins are on this server.
+     */
+    public void of_checkExternComponents()
+    {
+        //  Example: ib_vault = Sys.of_check4SpecificPluginOnServer("Plugin");
+        boolean bool = Sys.of_check4SpecificPluginOnServer("Vault");
+    }
+
+    /**
+     * This function sends a status report to the console after
+     * successfully loading all objects or required methods for the plugin.
+     */
+    public void of_printStatusReport2Console()
+    {
+        //	Farbcodes
+        String red = "\u001B[31m";
+        String white = "\u001B[0m";
+        String green = "\u001B[32m";
+        String yellow = "\u001B[33m";
+        String purple = "\u001B[35m";
+        String blue = "\u001B[36m";
+
+        Sys.of_sendMessage("┏╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋");
+        if(Sys.of_isHotfix())
+        {
+            Sys.of_sendMessage(red+"[Hotfix: "+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
+        }
+        else
+        {
+            Sys.of_sendMessage(red+"["+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
+        }
+        Sys.of_sendMessage("Developed by:");
+        Sys.of_sendMessage("»"+purple+" Nihar"+white);
+        Sys.of_sendMessage(blue+"▶ Settings:"+white);
         Sys.of_sendMessage("Plugin-Enabled: "+of_isUsingPlugin());
         Sys.of_sendMessage("MySQL-Enabled: "+of_isUsingMySQL());
         if(main.SQL != null)
         {
             Sys.of_sendMessage("MySQL-Connected: "+main.SQL.of_isConnected());
         }
-
+        Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
     }
 
     /* ******************************* */
