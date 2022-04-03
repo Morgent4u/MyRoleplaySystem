@@ -552,7 +552,7 @@ public class Sys
      */
     public static boolean of_check4SpecificPluginOnServer(String pluginName)
     {
-        Sys.of_sendMessage("Searching for the plugin '"+pluginName+"' on this server...");
+        Sys.of_sendMessage("Search for the plugin '"+pluginName+"' on this server...");
 
         if(Bukkit.getPluginManager().getPlugin(pluginName) != null)
         {

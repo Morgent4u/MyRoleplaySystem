@@ -63,24 +63,20 @@ public class main extends JavaPlugin
             {
                 //	Event und Befehle anmelden...
 
-                // Test the UPD-Srv:
-                UPDSrv updSrv = new UPDSrv(Sys.of_getMainFilePath());
-                updSrv.of_load();
-
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 SETTINGS.of_initSystemServices();
 
                 //	Statusbericht an die Konsole:
                 SETTINGS.of_printStatusReport2Console();
-
-                //  Alle gespeicherten Debug-Meldungen ausgeben.
-                Sys.of_setDebugMode(useDebugMode);
             }
             else
             {
                 Sys.of_sendWarningMessage("System has been disabled by 'settings.yml' or no database connection.");
                 Bukkit.getPluginManager().disablePlugin(this);
             }
+
+            //  Alle gespeicherten Debug-Meldungen ausgeben.
+            Sys.of_setDebugMode(useDebugMode);
         }
     }
 

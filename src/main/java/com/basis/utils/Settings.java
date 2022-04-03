@@ -2,6 +2,7 @@ package com.basis.utils;
 
 import com.basis.ancestor.Objekt;
 import com.basis.extern.MySQL;
+import com.basis.extern.UPDSrv;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 
@@ -82,7 +83,7 @@ public class Settings extends Objekt
                 main.SQL.of_setDbName(database);
                 main.SQL.of_setUserName(username);
                 main.SQL.of_setPassword(password);
-                main.SQL.of_setUpdateKeyTableAndColumns("mrs_keys", "lastkey", "tablename");
+                main.SQL.of_setUpdateKeyTableAndColumns("mrs_key", "lastKey", "tableName");
 
                 //	Verbindung zur DB herstellen und ggf. UPDSrv ansprechen!
                 rc = main.SQL.of_createConnection();
@@ -91,6 +92,35 @@ public class Settings extends Objekt
                 if(rc == 1)
                 {
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - Connected.");
+
+                    //  Überprüfen ob es eine neues UPD gibt, welches eingespielt werden muss...
+                    UPDSrv updSrv = new UPDSrv(Sys.of_getMainFilePath());
+
+                    //  1 = UPD-File geladen und gefunden. -1 = keine UPD-File gefunden.
+                    int updSrvRc = updSrv.of_load();
+
+                    //  Wenn ein UPD-File gefunden wurde, dann...
+                    if(updSrvRc == 1)
+                    {
+                        updSrv.of_sendMessage("Search for database updates...");
+
+                        //  Wenn eine neue UPD-Version gefunden wurde...
+                        if(updSrv.of_isNewUpdateAvailable())
+                        {
+                            //  Neues Update vorhanden!
+                            updSrvRc = updSrv.of_runUPD();
+
+                            if(updSrvRc != 1)
+                            {
+                                updSrv.of_sendMessage("Error while updating database! No sql-statements found! (Is this okay?)");
+                            }
+                        }
+                        else
+                        {
+                            //  Kein neues Update vorhanden!
+                            updSrv.of_sendMessage("No new update available. Your database is up to date.");
+                        }
+                    }
                 }
                 else
                 {

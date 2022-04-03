@@ -104,49 +104,8 @@ public class MySQL
         if(of_isConnected())
         {
             //	Debugs...
-            Sys.of_debug(instanzName+" Successfuly connected to database "+green + dbName + white);
-            Sys.of_debug(instanzName+" Searching for new database updates...");
-
-            int rc = -1;
-
-            /*
-            //	UPD-Service zum Aktualisieren der Datenbank.
-            UPDService updSrv = new UPDService();
-
-            if(updSrv.of_canRunUPD())
-            {
-                Sys.of_debug(instanzName+" The UPD-Service has found new database updates!");
-
-                Sys.of_debug("=== UPD-Service: Start ===");
-                rc = updSrv.of_runUPD();
-                Sys.of_debug("=== UPD-Service: End ===");
-
-                if(rc == 1)
-                {
-                    Sys.of_debug(instanzName+"==== UPD-Conclusion ====");
-                    Sys.of_debug(instanzName+" [UPD-Service]:");
-                    Sys.of_debug(instanzName+" Executed-SQLs: " + updSrv.of_getExecutedSQLs());
-                    Sys.of_debug(instanzName+" Error-SQLs: " + updSrv.of_getErrorSQLs());
-                    Sys.of_debug(instanzName+" Skipped-SQLs: " + updSrv.of_getSkippedSQLs());
-                    Sys.of_debug(instanzName+"========================");
-                }
-                //	Fehler beim Einspielen des UPDs!
-                else
-                {
-                    main.SQL.of_closeConnection();
-                    main.SQL = null;
-                    main.SETTINGS.of_setUseMySQL(false);
-                    Sys.of_debug(instanzName+" There was an error by updating your database! Switch to the file-system (only for uptime)");
-                }
-            }
-            else
-            {
-                Sys.of_debug(instanzName+ " No database updates found. You're database is fine :)");
-                rc = 1;
-            }
-            */
-
-            return rc;
+            Sys.of_debug(instanzName+" Successfully connected to database "+green + dbName + white);
+            return 1;
         }
 
         return -1;
