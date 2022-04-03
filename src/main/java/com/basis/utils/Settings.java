@@ -2,7 +2,7 @@ package com.basis.utils;
 
 import com.basis.ancestor.Objekt;
 import com.basis.extern.MySQL;
-import com.basis.extern.UPDSrv;
+import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 
@@ -94,7 +94,7 @@ public class Settings extends Objekt
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - Connected.");
 
                     //  Überprüfen ob es eine neues UPD gibt, welches eingespielt werden muss...
-                    UPDSrv updSrv = new UPDSrv(Sys.of_getMainFilePath());
+                    UPDService updSrv = new UPDService(Sys.of_getMainFilePath());
 
                     //  1 = UPD-File geladen und gefunden. -1 = keine UPD-File gefunden.
                     int updSrvRc = updSrv.of_load();
@@ -146,6 +146,10 @@ public class Settings extends Objekt
     /* UNLOADER */
     /* ************************* */
 
+    /**
+     * This function destroys objects in the correct order
+     * which are defined in the main.java class.
+     */
     @Override
     public void of_unload()
     {
@@ -164,7 +168,8 @@ public class Settings extends Objekt
     /* ************************* */
 
     /**
-     * This function initialize objects which are required for this plugin!
+     * This function initializes objects which are defined in the
+     * main.java class.
      */
     public void of_initSystemServices()
     {

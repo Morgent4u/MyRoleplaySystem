@@ -20,7 +20,7 @@ import java.util.Arrays;
  * GitHub-CoPilot project.
  *
  */
-public class UPDSrv extends Objekt
+public class UPDService extends Objekt
 {
     //  Attributs:
     File file;
@@ -42,7 +42,7 @@ public class UPDSrv extends Objekt
      * Constructor
      * @param searchDirectory File path which will be used to find the upd-file.
      */
-    public UPDSrv(String searchDirectory)
+    public UPDService(String searchDirectory)
     {
         //  Search path...
         searchDirectory = searchDirectory + "//UPD//2022UPD_" + Sys.of_getPaket() + ".upd";
@@ -65,42 +65,73 @@ public class UPDSrv extends Objekt
             //  Load the file...
             try
             {
+                //  FileReader und BufferReader initialisieren!
                 FileReader reader = new FileReader(file);
                 BufferedReader bufferReader = new BufferedReader(reader);
 
-                //  SQL-Statement zusammenbauen...
-                int noSqlStatement = 0;
-                StringBuilder sqlStatementsFullBlock = new StringBuilder();
+                StringBuilder sqlStatementsInFile = new StringBuilder();
                 String line;
+                String flagPattern = "=UPD_VERSION_NUMBER=";
 
+                //  Jede Zeile einlesen...
                 while((line = bufferReader.readLine()) != null)
                 {
-                    // Kommentare mit einem UPD-Versions-Kennzeichen direkt hinzufügen...
                     if(!line.isEmpty())
                     {
-                        if(line.startsWith("-- UPDv="))
+                        //  Wenn ein SQL-Statement gefunden wird oder die UPD-Versions-Nummer, darf
+                        //  dieses Statement hinzugefügt werden.
+                        if(line.startsWith("-- UPDv=") || !line.startsWith("--"))
                         {
-                            sqlStatements.add(line);
-                            noSqlStatement++;
-                        }
-                        //  SQL-Statement zusammenbauen...
-                        else if(!line.startsWith("--"))
-                        {
-                            sqlStatementsFullBlock.append(line);
+                            //  Wenn es eine UPD-Versions-Nummer ist, eine Markierung setzen um beim auseinander parsen
+                            //  zu wissen, was der SQL-Statement Anteil und was der UPD-Versions-Nummern Anteil ist!
+                            if(line.startsWith("-- UPDv="))
+                            {
+                                sqlStatementsInFile.append(line).append(flagPattern);
+                            }
+                            else
+                            {
+                                sqlStatementsInFile.append(line);
+                            }
                         }
                     }
                 }
 
-                //  SQL-Statements auseinander parsen...
-                String[] sqlExecuteStatements = sqlStatementsFullBlock.toString().split(";");
+                //  Nach dem Zusammenbauen der gesamten UPD-File nun die SQL-Statements und die
+                //  UPD-Versions-Nummern in der richtigen Reihenfolge auslesen und zur ArrayList hinzufügen.
 
-                //  Array-Elemente zur ArrayList hinzufügen...
-                sqlStatements.addAll(Arrays.asList(sqlExecuteStatements));
+                String[] sqlStmts = sqlStatementsInFile.toString().split(";");
+                int noSqlStatements = 0;
+
+                if(sqlStmts.length > 0)
+                {
+                    for (String sqlStmt : sqlStmts)
+                    {
+                        if(sqlStmt.contains(flagPattern))
+                        {
+                            String[] splitSQLParts = sqlStmt.split(flagPattern);
+
+                            //  Es muss die Länge 2 haben, ansonsten wurde ein falsches Flagkennzeichen gesetzt!
+                            if(splitSQLParts.length == 2)
+                            {
+                                //  UPD-Version
+                                sqlStatements.add(splitSQLParts[0]);
+                                noSqlStatements++;
+
+                                //  SQL-Statement
+                                sqlStatements.add(splitSQLParts[1] + ";");
+                            }
+                        }
+                        else
+                        {
+                            sqlStatements.add(sqlStmt + ";");
+                        }
+                    }
+                }
 
                 //  Anzahl der SQL-Statements setzen...
-                if(sqlStatements.size() > 0 && noSqlStatement < sqlStatements.size())
+                if(sqlStatements.size() > 0 && noSqlStatements < sqlStatements.size())
                 {
-                    sqlStatementSize = sqlStatements.size() - noSqlStatement;
+                    sqlStatementSize = sqlStatements.size() - noSqlStatements;
                 }
 
                 //  Close the file...
@@ -134,7 +165,7 @@ public class UPDSrv extends Objekt
     {
         if(sqlStatements.size() != 0)
         {
-            int currentDbVersionNumber = -1;
+            int currentUPDVersionNumber = -1;
             boolean executeCurrentStatement = false;
 
             of_sendMessage("========= UPD-Service ("+sqlStatementSize+") =========");
@@ -150,9 +181,9 @@ public class UPDSrv extends Objekt
                 if(sql.startsWith("-- UPDv="))
                 {
                     executeCurrentStatement = false;
-                    currentDbVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
+                    currentUPDVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
 
-                    if(currentDbVersionNumber != -1 && currentDbVersionNumber >= lowestDbVersion && currentDbVersionNumber <= highestDbVersion)
+                    if(currentUPDVersionNumber != -1 && currentUPDVersionNumber >= lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
                     {
                         executeCurrentStatement = true;
                     }
@@ -234,7 +265,7 @@ public class UPDSrv extends Objekt
                 //  Version aus der UPD-Datei und anschließend die der DB.
 
                 String lastUPDVersion = null;
-                String sqlSelect = "SELECT dbVersion FROM mrs_dbversion;";
+                String sqlSelect = "SELECT dbVersion FROM "+main.SQL.of_getTableNotation()+"dbversion;";
                 String result = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
 
                 if(result != null)

@@ -25,7 +25,7 @@ public class MySQL
     String white = "\u001B[0m";
     String green = "\u001B[32m";
 
-    String instanzName;
+    String instanceName;
     String connectionString;
 
     String server;
@@ -37,6 +37,7 @@ public class MySQL
     String updateKeyTable;
     String updateKeyColumn;
     String updateTableColumn4Key;
+    String tableNotation;
 
     /* ************************* */
     /* CONSTRUCTOR */
@@ -49,7 +50,7 @@ public class MySQL
      */
     public MySQL(String instanzName)
     {
-        this.instanzName = "[MySQL-"+instanzName+"]:";
+        this.instanceName = "[MySQL-"+instanzName+"]:";
     }
 
     /* ************************* */
@@ -65,7 +66,7 @@ public class MySQL
      */
     public int of_createConnection()
     {
-        Sys.of_debug(instanzName + " Try to connect to the following database: " + dbName);
+        Sys.of_debug(instanceName + " Try to connect to the following database: " + dbName);
 
         //	Validierung
         String errorMessage = of_validate();
@@ -104,7 +105,7 @@ public class MySQL
         if(of_isConnected())
         {
             //	Debugs...
-            Sys.of_debug(instanzName+" Successfully connected to database "+green + dbName + white);
+            Sys.of_debug(instanceName +" Successfully connected to database "+green + dbName + white);
             return 1;
         }
 
@@ -155,7 +156,7 @@ public class MySQL
         {
             try
             {
-                Sys.of_debug(instanzName+" Successfuly disconnected from database "+green + dbName + white);
+                Sys.of_debug(instanceName +" Successfully disconnected from database "+green + dbName + white);
                 con.close();
 
                 if(con.isClosed())
@@ -372,9 +373,9 @@ public class MySQL
     public int of_updateKey(String tableName)
     {
         //	Beide Strings muessen gesetzt worden sein!
-        if(!updateKeyTable.isEmpty() && !updateKeyColumn.isEmpty() && !updateTableColumn4Key.isEmpty())
+        if(!updateKeyTable.isEmpty() && !updateKeyColumn.isEmpty() && !updateTableColumn4Key.isEmpty() && tableNotation != null && !tableNotation.isEmpty())
         {
-            String sqlSelect = "SELECT " + updateKeyColumn + " FROM " + updateKeyTable + " WHERE " + updateTableColumn4Key + " = '"+tableName+"';";
+            String sqlSelect = "SELECT " + updateKeyColumn + " FROM " + updateKeyTable + " WHERE " + updateTableColumn4Key + " = '" + tableNotation + tableName+"';";
             int key = -1;
 
             try
@@ -385,12 +386,12 @@ public class MySQL
 
             if(key == -1)
             {
-                Sys.of_sendErrorMessage(null, "MySQL", "of_updateKey("+tableName+");", "This is a SQL-problem might be the table entry doesn't exist! SQL: "+sqlSelect);
+                Sys.of_sendErrorMessage(null, "MySQL", "of_updateKey("+tableNotation+tableName+");", "This is a SQL-problem might be the table entry doesn't exist! SQL: "+sqlSelect);
                 return -1;
             }
 
             key++;
-            String sqlUpdate = "UPDATE "+updateKeyTable+" SET " + updateKeyColumn + " = " + key + " WHERE " + updateTableColumn4Key + " = '" + tableName + "';";
+            String sqlUpdate = "UPDATE "+updateKeyTable+" SET " + updateKeyColumn + " = " + key + " WHERE " + updateTableColumn4Key + " = '" + tableNotation + tableName + "';";
             of_run_update(sqlUpdate);
             return key;
         }
@@ -433,6 +434,18 @@ public class MySQL
         this.updateKeyTable = updateKeyTable;
         this.updateKeyColumn = updateKeyColumn;
         this.updateTableColumn4Key = updateTableColumn4Key;
+
+        //  Notation raus filtern und setzen (wird z.B. für den UPD-Service benötigt, sowie den Table-Update!
+        tableNotation = updateKeyTable.split("_")[0] + "_";
+    }
+
+    /* ****************************** */
+    /* GETTER */
+    /* ****************************** */
+
+    public String of_getTableNotation()
+    {
+        return tableNotation;
     }
 
     /* ****************************** */

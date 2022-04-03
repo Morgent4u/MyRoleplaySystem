@@ -1,7 +1,6 @@
 package com.basis.main;
 
 import com.basis.extern.MySQL;
-import com.basis.extern.UPDSrv;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import org.bukkit.Bukkit;
