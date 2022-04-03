@@ -30,3 +30,6 @@ CREATE TABLE mrs_user (
 -- Update the key-control table.
 INSERT INTO mrs_key ( tableName )
      VALUES ( 'mrs_user' );
+
+-- UPDv=22.1.0.02
+ALTER TABLE mrs_user ADD COLUMN firstConnection DATETIME NOT NULL;

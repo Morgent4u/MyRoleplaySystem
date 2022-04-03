@@ -166,48 +166,49 @@ public class UPDService extends Objekt
         if(sqlStatements.size() != 0)
         {
             int currentUPDVersionNumber = -1;
+            int executedSQLCounter = 0;
             boolean executeCurrentStatement = false;
 
             of_sendMessage("========= UPD-Service ("+sqlStatementSize+") =========");
 
             //  Iterate all sql-statements...
-            for(int i = 0; i < sqlStatements.size(); i++)
+            for (String sql : sqlStatements)
             {
                 //  Derzeitiges SQL-Statement ermitteln...
-                String sql = sqlStatements.get(i);
-
                 //  UPD-Version wurde ermittelt.. schauen ob die dazugehörigen
                 //  SQL-Statements ausgeführt werde müssen...
-                if(sql.startsWith("-- UPDv="))
+                if (sql.startsWith("-- UPDv="))
                 {
                     executeCurrentStatement = false;
                     currentUPDVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
 
-                    if(currentUPDVersionNumber != -1 && currentUPDVersionNumber >= lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
+                    if (currentUPDVersionNumber != -1 && currentUPDVersionNumber >= lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
                     {
                         executeCurrentStatement = true;
                     }
                 }
                 //  Execute current SQL.
-                else if(executeCurrentStatement)
+                else if (executeCurrentStatement)
                 {
+                    executedSQLCounter++;
                     boolean bool = main.SQL.of_run_update_suppress(sql);
 
-                    if(bool)
+                    if (bool)
                     {
-                        of_sendMessage("SQL-Statement executed: " + i + "/" + sqlStatementSize);
+                        of_sendMessage("SQL-Statement executed: " + executedSQLCounter + "/" + sqlStatementSize);
                         sqlExecutions++;
                     }
                     else
                     {
-                        of_sendMessage("SQL-Statement error: " + i + "/" + sqlStatementSize);
+                        of_sendMessage("SQL-Statement error: " + executedSQLCounter + "/" + sqlStatementSize);
                         sqlErrors++;
                     }
                 }
                 //  Skippe current SQL.
                 else
                 {
-                    of_sendMessage("SQL-Statement skipped: " + i + "/" + sqlStatementSize);
+                    executedSQLCounter++;
+                    of_sendMessage("SQL-Statement skipped: " + executedSQLCounter + "/" + sqlStatementSize);
                     sqlSkipped++;
                 }
             }
@@ -223,6 +224,8 @@ public class UPDService extends Objekt
 
         return 0;
     }
+
+    //  TODO: Automatisches eintragen dieser Plugin-Version in die DB! So wie ein erneuter Test!
 
     public void of_sendMessage(String message)
     {

@@ -1,8 +1,10 @@
 package com.roleplay.spieler;
 
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import org.bukkit.entity.Player;
@@ -16,7 +18,7 @@ import org.bukkit.entity.Player;
  * Further this class is used to save player data into
  * the database or the file-system.
  */
-public class SpielerContext
+public class SpielerContext extends Objekt
 {
     //	Attribute:
     private HashMap<String, Spieler> players = new HashMap<String, Spieler>();
@@ -45,27 +47,37 @@ public class SpielerContext
             String uuid = p.getUniqueId().toString();
             int dbId = -1;
 
-            if(main.SETTINGS.of_isUsingMySQL())
+            //	Gibt es den Spieler bereits?
+            String sqlStatement = "SELECT user FROM mrs_user WHERE uuid = '"+uuid+"';";
+            dbId = Sys.of_getString2Int(main.SQL.of_getRowValue_suppress(sqlStatement, "user"));
+
+            if(dbId == -1)
             {
-                //	Gibt es den Spieler bereits?
-                String sqlStatement = "SELECT user FROM mrs_user WHERE uuid = '"+uuid+"';";
-                dbId = Sys.of_getString2Int(main.SQL.of_getRowValue_suppress(sqlStatement, "user"));
+                //  Create new database user.
+                dbId = of_createNewPlayerEntry2Database(p);
+            }
 
-                if(dbId == -1)
+            //  Load player data via. database request.
+            if(dbId != -1)
+            {
+                String sqlSelect = "SELECT * FROM mrs_user WHERE user = "+dbId+";";
+                ResultSet result = main.SQL.of_getResultSet_suppress(sqlSelect, true);
+
+                try
                 {
-                    //	Neuen Nutzer anlegen...
-                    dbId = of_createNewPlayerEntry2Database(p);
+                    //  Set data from the ResultSet to the player instance.
+                    ps.of_setRangId(result.getInt("rang"));
+                    ps.of_setJobId(result.getInt("job"));
+                    ps.of_setMoneyATM(result.getInt("money"));
+                    ps.of_setMoneyCash(result.getInt("atm"));
                 }
-
-                //	Spieler-Inhalte laden...
-                if(dbId != -1)
+                catch (Exception e)
                 {
-                    String sqlSelect = "SELECT defaultLanguage FROM mlc_user WHERE user = "+dbId+";";
-                    // defaultLanguage = main.SQL.of_getRowValue_suppress(sqlSelect, "defaultLanguage");
+                    of_sendErrorMessage(e, "SpielerContext.of_loadPlayer(Player);", "Error while loading the player data from the database.");
                 }
             }
 
-            ps.of_setTargetId(dbId);
+            ps.of_setObjectId(dbId);
             players.put(p.getName(), ps);
         }
     }
@@ -85,7 +97,7 @@ public class SpielerContext
 
         if(dbId > 0)
         {
-            String sqlInsert = "INSERT INTO mrs_user (user, uuid) VALUES ("+dbId+", '"+p.getUniqueId().toString()+"');";
+            String sqlInsert = "INSERT INTO mrs_user (user, name, uuid, firstConnection, lastConnection) VALUES ("+dbId+", '"+p.getName()+"', '"+p.getUniqueId().toString()+"', NOW(), NOW());";
             boolean bool = main.SQL.of_run_update(sqlInsert);
 
             if(bool)
@@ -108,28 +120,17 @@ public class SpielerContext
     {
         if(ps != null)
         {
-            //	Datenbank oder FileSystem?
-            if(main.SETTINGS.of_isUsingMySQL())
-            {
-                /*
-                //	Update-Statement:
-                String sqlUpdate = "UPDATE mlc_user SET name = '"+ps.of_getName()+"', defaultLanguage = '"+ps.of_getDefaultLanguage()+"' WHERE mlc_user.user = " + ps.of_getTargetId() + ";";
-                boolean bool = main.SQL.of_run_update_suppress(sqlUpdate);
+            //	Update-Statement:
+            String sqlUpdate = "UPDATE mrs_user SET name = '"+ps.of_getName()+"'" +
+                    ", rang = "+ ps.of_getRangId() +
+                    ", job = "+ ps.of_getJobId() +
+                    ", atm = "+ ps.of_getMoneyATM() +
+                    ", money = "+ ps.of_getMoneyCash() +
+                    ", lastConnection = NOW()" +
+                    ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
 
-                //	Bei einem Fehler, wechsel zum FileSystem!
-                if(!bool)
-                {
-                    //	Verbindung beenden...
-                    main.SETTINGS.of_setUseMySQL(false);
-                    main.SQL.of_closeConnection();
-
-                    //	Switch zum FileSystem
-                    return of_savePlayer(ps);
-                }
-                 */
-
-                return 1;
-            }
+            main.SQL.of_run_update_suppress(sqlUpdate);
+            return 1;
         }
 
         return -1;

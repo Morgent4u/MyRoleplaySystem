@@ -15,10 +15,8 @@ public class Objekt
      *
      */
 
-    private int objektId;
-    private int objektTargetId;
-
-    private String objektInfo;
+    private int objectId;
+    private String objectInfo;
 
     //	Flags
     private boolean ib_errorFlag;
@@ -86,7 +84,7 @@ public class Objekt
         //	 1: OK
         //	-1: Fehler
 
-        //	Wird ggf. vom Erben �berschrieben...
+        //	Wird ggf. vom Erben ueberschrieben...
         return -1;
     }
 
@@ -119,8 +117,7 @@ public class Objekt
             Sys.of_sendMessage("======================================");
             Sys.of_sendMessage(green+"[DEBUG] "+Sys.of_getPaket()+white+", Object: "+yellow+of_getObjektName()+white);
             Sys.of_sendMessage(blue+"Invoker: "+white+invoker);
-            Sys.of_sendMessage(white+"ObjectId: "+of_getObjektId());
-            Sys.of_sendMessage(white+"ObjectTargetId: "+of_getTargetId());
+            Sys.of_sendMessage(white+"ObjectId: "+of_getObjectId());
             Sys.of_sendMessage(white+"ObjectInfoAttribute: "+of_getInfo());
             Sys.of_sendMessage(white+"HasAnError: " + of_hasAnError());
             Sys.of_sendMessage(white+"AutoSaving: " + of_isAutoSaveEnabled());
@@ -165,8 +162,7 @@ public class Objekt
         Sys.of_sendMessage("=====================================");
         Sys.of_sendMessage(red+"[ERROR] "+Sys.of_getPaket()+white+", Object: "+yellow+of_getObjektName()+white);
         Sys.of_sendMessage(blue+"Invoker: "+white+invoker);
-        Sys.of_sendMessage(white+"ObjectId: "+of_getObjektId());
-        Sys.of_sendMessage(white+"ObjectTargetId: "+of_getTargetId());
+        Sys.of_sendMessage(white+"ObjectId: "+of_getObjectId());
         Sys.of_sendMessage(white+"ObjectInfoAttribute: "+of_getInfo());
         Sys.of_sendMessage(white+"HasAnError: " + of_hasAnError());
         Sys.of_sendMessage(white+"AutoSaving: " + of_isAutoSaveEnabled());
@@ -188,9 +184,9 @@ public class Objekt
     /* SETTER */
     /* ************************* */
 
-    public void of_setTargetId(int targetId)
+    public void of_setObjectId(int id)
     {
-        this.objektTargetId = targetId;
+        objectId = id;
     }
 
     public void of_setAutoSave(boolean bool)
@@ -200,7 +196,7 @@ public class Objekt
 
     public void of_setInfo(String info)
     {
-        this.objektInfo = info;
+        this.objectInfo = info;
     }
 
     /* ************************* */
@@ -214,17 +210,12 @@ public class Objekt
 
     public String of_getInfo()
     {
-        return objektInfo;
+        return objectInfo;
     }
 
-    public int of_getObjektId()
+    public int of_getObjectId()
     {
-        return objektId;
-    }
-
-    public int of_getTargetId()
-    {
-        return objektTargetId;
+        return objectId;
     }
 
     /* ************************* */
