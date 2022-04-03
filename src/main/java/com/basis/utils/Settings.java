@@ -5,6 +5,7 @@ import com.basis.extern.MySQL;
 import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.spieler.SpielerService;
 
 /**
  * @Created 22.03.2022
@@ -63,7 +64,7 @@ public class Settings extends Objekt
 
 
             //	MySQL-Attribute einlesen:
-            ib_useMySQL = datei.of_getSetBoolean(sectionKey+".MySQL.Use", false);
+            ib_useMySQL = true;
             String hostName = datei.of_getSetString(sectionKey + ".MySQL.Host", "localhost");
             String database = datei.of_getSetString(sectionKey + ".MySQL.Database", "database");
             String username = datei.of_getSetString(sectionKey + ".MySQL.Username", "user");
@@ -153,8 +154,7 @@ public class Settings extends Objekt
     @Override
     public void of_unload()
     {
-
-
+        main.SPIELERSERVICE.of_unload();
 
         //  Nach dem SpielerService etc.
         if(of_isUsingMySQL() && main.SQL.of_isConnected())
@@ -174,8 +174,8 @@ public class Settings extends Objekt
     public void of_initSystemServices()
     {
         //  Initalisierung von Objekten:
-
-
+        main.SPIELERSERVICE = new SpielerService();
+        main.SPIELERSERVICE.of_load();
 
         //	Im Anschluss schauen, ob noch andere Komponenten gefordert sind und ob diese zur Verfügung stehen.
         of_checkExternComponents();

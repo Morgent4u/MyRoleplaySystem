@@ -3,6 +3,7 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,6 +29,7 @@ public class main extends JavaPlugin
     public static Plugin PLUGIN;
     public static MySQL SQL;
     public static Settings SETTINGS;
+    public static SpielerService SPIELERSERVICE;
 
     /* ************************* */
     /* ENABLE */
