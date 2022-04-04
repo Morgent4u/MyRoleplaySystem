@@ -4,6 +4,7 @@
 -- Last updates:
 -- 2022-04-02: Added create database and table functions.
 -- 2022-04-02: Tested the current script.
+-- 2022-04-04: Added UPDv22.1.0.02. Added new column for the table mrs_user.
 
 ----------------------------------------------------------------
 
