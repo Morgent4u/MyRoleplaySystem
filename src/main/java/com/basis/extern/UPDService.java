@@ -233,8 +233,6 @@ public class UPDService extends Objekt
         return 0;
     }
 
-    //  TODO: Automatisches eintragen dieser Plugin-Version in die DB! So wie ein erneuter Test!
-
     private void of_updateDatabaseVersion()
     {
         //  Update the database version...

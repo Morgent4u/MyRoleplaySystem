@@ -29,8 +29,7 @@ public class SpielerContext extends Objekt
 
     /**
      * This function registers a player to this plugin.
-     * The player data will be load by using the database or the
-     * file-system.
+     * The player data will be load by using the database.
      * @param p Player instance.
      */
     public void of_loadPlayer(Player p)
@@ -73,6 +72,24 @@ public class SpielerContext extends Objekt
 
             ps.of_setObjectId(dbId);
             players.put(p.getName(), ps);
+        }
+    }
+
+    /* ************************************* */
+    /* UNLOADER */
+    /* ************************************* */
+
+    /**
+     * This function saves the player instance into the database and removes the player form the
+     * player-list.
+     * @param ps Player instance.
+     */
+    public void of_unloadPlayer(Spieler ps)
+    {
+        if(ps != null)
+        {
+            of_savePlayer(ps);
+            players.remove(ps.of_getName());
         }
     }
 
