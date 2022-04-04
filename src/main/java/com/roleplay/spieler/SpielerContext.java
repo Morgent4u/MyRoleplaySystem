@@ -24,12 +24,6 @@ public class SpielerContext extends Objekt
     private HashMap<String, Spieler> players = new HashMap<String, Spieler>();
 
     /* ************************************* */
-    /* CONSTRUCTOR */
-    /* ************************************* */
-
-    public SpielerContext() { }
-
-    /* ************************************* */
     /* LOADER */
     /* ************************************* */
 

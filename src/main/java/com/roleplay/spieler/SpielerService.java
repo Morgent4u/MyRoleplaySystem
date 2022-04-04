@@ -25,12 +25,6 @@ public class SpielerService extends Objekt
     public SpielerContext _CONTEXT;
 
     /* ************************************* */
-    /* CONSTRUCTOR */
-    /* ************************************* */
-
-    public SpielerService() { }
-
-    /* ************************************* */
     /* LOADER // UNLOADER */
     /* ************************************* */
 

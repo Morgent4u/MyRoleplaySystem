@@ -165,6 +165,8 @@ public class UPDService extends Objekt
     {
         if(sqlStatements.size() != 0)
         {
+            //  SQL-StatementSize anheben, da das Aktualisieren der DB auch als ein SQL-UPD gewertet wird!
+            sqlStatementSize++;
             int currentUPDVersionNumber = -1;
             int executedSQLCounter = 0;
             boolean executeCurrentStatement = false;
@@ -176,13 +178,13 @@ public class UPDService extends Objekt
             {
                 //  Derzeitiges SQL-Statement ermitteln...
                 //  UPD-Version wurde ermittelt.. schauen ob die dazugehörigen
-                //  SQL-Statements ausgeführt werde müssen...
+                //  SQL-Statements ausgeführt werden müssen...
                 if (sql.startsWith("-- UPDv="))
                 {
                     executeCurrentStatement = false;
                     currentUPDVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
 
-                    if (currentUPDVersionNumber != -1 && currentUPDVersionNumber >= lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
+                    if (currentUPDVersionNumber != -1 && currentUPDVersionNumber > lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
                     {
                         executeCurrentStatement = true;
                     }
@@ -213,11 +215,17 @@ public class UPDService extends Objekt
                 }
             }
 
+            //  Datenbank-Version aktualisieren.
+            executedSQLCounter++;
+            of_updateDatabaseVersion();
+            of_sendMessage("SQL-Statement executed: " + executedSQLCounter + "/" + sqlStatementSize);
+
             //  Conclusion anzeigen...
             of_sendMessage("========= UPD-Service: Conclusion =========");
             of_sendMessage("SQL-Statements executed: " + sqlExecutions);
             of_sendMessage("SQL-Statements skipped: " + sqlSkipped);
             of_sendMessage("SQL-Statements errors: " + sqlErrors);
+            of_sendMessage("Database version: " + Sys.of_getVersion());
             of_sendMessage("===========================================");
             return 1;
         }
@@ -226,6 +234,14 @@ public class UPDService extends Objekt
     }
 
     //  TODO: Automatisches eintragen dieser Plugin-Version in die DB! So wie ein erneuter Test!
+
+    private void of_updateDatabaseVersion()
+    {
+        //  Update the database version...
+        String sqlUpdate = "UPDATE "+main.SQL.of_getTableNotation()+"dbversion SET dbVersion = '"+Sys.of_getVersion()+"';";
+        main.SQL.of_run_update(sqlUpdate);
+        sqlExecutions++;
+    }
 
     public void of_sendMessage(String message)
     {
@@ -250,7 +266,6 @@ public class UPDService extends Objekt
             if(sqlStatements.get(i).startsWith("-- UPDv="))
             {
                 lastIndex4UpdVVersion = i;
-                break;
             }
         }
 
@@ -259,43 +274,35 @@ public class UPDService extends Objekt
             //  Das Kennzeichen für die UPD-Version entfernen.
             String fileUpdVersion = sqlStatements.get(lastIndex4UpdVVersion).replace("-- UPDv=", "");
 
-            // Die Plugin version stimmt nicht mit dem letzten erstellten UPD überein. Demnach gibt es ein
-            // neues UPD. Jetzt nur noch schauen, ob die DB aktuell ist.
-            if(!fileUpdVersion.equals(Sys.of_getVersion()))
+            //  Check if the datbase needs to be updated.  If the database version is lower than the plugin version, the database needs to be updated.
+            String lastUPDVersion = null;
+            String sqlSelect = "SELECT dbVersion FROM "+main.SQL.of_getTableNotation()+"dbversion;";
+            String dbVersion = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
+
+            if(dbVersion != null)
             {
-                //  Es kann sein, dass das Plugin auf 2x Servern läuft und somit die DB
-                //  bereits aktualsiert wurde. Aus dem Grund überprüfen wir nun noch die
-                //  Version aus der UPD-Datei und anschließend die der DB.
-
-                String lastUPDVersion = null;
-                String sqlSelect = "SELECT dbVersion FROM "+main.SQL.of_getTableNotation()+"dbversion;";
-                String result = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
-
-                if(result != null)
+                //	Wenn die DB-Version gleich mit der PL-Verison ist, gibt es kein UPD zum einspielen!
+                if(dbVersion.equals(Sys.of_getVersion()))
                 {
-                    //	Wenn die DB-Version gleich mit der PL-Verison ist, gibt es kein UPD zum einspielen!
-                    if(result.equals(Sys.of_getVersion()))
-                    {
-                        return false;
-                    }
-                    //	Letzte UPD-Version...
-                    else
-                    {
-                        lastUPDVersion = result;
-                    }
+                    return false;
                 }
-                //	Grund-Version...
+                //	Letzte UPD-Version...
                 else
                 {
-                    lastUPDVersion = "22.1.0.00";
+                    lastUPDVersion = dbVersion;
                 }
-
-                //  Okay UPD muss eingespielt werden, Grenzbereich ermitteln...
-                highestDbVersion = Sys.of_getString2Int(Sys.of_getVersion().split("\\.")[3]);
-                lowestDbVersion = Sys.of_getString2Int(lastUPDVersion.split("\\.")[3]);
-
-                return lowestDbVersion != -1 && highestDbVersion != -1 && highestDbVersion >= lowestDbVersion;
             }
+            //	Grund-Version...
+            else
+            {
+                lastUPDVersion = "22.1.0.00";
+            }
+
+            //  Okay UPD muss eingespielt werden, Grenzbereich ermitteln...
+            highestDbVersion = Sys.of_getString2Int(Sys.of_getVersion().split("\\.")[3]);
+            lowestDbVersion = Sys.of_getString2Int(lastUPDVersion.split("\\.")[3]);
+
+            return lowestDbVersion != -1 && highestDbVersion != -1 && highestDbVersion >= lowestDbVersion;
         }
 
         return false;
