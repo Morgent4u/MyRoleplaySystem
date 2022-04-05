@@ -1,6 +1,7 @@
 package com.roleplay.spieler;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -37,9 +38,18 @@ public class SpielerService extends Objekt
     {
         _CONTEXT = new SpielerContext();
 
-        for(Player p : Bukkit.getOnlinePlayers())
+        if(Bukkit.getOnlinePlayers().size() > 0)
         {
-            _CONTEXT.of_loadPlayer(p);
+            for(Player p : Bukkit.getOnlinePlayers())
+            {
+                _CONTEXT.of_loadPlayer(p);
+            }
+        }
+        //  Close database connection.
+        else
+        {
+            //  The database connection will be established when the player connects to the server!
+            main.SQL.of_closeConnection();
         }
 
         return 1;

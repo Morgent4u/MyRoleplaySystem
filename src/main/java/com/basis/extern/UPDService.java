@@ -106,6 +106,7 @@ public class UPDService extends Objekt
                 {
                     for (String sqlStmt : sqlStmts)
                     {
+                        //  Wenn es ein UPD-Version-Kennzeichen ist...
                         if(sqlStmt.contains(flagPattern))
                         {
                             String[] splitSQLParts = sqlStmt.split(flagPattern);

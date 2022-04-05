@@ -34,8 +34,17 @@ public class SpielerContext extends Objekt
      */
     public void of_loadPlayer(Player p)
     {
+        //  Check if the player is already registered.
         if(!players.containsKey(p.getName()))
         {
+            // Check the player count.
+            if(players.size() == 0 && !main.SQL.of_isConnected())
+            {
+                //  Connect to the database.
+                main.SQL.of_createConnection();
+            }
+
+            //  Create a new player instance.
             Spieler ps = new Spieler(p);
             String uuid = p.getUniqueId().toString();
             int dbId = -1;
@@ -90,6 +99,13 @@ public class SpielerContext extends Objekt
         {
             of_savePlayer(ps);
             players.remove(ps.of_getName());
+
+            //  Check player count.
+            if(players.size() == 0)
+            {
+                //  Disconnect from the database.
+                main.SQL.of_closeConnection();
+            }
         }
     }
 

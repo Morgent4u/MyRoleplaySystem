@@ -3,6 +3,8 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.events.ue_spieler;
+import com.roleplay.extern.Vault;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -30,6 +32,7 @@ public class main extends JavaPlugin
     public static MySQL SQL;
     public static Settings SETTINGS;
     public static SpielerService SPIELERSERVICE;
+    public static Vault VAULT;
 
     /* ************************* */
     /* ENABLE */
@@ -63,12 +66,21 @@ public class main extends JavaPlugin
             if(rc == 1)
             {
                 //	Event und Befehle anmelden...
+                Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
-                SETTINGS.of_initSystemServices();
+                rc = SETTINGS.of_initSystemServices();
 
-                //	Statusbericht an die Konsole:
-                SETTINGS.of_printStatusReport2Console();
+                if(rc == 1)
+                {
+                    //	Statusbericht an die Konsole:
+                    SETTINGS.of_printStatusReport2Console();
+                }
+                else
+                {
+                    Sys.of_sendWarningMessage("System has been disabled by the plugin. A required function or object is missing!");
+                    Bukkit.getPluginManager().disablePlugin(this);
+                }
             }
             else
             {

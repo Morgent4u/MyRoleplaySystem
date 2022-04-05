@@ -5,6 +5,7 @@ import com.basis.extern.MySQL;
 import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.extern.Vault;
 import com.roleplay.spieler.SpielerService;
 
 /**
@@ -24,8 +25,14 @@ public class Settings extends Objekt
 
     String sectionKey;
 
+    //  Dependencies:
     boolean ib_usePlugin;
     boolean ib_useMySQL;
+    boolean ib_useVault;
+    boolean ib_usePlaceholderApi;
+
+    //  Setting-Attributes:
+    boolean ib_useVaultMoney;
 
     /* ************************* */
     /* CONSTRUCTOR */
@@ -61,7 +68,7 @@ public class Settings extends Objekt
         if(ib_usePlugin)
         {
             //  Einstellungen einlesen...
-
+            ib_useVaultMoney = datei.of_getSetBoolean(sectionKey + ".Vault.MoneySystem", true);
 
             //	MySQL-Attribute einlesen:
             ib_useMySQL = true;
@@ -94,7 +101,7 @@ public class Settings extends Objekt
                 {
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - Connected.");
 
-                    //  Überprüfen ob es eine neues UPD gibt, welches eingespielt werden muss...
+                    //  Überprüfen ob es ein neues UPD gibt, welches eingespielt werden muss...
                     UPDService updSrv = new UPDService(Sys.of_getMainFilePath());
 
                     //  1 = UPD-File geladen und gefunden. -1 = keine UPD-File gefunden.
@@ -170,25 +177,46 @@ public class Settings extends Objekt
     /**
      * This function initializes objects which are defined in the
      * main.java class.
+     * @return 1 = success, -1 = failure
      */
-    public void of_initSystemServices()
+    public int of_initSystemServices()
     {
-        //  Initalisierung von Objekten:
-        main.SPIELERSERVICE = new SpielerService();
-        main.SPIELERSERVICE.of_load();
+        //  Check for the required components before registering own services.
+        int rc = of_checkExternComponents();
 
-        //	Im Anschluss schauen, ob noch andere Komponenten gefordert sind und ob diese zur Verfügung stehen.
-        of_checkExternComponents();
+        if(rc == 1)
+        {
+            //  Initializes own services.
+            main.SPIELERSERVICE = new SpielerService();
+            main.SPIELERSERVICE.of_load();
+            return 1;
+        }
+
+        return -1;
     }
 
     /**
      * This function checks while start up if
-     * required or softdepends plugins are on this server.
+     * required or soft depends plugins are on this server.
+     * @return 1 = success, 0 = failure
      */
-    public void of_checkExternComponents()
+    public int of_checkExternComponents()
     {
-        //  Example: ib_vault = Sys.of_check4SpecificPluginOnServer("Plugin");
-        boolean bool = Sys.of_check4SpecificPluginOnServer("Vault");
+        //  If vault is not on the server then stop the process.
+        ib_useVault = Sys.of_check4SpecificPluginOnServer("Vault");
+
+        if(of_isUsingVault())
+        {
+            // Initialize Vault:
+            main.VAULT = new Vault();
+            main.VAULT.of_load();
+
+            //  Check for soft depends on plugins.
+            ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
+            return 1;
+        }
+
+        return -1;
     }
 
     /**
@@ -223,6 +251,9 @@ public class Settings extends Objekt
         {
             Sys.of_sendMessage("MySQL-Connected: "+main.SQL.of_isConnected());
         }
+        Sys.of_sendMessage("Vault-Enabled: "+of_isUsingVault());
+        Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
+        Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
     }
 
@@ -265,5 +296,20 @@ public class Settings extends Objekt
     public boolean of_isUsingMySQL()
     {
         return ib_useMySQL;
+    }
+
+    public boolean of_isUsingVault()
+    {
+        return ib_useVault;
+    }
+
+    public boolean of_isUsingPlaceholderAPI()
+    {
+        return ib_usePlaceholderApi;
+    }
+
+    public boolean of_isUsingVaultMoneySystem()
+    {
+        return ib_useVaultMoney;
     }
 }
