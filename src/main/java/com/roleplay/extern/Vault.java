@@ -17,13 +17,17 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 public class Vault extends Objekt
 {
     //  Attributes:
-    public static Permission PERMISSIONS;
+    public Permission PERMISSIONS;
     public Economy ECONOMY;
 
     /* ************************************* */
     /* LOADER */
     /* ************************************* */
 
+    /**
+     * This function is used to register all required components for this plugin.
+     * @return 1 if everything is registered, 0 if not.
+     */
     @Override
     public int of_load()
     {
