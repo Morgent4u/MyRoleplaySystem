@@ -150,6 +150,36 @@ public class Datei
      * If the configKey is not set the defaultValue will be set and also returned.
      * If the the configKey is already set, the value will be returned.
      * @param configKey Section in the .YML-File.
+     * @param defaultValue Default value which will be used as initialize value for the given section.
+     * @return The value in the configKey or the defaultValue if the configKey is not given.
+     */
+    public double of_getSetDouble(String configKey, double defaultValue)
+    {
+        double tmpValue = -1;
+
+        if(cfg.isSet(configKey))
+        {
+            tmpValue = Sys.of_getString2Int(cfg.getString(configKey));
+
+            if(tmpValue == -1)
+            {
+                tmpValue = defaultValue;
+            }
+        }
+        else
+        {
+            cfg.set(configKey, defaultValue);
+            tmpValue = defaultValue;
+        }
+
+        return tmpValue;
+    }
+
+    /**
+     * This function checks if the current configKey is already set.
+     * If the configKey is not set the defaultValue will be set and also returned.
+     * If the the configKey is already set, the value will be returned.
+     * @param configKey Section in the .YML-File.
      * @param defaultBool Default value which will be used as initialize value for the given section.
      * @return The value in the configKey or the defaultValue if the configKey is not given.
      */

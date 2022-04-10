@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.basis.utils.Datei;
 import org.bukkit.entity.Player;
 
 /**
@@ -37,47 +38,96 @@ public class SpielerContext extends Objekt
         //  Check if the player is already registered.
         if(!players.containsKey(p.getName()))
         {
-            // Check the player count.
-            if(players.size() == 0 && !main.SQL.of_isConnected())
-            {
-                //  Connect to the database.
-                main.SQL.of_createConnection();
-            }
-
             //  Create a new player instance.
             Spieler ps = new Spieler(p);
             String uuid = p.getUniqueId().toString();
-            int dbId = -1;
+            int dbId = players.size() + 1;
+            int rangId = -1;
+            int jobId = -1;
+            double moneyATM = -1;
+            double moneyCash = -1;
 
-            //	Gibt es den Spieler bereits?
-            String sqlStatement = "SELECT user FROM mrs_user WHERE uuid = '"+uuid+"';";
-            dbId = Sys.of_getString2Int(main.SQL.of_getRowValue_suppress(sqlStatement, "user"));
-
-            if(dbId == -1)
+            if(main.SETTINGS.of_isUsingMySQL())
             {
-                //  Create new database user.
-                dbId = of_createNewPlayerEntry2Database(p);
+                // Check the player count.
+                if(players.size() == 0 && !main.SQL.of_isConnected())
+                {
+                    //  Connect to the database.
+                    main.SQL.of_createConnection();
+                }
+
+                //	Gibt es den Spieler bereits?
+                String sqlStatement = "SELECT user FROM mrs_user WHERE uuid = '"+uuid+"';";
+                dbId = Sys.of_getString2Int(main.SQL.of_getRowValue_suppress(sqlStatement, "user"));
+
+                if(dbId == -1)
+                {
+                    //  Create new database user.
+                    dbId = of_createNewPlayerEntry2Database(p);
+                    ps.of_setHasPlayedBefore(false);
+                }
+
+                //  Load player data via. database request.
+                if(dbId != -1)
+                {
+                    String sqlSelect = "SELECT * FROM mrs_user WHERE user = "+dbId+";";
+                    ResultSet result = main.SQL.of_getResultSet_suppress(sqlSelect, true);
+
+                    try
+                    {
+                        //  Set data from the ResultSet to the player instance.
+                        rangId = result.getInt("rang");
+                        jobId = result.getInt("job");
+                        moneyATM = result.getDouble("money");
+                        moneyCash = result.getDouble("atm");
+                    }
+                    catch (Exception e)
+                    {
+                        of_sendErrorMessage(e, "SpielerContext.of_loadPlayer(Player);", "Error while loading the player data from the database.");
+                    }
+                }
+                //  Switch to the file-system.
+                else
+                {
+                    // Disable the MySQL connection and switch to the file-system.
+                    main.SETTINGS.of_setUseMySQL(false);
+
+                    if(main.SQL != null && main.SQL.of_isConnected())
+                    {
+                        main.SQL.of_closeConnection();
+                        main.SQL = null;
+                    }
+
+                    //  File-System...
+                    of_loadPlayer(p);
+                }
+            }
+            else
+            {
+                //  File-System...
+                Datei user = new Datei(Sys.of_getMainFilePath() + "userdata//" + uuid + ".yml");
+
+                //  Set playerHasPlayedBefore state.
+                if(!user.of_fileExists())
+                {
+                    ps.of_setHasPlayedBefore(false);
+                }
+
+                String sectionKey = "System";
+                rangId = user.of_getSetInt(sectionKey + ".RangId", 999);
+                jobId = user.of_getSetInt(sectionKey + ".JobId", 999);
+
+                //  TODO: Read the default ATM-Value and default CASH-Value from the config.
+                sectionKey = "Player";
+                moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", 999);
+                moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", 999);
             }
 
-            //  Load player data via. database request.
-            if(dbId != -1)
-            {
-                String sqlSelect = "SELECT * FROM mrs_user WHERE user = "+dbId+";";
-                ResultSet result = main.SQL.of_getResultSet_suppress(sqlSelect, true);
-
-                try
-                {
-                    //  Set data from the ResultSet to the player instance.
-                    ps.of_setRangId(result.getInt("rang"));
-                    ps.of_setJobId(result.getInt("job"));
-                    ps.of_setMoneyATM(result.getInt("money"));
-                    ps.of_setMoneyCash(result.getInt("atm"));
-                }
-                catch (Exception e)
-                {
-                    of_sendErrorMessage(e, "SpielerContext.of_loadPlayer(Player);", "Error while loading the player data from the database.");
-                }
-            }
+            //  Set player data to the player instance.
+            ps.of_setRangId(rangId);
+            ps.of_setJobId(jobId);
+            ps.of_setMoneyATM(moneyATM);
+            ps.of_setMoneyCash(moneyCash);
 
             ps.of_setObjectId(dbId);
             players.put(p.getName(), ps);

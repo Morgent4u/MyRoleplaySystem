@@ -33,6 +33,8 @@ public class Settings extends Objekt
 
     //  Setting-Attributes:
     boolean ib_useVaultMoney;
+    double moneyDefaultATM = 0;
+    double moneyDefaultCash = 0;
 
     /* ************************* */
     /* CONSTRUCTOR */
@@ -68,14 +70,22 @@ public class Settings extends Objekt
         if(ib_usePlugin)
         {
             //  Einstellungen einlesen...
-            ib_useVaultMoney = datei.of_getSetBoolean(sectionKey + ".Vault.MoneySystem", true);
+            String apiSection = sectionKey + ".API.";
+            ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", true);
+            ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
+
+            //  Money-Section:
+            String rpSection = sectionKey + ".RolePlay.";
+            moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
+            moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
 
             //	MySQL-Attribute einlesen:
-            ib_useMySQL = true;
-            String hostName = datei.of_getSetString(sectionKey + ".MySQL.Host", "localhost");
-            String database = datei.of_getSetString(sectionKey + ".MySQL.Database", "database");
-            String username = datei.of_getSetString(sectionKey + ".MySQL.Username", "user");
-            String password = datei.of_getSetString(sectionKey + ".MySQL.Password", "pwd");
+            String externalSection = sectionKey + "External.";
+            ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
+            String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");
+            String database = datei.of_getSetString(externalSection + "MySQL.Database", "database");
+            String username = datei.of_getSetString(externalSection + "MySQL.Username", "user");
+            String password = datei.of_getSetString(externalSection + "MySQL.Password", "pwd");
 
             //  Speichern der Einstellungen.
             datei.of_save("Settings.of_load();");
@@ -161,10 +171,13 @@ public class Settings extends Objekt
     @Override
     public void of_unload()
     {
-        main.SPIELERSERVICE.of_unload();
+        if(main.SPIELERSERVICE != null)
+        {
+            main.SPIELERSERVICE.of_unload();
+        }
 
         //  Nach dem SpielerService etc.
-        if(of_isUsingMySQL() && main.SQL.of_isConnected())
+        if(main.SQL != null && of_isUsingMySQL() && main.SQL.of_isConnected())
         {
             main.SQL.of_closeConnection();
         }
@@ -211,9 +224,13 @@ public class Settings extends Objekt
             main.VAULT = new Vault();
             main.VAULT.of_load();
 
-            //  Check for soft depends on plugins.
-            ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
-            return 1;
+            //  If no error occurred we can check for the soft dependencies.
+            if(!main.VAULT.of_hasAnError())
+            {
+                //  Check for soft depends on plugins.
+                ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
+                return 1;
+            }
         }
 
         return -1;

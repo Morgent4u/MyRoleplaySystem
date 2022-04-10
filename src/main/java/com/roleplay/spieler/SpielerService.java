@@ -46,7 +46,7 @@ public class SpielerService extends Objekt
             }
         }
         //  Close database connection.
-        else
+        else if(main.SETTINGS.of_isUsingMySQL() && main.SQL != null && main.SQL.of_isConnected())
         {
             //  The database connection will be established when the player connects to the server!
             main.SQL.of_closeConnection();
@@ -76,6 +76,77 @@ public class SpielerService extends Objekt
     /* ************************************* */
     /* OBJEKT-ANWEISUNGEN */
     /* ************************************* */
+
+    /**
+     * This function is used to add or remove player atm/cash money.
+     * In case that money will be removed from the player and the player does not have enough money,
+     * the function will return false.
+     * @param ps Player instance.
+     * @param moneyType The money-type for example: 'ATM' or 'CASH'.
+     * @param removeAdd The operation for example: 'REMOVE' or 'ADD'.
+     * @param moneyAmount The amount of money which will be added or removed.
+     * @return TRUE if the operation was successful, FALSE if not.
+     */
+    public boolean of_editPlayerMoney(Spieler ps, String moneyType, String removeAdd, int moneyAmount)
+    {
+        //  Check if money-amount is given.
+        if(moneyAmount > 0)
+        {
+            boolean lb_continue = true;
+            moneyType = moneyType.toLowerCase();
+            removeAdd = removeAdd.toLowerCase();
+
+            switch (moneyType)
+            {
+                case "atm":
+                    //  Money-type need to be set to send a message to the player with the money-type.
+                    ps.of_setMoneyType(1);
+
+                    if(removeAdd.equals("remove"))
+                    {
+                        if(ps.of_getMoneyATM() >= moneyAmount)
+                        {
+                            ps.of_setMoneyATM(ps.of_getMoneyATM() - moneyAmount);
+                        }
+                        //  Set the money difference to the player.
+                        else
+                        {
+                            ps.of_setMoneyDiff(moneyAmount - ps.of_getMoneyATM());
+                            lb_continue = false;
+                        }
+                    }
+                    else if(removeAdd.equals("add"))
+                    {
+                        ps.of_setMoneyATM(ps.of_getMoneyATM() + moneyAmount);
+                    }
+                case "cash":
+                    //  Money-type need to be set to send a message to the player with the money-type.
+                    ps.of_setMoneyType(0);
+
+                    if(removeAdd.equals("remove"))
+                    {
+                        if(ps.of_getMoneyCash() >= moneyAmount)
+                        {
+                            ps.of_setMoneyCash(ps.of_getMoneyCash() - moneyAmount);
+                        }
+                        //  Set the money difference to the player.
+                        else
+                        {
+                            ps.of_setMoneyDiff(moneyAmount - ps.of_getMoneyCash());
+                            lb_continue = false;
+                        }
+                    }
+                    else if(removeAdd.equals("add"))
+                    {
+                        ps.of_setMoneyCash(ps.of_getMoneyCash() + moneyAmount);
+                    }
+            }
+
+            return lb_continue;
+        }
+
+        return false;
+    }
 
     /**
      * This function sends an interactive-chat message to the player.

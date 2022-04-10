@@ -1,6 +1,7 @@
 package com.roleplay.spieler;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import org.bukkit.entity.Player;
 
 /**
@@ -19,16 +20,20 @@ public class Spieler extends Objekt
     //	Default-Attribute:
     String name;
     String uuid;
-    String moneyType;
 
     int rangId;
     int jobId;
 
     //  Money-Attribute:
-    int moneyCash;
-    int moneyATM;
-    int moneyDiff;
+    double moneyCash;
+    double moneyATM;
+    double moneyDiff;
+    //  1 = ATM, 0 = CASH
+    int moneyType;
     int dbIdOtherPlayer;
+
+    boolean ib_playedBefore = true;
+    boolean ib_newbie;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -64,22 +69,22 @@ public class Spieler extends Objekt
         this.uuid = uuid;
     }
 
-    public void of_setMoneyCash(int moneyCash)
+    public void of_setMoneyCash(double moneyCash)
     {
         this.moneyCash = moneyCash;
     }
 
-    public void of_setMoneyATM(int moneyATM)
+    public void of_setMoneyATM(double moneyATM)
     {
         this.moneyATM = moneyATM;
     }
 
-    public void of_setMoneyDiff(int moneyDiff)
+    public void of_setMoneyDiff(double moneyDiff)
     {
         this.moneyDiff = moneyDiff;
     }
 
-    public void of_setMoneyType(String moneyType)
+    public void of_setMoneyType(int moneyType)
     {
         this.moneyType = moneyType;
     }
@@ -97,6 +102,16 @@ public class Spieler extends Objekt
     public void of_setJobId(int jobId)
     {
         this.jobId = jobId;
+    }
+
+    public void of_setHasPlayedBefore(boolean playedBefore)
+    {
+        this.ib_playedBefore = playedBefore;
+    }
+
+    public void of_setIsNewbie(boolean newbie)
+    {
+        this.ib_newbie = newbie;
     }
 
     /* ************************************* */
@@ -123,22 +138,34 @@ public class Spieler extends Objekt
         return uuid;
     }
 
-    public int of_getMoneyCash()
+    public double of_getMoneyCash()
     {
+        //  TODO: Check what is used for vault!
+        if(main.SETTINGS.of_isUsingVaultMoneySystem())
+        {
+            return main.VAULT.ECONOMY.getBalance(p);
+        }
+
         return moneyCash;
     }
 
-    public int of_getMoneyATM()
+    public double of_getMoneyATM()
     {
+        //  TODO: Check what is used for vault!
+        if(main.SETTINGS.of_isUsingVaultMoneySystem())
+        {
+            return main.VAULT.ECONOMY.getBalance(p);
+        }
+
         return moneyATM;
     }
 
-    public int of_getMoneyDiff()
+    public double of_getMoneyDiff()
     {
         return moneyDiff;
     }
 
-    public String of_getMoneyType()
+    public int of_getMoneyType()
     {
         return moneyType;
     }
@@ -161,4 +188,14 @@ public class Spieler extends Objekt
     /* ************************************* */
     /* BOOLS */
     /* ************************************* */
+
+    public boolean of_hasPlayedBefore()
+    {
+        return ib_playedBefore;
+    }
+
+    public boolean of_isNewbie()
+    {
+        return ib_newbie;
+    }
 }
