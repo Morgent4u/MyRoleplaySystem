@@ -6,6 +6,7 @@ import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.extern.Vault;
+import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
 
 /**
@@ -202,6 +203,10 @@ public class Settings extends Objekt
             //  Initializes own services.
             main.SPIELERSERVICE = new SpielerService();
             main.SPIELERSERVICE.of_load();
+
+            main.INVENTARSERVICE = new InventarService();
+            main.INVENTARSERVICE.of_load();
+
             return 1;
         }
 

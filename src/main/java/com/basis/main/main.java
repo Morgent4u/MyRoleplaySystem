@@ -5,6 +5,7 @@ import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.Vault;
+import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -31,8 +32,9 @@ public class main extends JavaPlugin
     public static Plugin PLUGIN;
     public static MySQL SQL;
     public static Settings SETTINGS;
-    public static SpielerService SPIELERSERVICE;
     public static Vault VAULT;
+    public static SpielerService SPIELERSERVICE;
+    public static InventarService INVENTARSERVICE;
 
     /* ************************* */
     /* ENABLE */

@@ -18,7 +18,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Datei
 {
     private File file;
-    private YamlConfiguration cfg;
+    public YamlConfiguration cfg;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -299,21 +299,21 @@ public class Datei
     /**
      * This function is used to save the current file.
      * @param invoker Invoker name or system area which calls this function.
+     * @return 1 if the file was saved successfully, otherwise -1.
      */
-    public void of_save(String invoker)
+    public int of_save(String invoker)
     {
-        //	RC:
-        //	 1: OK
-        //	-1: Fehler
-
         try
         {
             cfg.save(file);
+            return 1;
         }
         catch (Exception e)
         {
             Sys.of_sendErrorMessage(e, "Datei", "of_save(String)", "Error while saving the file!");
         }
+
+        return -1;
     }
 
     /* ************************************* */
@@ -507,6 +507,16 @@ public class Datei
     public YamlConfiguration of_getConfig()
     {
         return cfg;
+    }
+
+    public String of_getFileName()
+    {
+        if(file != null)
+        {
+            return file.getName();
+        }
+
+        return "NoFileName";
     }
 
     /* ************************************* */
