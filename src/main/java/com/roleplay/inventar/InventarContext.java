@@ -2,6 +2,7 @@ package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
 import com.basis.sys.Sys;
+import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -43,6 +44,10 @@ public class InventarContext extends Objekt
 
         return 1;
     }
+
+    /* ************************************* */
+    /* OBJEKT ANWEISUNGEN */
+    /* ************************************* */
 
     /**
      * This function loads an inventory from a file.
@@ -118,7 +123,10 @@ public class InventarContext extends Objekt
             }
         }
 
-        return -1;
+        //  Add the inventory to the inventar-context (inventories).
+        inventar.of_setObjectId(inventories.size() + 1);
+        inventories.put(inventar.of_getObjectId(), inventar);
+        return 1;
     }
 
     /**
@@ -182,4 +190,14 @@ public class InventarContext extends Objekt
 
         return -1;
     }
+
+    /* ************************************* */
+    /* GETTER */
+    /* ************************************* */
+
+    public Inventar of_getInv(int invId)
+    {
+       return inventories.get(invId);
+    }
+
 }

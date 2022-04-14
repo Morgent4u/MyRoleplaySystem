@@ -25,6 +25,18 @@ import java.util.List;
  */
 public class InventarService extends Objekt
 {
+    public InventarContext _CONTEXT;
+
+    /* ************************************* */
+    /* CONSTRUCTOR */
+    /* ************************************* */
+
+    public InventarService()
+    {
+        _CONTEXT = new InventarContext();
+        _CONTEXT.of_load();
+    }
+
     /* ************************************* */
     /* OBJEKT - ANWEISUNGEN */
     /* ************************************* */
@@ -118,7 +130,7 @@ public class InventarService extends Objekt
      */
     public Inventory of_copyInv(Inventory inv, String invTitle)
     {
-        Inventory tmpInv = null;
+        Inventory tmpInv;
 
         //	Sicherstellen, dass das Inv vom Typ Chest ist, da sonst SIZE nicht
         //	funktioniert.

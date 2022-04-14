@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 public class SpielerContext extends Objekt
 {
     //	Attribute:
-    private HashMap<String, Spieler> players = new HashMap<String, Spieler>();
+    private HashMap<String, Spieler> players = new HashMap<>();
 
     /* ************************************* */
     /* LOADER */
@@ -151,7 +151,7 @@ public class SpielerContext extends Objekt
             players.remove(ps.of_getName());
 
             //  Check player count.
-            if(players.size() == 0)
+            if(players.size() == 0 && main.SQL != null && main.SQL.of_isConnected())
             {
                 //  Disconnect from the database.
                 main.SQL.of_closeConnection();
@@ -207,6 +207,9 @@ public class SpielerContext extends Objekt
                     ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
 
             main.SQL.of_run_update_suppress(sqlUpdate);
+
+            // TODO: Save the player data into the file-system.
+
             return 1;
         }
 

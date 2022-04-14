@@ -16,13 +16,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class ue_spieler implements Listener
 {
     /**
-     * This event is used to interact with the player when he joins the server.
+     * This event is used to interact with the player while joining the server.
      * @param e Event instance.
      */
     @EventHandler
     public void ue_playerJoin4MRS(PlayerJoinEvent e)
     {
-        //  Load all player specific data from database and store the instance in the player-context.
+        //  Load all player specific data from database / file-system and store the instance in the player-context.
         main.SPIELERSERVICE._CONTEXT.of_loadPlayer(e.getPlayer());
     }
 

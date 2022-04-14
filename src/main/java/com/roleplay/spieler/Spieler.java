@@ -31,6 +31,7 @@ public class Spieler extends Objekt
     //  1 = ATM, 0 = CASH
     int moneyType;
     int dbIdOtherPlayer;
+    int invId;
 
     boolean ib_playedBefore = true;
     boolean ib_newbie;
@@ -114,6 +115,11 @@ public class Spieler extends Objekt
         this.ib_newbie = newbie;
     }
 
+    public void of_setInvId(int invId)
+    {
+        this.invId = invId;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -183,6 +189,11 @@ public class Spieler extends Objekt
     public int of_getJobId()
     {
     	return jobId;
+    }
+
+    public int of_getInvId()
+    {
+        return invId;
     }
 
     /* ************************************* */

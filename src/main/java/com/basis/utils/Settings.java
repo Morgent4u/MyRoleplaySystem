@@ -63,7 +63,7 @@ public class Settings extends Objekt
         //	 0: Nicht aktivieren.
         //	-1: Fehler
 
-        int rc = -1;
+        int rc;
 
         //	Settings:
         ib_usePlugin = datei.of_getSetBoolean(sectionKey + ".Enabled", true);
@@ -205,7 +205,6 @@ public class Settings extends Objekt
             main.SPIELERSERVICE.of_load();
 
             main.INVENTARSERVICE = new InventarService();
-            main.INVENTARSERVICE.of_load();
 
             return 1;
         }
