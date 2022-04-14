@@ -5,7 +5,6 @@ import com.basis.sys.Sys;
 import com.basis.utils.Datei;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -22,13 +21,13 @@ import java.util.*;
  * GitHub-CoPilot project.
  *
  */
-public class InvDatei extends Datei
+public class InventarDatei extends Datei
 {
     /* ************************************* */
     /* CONSTRUCTOR */
     /* ************************************* */
 
-    public InvDatei(String path)
+    public InventarDatei(String path)
     {
         super(path);
     }

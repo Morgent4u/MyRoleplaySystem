@@ -50,7 +50,7 @@ public class InventarContext extends Objekt
      * @param inventar The inventory to load.
      * @return 1 if the inventory was loaded successfully. -1 if the inventory was not loaded.
      */
-    public int of_loadInventoryByFile(InvDatei datei, Inventar inventar)
+    public int of_loadInventoryByFile(InventarDatei datei, Inventar inventar)
     {
         if(datei.of_fileExists())
         {
@@ -140,7 +140,7 @@ public class InventarContext extends Objekt
             int invSize = inventory.getSize();
 
             //  Create a new file.
-            InvDatei datei = new InvDatei(Sys.of_getMainFilePath() + "//" + inventoryNameNormalized);
+            InventarDatei datei = new InventarDatei(Sys.of_getMainFilePath() + "//" + inventoryNameNormalized);
             String section = "Inventory";
 
             datei.of_set(section + ".Name", inventoryName.replace("§", "&"));
