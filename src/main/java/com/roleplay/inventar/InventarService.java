@@ -66,7 +66,7 @@ public class InventarService extends Objekt
             meta.setDisplayName(displayName);
             meta.setUnbreakable(true);
             meta.setUnbreakable(true);
-            meta = main.INVENTARSERVICE.of_setDefaultAttributes2ItemMeta(meta);
+            meta = of_setDefaultAttributes2ItemMeta(meta);
 
             //  Set the lore.
             if(arrayLore != null && arrayLore.length > 0)

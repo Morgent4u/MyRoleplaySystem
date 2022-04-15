@@ -93,7 +93,7 @@ public class InventarDatei extends Datei
                     {
                         //  Get the enchantment level and the enchantment name.
                         int enchantLevel = enchants.get(enchant);
-                        String enchantmentData = enchant.getName().toString()+";"+enchantLevel;
+                        String enchantmentData = enchant.getName().toString()+","+enchantLevel;
 
                         //  Add the enchantment to the enchantData.
                         enchantData.add(enchantmentData);
@@ -101,7 +101,7 @@ public class InventarDatei extends Datei
 
                     if(!enchantData.isEmpty())
                     {
-                        of_getSetStringArrayList(configKey+".Enchantments", enchantData);
+                        of_set(configKey+".Enchantments", enchantData);
                     }
                 }
             }
@@ -161,7 +161,7 @@ public class InventarDatei extends Datei
     {
         if(cfg != null)
         {
-            if(cfg.getString(configKey) != null)
+            if(cfg.isSet(configKey))
             {
                 //  Get the material or type of the itemStack.
                 Material material = Material.getMaterial(of_getSetString(configKey+".Material", "STONE").toUpperCase());
@@ -212,7 +212,7 @@ public class InventarDatei extends Datei
                                 for(String enchant : enchants)
                                 {
                                     //  Search for specific attributes...
-                                    String[] enchantData = enchant.split(";");
+                                    String[] enchantData = enchant.split(",");
 
                                     if(enchantData.length > 0)
                                     {
@@ -237,7 +237,6 @@ public class InventarDatei extends Datei
 
                         //  Finally, set the current created meta to the itemStack and return it.
                         item.setItemMeta(meta);
-
                         return item;
                     }
                 }
@@ -245,49 +244,5 @@ public class InventarDatei extends Datei
         }
 
         return null;
-    }
-
-    /**
-     * This function is equal to of_getItemStacks2ArrayByKey(String) but you can set
-     * the amount of the itemstacks which should be return.
-     * @param configKey The config key of the itemstack.
-     * @param arraySize The size of the array which should be return.
-     * @return The array of itemstacks.
-     */
-    public ItemStack[] of_getItemStacks2ArrayByKey(String configKey, int arraySize)
-    {
-        if(cfg != null)
-        {
-            //  Get all ItemStacks which are defined for this configKey.
-            ItemStack[] items = of_getItemStacks2ArrayByKey(configKey);
-            ItemStack[] items4Return = new ItemStack[arraySize];
-
-            //  Only return the amount which is set
-            if(items != null && items.length <= arraySize)
-            {
-                System.arraycopy(items, 0, items4Return, 0, arraySize);
-                return items4Return;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * This function returns an array of ItemStack by a configKey.
-     * @param configKey The configKey of the file for the ItemStacks.
-     * @return An array of ItemStack.
-     */
-    public ItemStack[] of_getItemStacks2ArrayByKey(String configKey)
-    {
-        ItemStack[] invContent = null;
-
-        try
-        {
-            invContent = ((List<ItemStack>) (cfg.get(configKey))).toArray(new ItemStack[0]);;
-        }
-        catch (Exception ignored) { }
-
-        return invContent;
     }
 }
