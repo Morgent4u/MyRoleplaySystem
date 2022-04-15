@@ -51,8 +51,8 @@ public class MessageBoard extends Objekt
         //  Add Messages:
         //  General:
         of_addMessageOrSound2Board("General.ErrorMessage", "&fHey &a%p%&f an error occurred! Error: &c%errorMessage%");
-        of_addMessageOrSound2Board("General.NoPermissions", "&cYou don't have permissions to do that!");
-        of_addMessageOrSound2Board("General.PlayerIsNotOnline", "&fThe player &c%otherPlayer%&f, you are searching for is not online!");
+        of_addMessageOrSound2Board("General.NoPermissions", "&cYou do not have permissions to do that!");
+        of_addMessageOrSound2Board("General.PlayerIsNotOnline", "&fThe player &c%otherPlayer%&f, you are looking for is not online!");
 
         // Roleplay:
         // ....
