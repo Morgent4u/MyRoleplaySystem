@@ -25,7 +25,7 @@ public class inv_menu extends Inventar
         inv = Bukkit.createInventory(null, InventoryType.BREWING, of_getInventarName());
 
         //  Define items for the inventory.
-        inv.setItem(0, main.INVENTARSERVICE.of_createPlayerHead("dummyPlayer", "§8[§4%p%§8]", new String[]{"§fShow some", "§ainformation§f to the player."}, 1));
+        inv.setItem(3, main.INVENTARSERVICE.of_createPlayerHead("dummyPlayer", "§8[§4%p%§8]", new String[]{"§fShow some", "§ainformation§f to the player."}, 1));
         return 1;
     }
 
@@ -36,6 +36,6 @@ public class inv_menu extends Inventar
     @Override
     public void of_defineCommands4Inventory()
     {
-        of_addCommands2ItemName(0, new String[] {"CMD=showinfo"});
+        of_addCommands2ItemName(0, new String[] {"DEBUG"});
     }
 }

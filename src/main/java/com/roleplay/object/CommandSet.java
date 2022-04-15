@@ -56,7 +56,9 @@ public class CommandSet extends Objekt
         for(String command : commands)
         {
             String[] commandData = command.split("=");
-            String cmd = null;
+
+            //  This need to be an empty string.
+            String cmd = "";
 
             //  Check if the command is given.
             if(commandData.length == 2)
@@ -77,7 +79,11 @@ public class CommandSet extends Objekt
 
     private int of_executeCommand(String category, String command)
     {
-        command = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(command, ps);
+        //  Replace all player placeholder if command is given!
+        if(!command.isEmpty())
+        {
+            command = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(command, ps);
+        }
 
         switch (category)
         {
@@ -86,6 +92,9 @@ public class CommandSet extends Objekt
                 return 1;
             case "SCMD":
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                return 1;
+            case "CLOSE":
+                main.SPIELERSERVICE.of_closeInventory(ps);
                 return 1;
             case "DEBUG":
                 of_sendDebugInformation("CommandSet.of_executeCommand(); DEBUG");
@@ -119,8 +128,17 @@ public class CommandSet extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
+        Sys.of_sendMessage("Player available: "+ (ps != null));
+
+        if(ps != null)
+        {
+            Sys.of_sendMessage("Player name: "+ps.of_getPlayer().getName());
+        }
+
         if(commands != null)
         {
+            Sys.of_sendMessage("Loaded commands: "+commands.length);
+
             for(int i = 0; i< commands.length; i++)
             {
                 Sys.of_sendMessage(i+": "+commands[i]);

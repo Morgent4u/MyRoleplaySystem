@@ -64,6 +64,7 @@ public class InventarContext extends Objekt
             String invClassification = invFile.of_getSetString(section + ".Classification", "DEFAULT").toUpperCase();
             String invType = invFile.of_getSetString(section + ".Type", "CHEST").toUpperCase();
             boolean useInventoryType = !invType.contains("CHEST");
+            boolean lb_closeOnClick = invFile.of_getSetBoolean(section + ".CloseOnClick", true);
 
             //  Get the inventory-size.s
             int invSize = invFile.of_getSetInt(section + ".Size", 27);
@@ -132,6 +133,7 @@ public class InventarContext extends Objekt
                 inventar.of_setInventarName(invName);
                 inventar.of_setInventory(inventory);
                 inventar.of_setInvClassification(invClassification);
+                inventar.of_setCloseOnClickEnabled(lb_closeOnClick);
             }
             //  An error occurred. No invSlot-size was defined.
             else
@@ -194,6 +196,7 @@ public class InventarContext extends Objekt
             invFile.of_set(section + ".Size", invSize);
             invFile.of_set(section + ".Classification", inventar.of_getInvClassification());
             invFile.of_set(section + ".Type", inventory.getType().toString().toUpperCase());
+            invFile.of_set(section + ".CloseOnClick", inventar.of_isClickCloseInv());
 
             if(items.length > 0)
             {

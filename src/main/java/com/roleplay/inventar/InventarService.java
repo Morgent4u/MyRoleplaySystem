@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -197,12 +196,31 @@ public class InventarService extends Objekt
     }
 
     /**
+     * This function converts a itemStack of the type PLAYER_HEAD to a playerHead-ItemStack
+     * with the skin of the given playerName.
+     * @param item The itemStack of the type PLAYER_HEAD.
+     * @param playerName The name of the player.
+     * @return The playerHead-ItemStack.
+     */
+    public ItemStack of_convertPlayerHead2PlayerHeadWithSkin(ItemStack item, String playerName)
+    {
+        try
+        {
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            meta.setOwner(playerName);
+            item.setItemMeta(meta);
+        }
+        catch (Exception ignored){}
+
+        return item;
+    }
+
+    /**
      * This function is used to open an inventory for a player.
      * @param ps The player instance.
      * @param invId The id of the inventory.
-     * @return The inventory.
      */
-    public int of_openInvById(Spieler ps, int invId)
+    public void of_openInvById(Spieler ps, int invId)
     {
         Inventar inv = _CONTEXT.of_getInv(invId);
 
@@ -210,10 +228,7 @@ public class InventarService extends Objekt
         {
             ps.of_setInvId(invId);
             ps.of_getPlayer().openInventory(inv.of_getInv(ps));
-            return 1;
         }
-
-        return -1;
     }
 
     /* ************************************* */

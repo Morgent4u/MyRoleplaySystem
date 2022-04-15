@@ -165,4 +165,15 @@ public class SpielerService extends Objekt
         tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
         ps.of_getPlayer().spigot().sendMessage(tc);
     }
+
+    /**
+     * This function closes the inventory of the player.
+     * @param ps Player instance.
+     */
+    public void of_closeInventory(Spieler ps)
+    {
+        ps.of_setInvId(-1);
+        ps.of_getPlayer().closeInventory();
+    }
+
 }

@@ -5,10 +5,9 @@ import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.object.CommandSet;
 import com.roleplay.spieler.Spieler;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import java.util.HashMap;
 
 /**
@@ -27,6 +26,7 @@ public class Inventar extends Objekt
     String invName;
     String invClassification = "DEFAULT";
 
+    boolean ib_clickCloseInv = true;
     boolean ib_copyInv;
 
     /* ************************************* */
@@ -50,6 +50,12 @@ public class Inventar extends Objekt
                 if(items[i] != null)
                 {
                     items[i] = main.INVENTARSERVICE.of_replaceItemStackWithPlayerStats(items[i], ps);
+
+                    //  Check if the item is a player head.
+                    if(items[i].getType() == Material.PLAYER_HEAD)
+                    {
+                        items[i] = main.INVENTARSERVICE.of_convertPlayerHead2PlayerHeadWithSkin(items[i], ps.of_getPlayer().getName());
+                    }
                 }
             }
 
@@ -74,6 +80,12 @@ public class Inventar extends Objekt
         {
             //  Execute all given commands.
             new CommandSet(cmds, ps).of_executeAllCommands();
+        }
+
+        //  Closing after executing all commands.
+        if(of_isClickCloseInv())
+        {
+            main.SPIELERSERVICE.of_closeInventory(ps);
         }
     }
 
@@ -208,6 +220,11 @@ public class Inventar extends Objekt
         this.invClassification = invClassification.toUpperCase();
     }
 
+    public void of_setCloseOnClickEnabled(boolean bool)
+    {
+        this.ib_clickCloseInv = bool;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -290,4 +307,15 @@ public class Inventar extends Objekt
     {
         return ib_copyInv;
     }
+
+    /**
+     * If this option is enabled after clicking on an item in the inventory, the inventory
+     * will be closed.
+     * @return true if the inventory should be closed after clicking on an item.
+     */
+    public boolean of_isClickCloseInv()
+    {
+        return ib_clickCloseInv;
+    }
+
 }
