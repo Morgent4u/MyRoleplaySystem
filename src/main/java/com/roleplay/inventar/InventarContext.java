@@ -219,7 +219,7 @@ public class InventarContext extends Objekt
                         //  An error occurred.
                         else
                         {
-                            inventar.of_sendErrorMessage(null, "InventarContext.of_saveInventory2File();", "The item-stack could not be saved: " + inventoryName + "." + i);
+                            inventar.of_sendErrorMessage(null, "InventarContext.of_saveInventory2File();", "The item-stack could not be saved on position: " + i);
                             return -1;
                         }
                     }

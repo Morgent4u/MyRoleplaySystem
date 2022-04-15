@@ -32,6 +32,7 @@ public class Settings extends Objekt
     boolean ib_useMySQL;
     boolean ib_useVault;
     boolean ib_usePlaceholderApi;
+    boolean ib_useMenuOnSwap;
 
     //  Setting-Attributes:
     boolean ib_useVaultMoney;
@@ -80,9 +81,10 @@ public class Settings extends Objekt
             String rpSection = sectionKey + ".RolePlay.";
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
+            ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
 
             //	MySQL-Attribute einlesen:
-            String externalSection = sectionKey + "External.";
+            String externalSection = sectionKey + ".External.";
             ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
             String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");
             String database = datei.of_getSetString(externalSection + "MySQL.Database", "database");
@@ -315,6 +317,16 @@ public class Settings extends Objekt
         return datei;
     }
 
+    public double of_getDefaultMoneyATM()
+    {
+        return moneyDefaultATM;
+    }
+
+    public double of_getDefaultMoneyCash()
+    {
+        return moneyDefaultCash;
+    }
+
     /* ************************* */
     /* BOOLS */
     /* ************************* */
@@ -342,5 +354,10 @@ public class Settings extends Objekt
     public boolean of_isUsingVaultMoneySystem()
     {
         return ib_useVaultMoney;
+    }
+
+    public boolean of_isUsingMenuOnSwap()
+    {
+        return ib_useMenuOnSwap;
     }
 }

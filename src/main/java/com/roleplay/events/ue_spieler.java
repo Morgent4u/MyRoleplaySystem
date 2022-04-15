@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -43,4 +44,23 @@ public class ue_spieler implements Listener
             main.SPIELERSERVICE._CONTEXT.of_unloadPlayer(ps);
         }
     }
+
+    /**
+     * This Event is used to interact with the player when he switches the item in his hands.
+     * @param e Event instance.
+     */
+    @EventHandler
+    public void ue_playerSwapHandItem4MRS(PlayerSwapHandItemsEvent e)
+    {
+        if(main.SETTINGS.of_isUsingMenuOnSwap())
+        {
+            Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(e.getPlayer().getName());
+
+            if(ps != null)
+            {
+                main.INVENTARSERVICE.of_openInvById(ps, 1);
+            }
+        }
+    }
+
 }

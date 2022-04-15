@@ -113,14 +113,15 @@ public class SpielerContext extends Objekt
                     ps.of_setHasPlayedBefore(false);
                 }
 
+                //  Default-Stuff
                 String sectionKey = "System";
                 rangId = user.of_getSetInt(sectionKey + ".RangId", 999);
                 jobId = user.of_getSetInt(sectionKey + ".JobId", 999);
 
-                //  TODO: Read the default ATM-Value and default CASH-Value from the config.
+                //  Player-Stuff
                 sectionKey = "Player";
-                moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", 999);
-                moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", 999);
+                moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", main.SETTINGS.of_getDefaultMoneyATM());
+                moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", main.SETTINGS.of_getDefaultMoneyCash());
             }
 
             //  Set player data to the player instance.
@@ -174,7 +175,7 @@ public class SpielerContext extends Objekt
 
         if(dbId > 0)
         {
-            String sqlInsert = "INSERT INTO mrs_user (user, name, uuid, firstConnection, lastConnection) VALUES ("+dbId+", '"+p.getName()+"', '"+p.getUniqueId()+"', NOW(), NOW());";
+            String sqlInsert = "INSERT INTO mrs_user (user, name, uuid, atm, money, firstConnection, lastConnection) VALUES ("+dbId+", '"+p.getName()+"', '"+p.getUniqueId()+"', "+main.SETTINGS.of_getDefaultMoneyATM()+", "+main.SETTINGS.of_getDefaultMoneyCash()+", NOW(), NOW());";
             boolean bool = main.SQL.of_run_update(sqlInsert);
 
             if(bool)

@@ -95,8 +95,8 @@ public class MessageBoard extends Objekt
      */
     public String of_translateMessageWithPlayerStats(String message, Spieler ps)
     {
-        //  Default translation...
-        message = of_translateMessage(message);
+        //  Default translation... do not call of_translateMessage(String) here!
+        message = message.replace("&", "§");
 
         //  Player Stats:
         message = message.replace("%p%", ps.of_getPlayer().getName());
