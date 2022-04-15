@@ -3,6 +3,7 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.Vault;
@@ -36,6 +37,7 @@ public class main extends JavaPlugin
     public static Vault VAULT;
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
+    public static MessageBoard MESSAGEBOARD;
 
     /* ************************* */
     /* ENABLE */

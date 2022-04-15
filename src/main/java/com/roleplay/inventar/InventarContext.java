@@ -1,6 +1,7 @@
 package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.inventar.normal.inv_menu;
 import org.bukkit.Bukkit;
@@ -50,7 +51,6 @@ public class InventarContext extends Objekt
      */
     public void of_loadInventoryByFile(Inventar inventar)
     {
-        Sys.of_debug("Inventar: " + inventar.of_getInvClassName());
         InventarDatei invFile = new InventarDatei(Sys.of_getMainFilePath() + "//Inventories//" + inventar.of_getInvClassName());
 
         if(invFile.of_fileExists())
@@ -92,6 +92,7 @@ public class InventarContext extends Objekt
                     }
                 }
 
+                //  Create the inventory and the inventar-instance.
                 Inventory inventory;
 
                 if(useInventoryType)
@@ -112,7 +113,21 @@ public class InventarContext extends Objekt
                     inventory = Bukkit.createInventory(null, invSize, invName);
                 }
 
-                //  Create the inventory and the inventar-instance.
+                // Check if the inventory need to be a copyInv.
+                if(!inventar.of_isCopyInv())
+                {
+                    //  The inventory need to be a copyInv if one of the ItemStacks or the inventory-name contains a placeholder!
+                    boolean lb_copyInv = invName.contains("%");
+
+                    if(!lb_copyInv)
+                    {
+                        lb_copyInv = main.INVENTARSERVICE.of_itemStacksContainsPattern(itemStacks, "%");
+                    }
+
+                    //  Set the copyInv state.
+                    inventar.of_setCopyInv(lb_copyInv);
+                }
+
                 inventory.setStorageContents(itemStacks);
                 inventar.of_setInventarName(invName);
                 inventar.of_setInventory(inventory);

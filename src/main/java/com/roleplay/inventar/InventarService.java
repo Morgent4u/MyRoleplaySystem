@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Created 14.04.2022
@@ -158,6 +159,44 @@ public class InventarService extends Objekt
     }
 
     /**
+     * This function replaces the lore and displayName with the player stats.
+     * @param item The itemStack which should be updated.
+     * @param ps The player instance.
+     * @return The itemStack with the updated lore and displayName.
+     */
+    public ItemStack of_replaceItemStackWithPlayerStats(ItemStack item, Spieler ps)
+    {
+        ItemMeta meta = item.getItemMeta();
+
+        if(meta != null)
+        {
+            if(meta.hasDisplayName())
+            {
+                meta.setDisplayName(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(meta.getDisplayName(), ps));
+            }
+
+            if(meta.hasLore())
+            {
+                List<String> lore = meta.getLore();
+
+                if(lore != null && lore.size() > 0)
+                {
+                    for(int i = 0; i < lore.size(); i++)
+                    {
+                        lore.set(i, main.MESSAGEBOARD.of_translateMessageWithPlayerStats(lore.get(i), ps));
+                    }
+                }
+
+                meta.setLore(lore);
+            }
+
+            item.setItemMeta(meta);
+        }
+
+        return item;
+    }
+
+    /**
      * This function is used to open an inventory for a player.
      * @param ps The player instance.
      * @param invId The id of the inventory.
@@ -170,7 +209,7 @@ public class InventarService extends Objekt
         if(inv != null)
         {
             ps.of_setInvId(invId);
-            ps.of_getPlayer().openInventory(inv.of_getInv());
+            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
             return 1;
         }
 
@@ -198,5 +237,64 @@ public class InventarService extends Objekt
         }
 
         return null;
+    }
+
+    /* ************************************* */
+    /* BOOLS */
+    /* ************************************* */
+
+    /**
+     * This function checks if the given ItemStack is containing the given pattern.
+     * @param item The ItemStack which should be checked.
+     * @param pattern The pattern which should be checked.
+     * @return True if the ItemStack is containing the pattern, otherwise false.
+     */
+    public boolean of_itemStacksContainsPattern(ItemStack item, String pattern)
+    {
+        if(item != null && item.hasItemMeta())
+        {
+            if(Objects.requireNonNull(item.getItemMeta()).hasDisplayName())
+            {
+                if(item.getItemMeta().getDisplayName().contains(pattern))
+                {
+                    return true;
+                }
+                //  Check the lore...
+                else
+                {
+                    if(item.getItemMeta().hasLore())
+                    {
+                        for(String lore : Objects.requireNonNull(item.getItemMeta().getLore()))
+                        {
+                            if(lore.contains(pattern))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * This function is an overload function of of_itemStacksContainsPattern(ItemStack, String);
+     * @param items The ItemStack array which should be checked.
+     * @param pattern The pattern which should be checked.
+     * @return True if the ItemStacks is containing the pattern, otherwise false.
+     */
+    public boolean of_itemStacksContainsPattern(ItemStack[] items, String pattern)
+    {
+        for(ItemStack item : items)
+        {
+            if(of_itemStacksContainsPattern(item, pattern))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

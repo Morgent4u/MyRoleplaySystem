@@ -34,14 +34,27 @@ public class Inventar extends Objekt
     /* ************************************* */
 
     /**
-     * This method is used to transfer the openInventoryEvent to a specific inventory-child-instance.
-     * So every inventory-child (or inherited-class) can react differently to this event.
+     * This event is used to modify the itemStacks in the given inventory.
      * @param openedInv The inventory from this event.
      * @param ps Player instance
      */
     public void ue_openInventoryEvent(Inventory openedInv, Spieler ps)
     {
-        //  This event need to override in the child class.
+        //  If this is a copyInv inventory we need to replace the given placeholder in the itemStacks.
+        if(of_isCopyInv())
+        {
+            ItemStack[] items = openedInv.getStorageContents();
+
+            for(int i = 0; i < items.length; i++)
+            {
+                if(items[i] != null)
+                {
+                    items[i] = main.INVENTARSERVICE.of_replaceItemStackWithPlayerStats(items[i], ps);
+                }
+            }
+
+            openedInv.setStorageContents(items);
+        }
     }
 
     /**
@@ -204,14 +217,14 @@ public class Inventar extends Objekt
      * If this inventory is a copyInv-inventory the inventory will be copied.
      * @return The inventory instance.
      */
-    public Inventory of_getInv()
+    public Inventory of_getInv(Spieler ps)
     {
         Inventory localInv = inv;
 
         //  If the inventory need to be copied...
         if(of_isCopyInv())
         {
-            localInv = main.INVENTARSERVICE.of_copyInv(inv, of_getInventarName());
+            localInv = main.INVENTARSERVICE.of_copyInv(inv, main.MESSAGEBOARD.of_translateMessageWithPlayerStats(of_getInventarName(), ps));
         }
 
         return localInv;
@@ -233,6 +246,15 @@ public class Inventar extends Objekt
         }
 
         return null;
+    }
+
+    /**
+     * This function returns the inventory without checking anything.
+     * @return The inventory instance.
+     */
+    public Inventory of_getInv()
+    {
+        return inv;
     }
 
     /**

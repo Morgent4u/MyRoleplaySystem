@@ -1,6 +1,7 @@
 package com.roleplay.object;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
@@ -76,7 +77,7 @@ public class CommandSet extends Objekt
 
     private int of_executeCommand(String category, String command)
     {
-        command = of_replacePlaceholderInCommand(command);
+        command = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(command, ps);
 
         switch (category)
         {
@@ -92,25 +93,6 @@ public class CommandSet extends Objekt
         }
 
         return -1;
-    }
-
-    //  TODO: MOVE THIS FUNCTION TO THE MESSAGE_SERVICE!
-    /**
-     * This function is temporary used to replace all player specific variables in the command.
-     * @param command The command which should be replaced.
-     * @return The command with replaced variables.
-     */
-    private String of_replacePlaceholderInCommand(String command)
-    {
-        command = command.replace("%p%", ps.of_getPlayer().getName());
-        command = command.replace("%uuid%", ps.of_getUUID());
-        command = command.replace("%moneyATM%", String.valueOf(ps.of_getMoneyATM()));
-        command = command.replace("%moneyCash%", String.valueOf(ps.of_getMoneyCash()));
-        command = command.replace("%jobId%", String.valueOf(ps.of_getJobId()));
-        command = command.replace("%rangId%", String.valueOf(ps.of_getRangId()));
-        command = command.replace("%id%", String.valueOf(ps.of_getObjectId()));
-
-        return command;
     }
 
     @Override

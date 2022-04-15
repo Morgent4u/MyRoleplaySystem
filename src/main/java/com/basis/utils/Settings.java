@@ -5,6 +5,7 @@ import com.basis.extern.MySQL;
 import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
@@ -208,6 +209,9 @@ public class Settings extends Objekt
             main.INVENTARSERVICE = new InventarService();
             main.INVENTARSERVICE.of_load();
 
+            main.MESSAGEBOARD = new MessageBoard();
+            main.MESSAGEBOARD.of_load();
+
             return 1;
         }
 
@@ -279,6 +283,8 @@ public class Settings extends Objekt
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage(blue+"▶ Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
+        Sys.of_sendMessage(blue+"▶ Message-/Soundboard:"+white);
+        main.MESSAGEBOARD.of_sendDebugDetailInformation();
         Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
     }
 
