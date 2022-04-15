@@ -143,6 +143,7 @@ public class Settings extends Objekt
                 }
                 else
                 {
+                    of_setUseMySQL(false);
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - No connection.");
                 }
 

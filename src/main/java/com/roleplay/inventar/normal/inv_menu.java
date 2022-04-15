@@ -13,6 +13,10 @@ import org.bukkit.event.inventory.InventoryType;
  */
 public class inv_menu extends Inventar
 {
+    /* ************************************* */
+    /* LOADER */
+    /* ************************************* */
+
     @Override
     public int of_load()
     {
@@ -23,6 +27,10 @@ public class inv_menu extends Inventar
         inv.setItem(0, main.INVENTARSERVICE.of_createPlayerHead("dummyPlayer", "&8[&4%p%&8]", new String[]{"§fShow some", "§ainformation§f to the player."}, 1));
         return 1;
     }
+
+    /* ************************************* */
+    /* OBJECT METHODS */
+    /* ************************************* */
 
     @Override
     public void of_defineCommands4Inventory()

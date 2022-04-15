@@ -2,6 +2,7 @@ package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -154,6 +155,26 @@ public class InventarService extends Objekt
         tmpInv.setContents(inv.getContents());
 
         return tmpInv;
+    }
+
+    /**
+     * This function is used to open an inventory for a player.
+     * @param ps The player instance.
+     * @param invId The id of the inventory.
+     * @return The inventory.
+     */
+    public int of_openInvById(Spieler ps, int invId)
+    {
+        Inventar inv = _CONTEXT.of_getInv(invId);
+
+        if(inv != null)
+        {
+            ps.of_setInvId(invId);
+            ps.of_getPlayer().openInventory(inv.of_getInv());
+            return 1;
+        }
+
+        return -1;
     }
 
     /* ************************************* */

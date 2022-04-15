@@ -3,6 +3,7 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
@@ -69,6 +70,7 @@ public class main extends JavaPlugin
             {
                 //	Event und Befehle anmelden...
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
+                Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 rc = SETTINGS.of_initSystemServices();

@@ -3,6 +3,7 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.object.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -44,8 +45,9 @@ public class Inventar extends Objekt
     }
 
     /**
-     * This method is used to transfer the clickInventoryEvent to a specific inventory-child-instance.
-     * So every inventory-child (or inherited-class) can react differently to this event.
+     * This method is used to execute the commands for the inventory-slot.
+     * This method also transfers the event to the child-class so that it can be
+     * overridden in the child-class.
      * @param localInv The inventory from this event.
      * @param clickedItem The item from this event.
      * @param clickedSlot The item-slot from this event.
@@ -53,7 +55,13 @@ public class Inventar extends Objekt
      */
     public void ue_clickInventoryEvent(Inventory localInv, ItemStack clickedItem, int clickedSlot, Spieler ps)
     {
-        //  TODO: Ahnen skript die CMDs ausführen lassen....
+        String[] cmds = commands.get(clickedSlot);
+
+        if(cmds != null && cmds.length > 0)
+        {
+            //  Execute all given commands.
+            new CommandSet(cmds, ps).of_executeAllCommands();
+        }
     }
 
     /* ************************************* */
@@ -104,9 +112,9 @@ public class Inventar extends Objekt
     public void of_sendDebugDetailInformation()
     {
         Sys.of_sendMessage("Inv-Id: " + of_getObjectId());
-        Sys.of_sendMessage("InventoryName: "+of_getInventarName());
+        Sys.of_sendMessage("Inv-Name: "+of_getInventarName());
         Sys.of_sendMessage("Inv-Classification: " + of_getInvClassification());
-        Sys.of_sendMessage("CopyInv: "+of_isCopyInv());
+        Sys.of_sendMessage("Inv-Copy: "+of_isCopyInv());
 
         //  Print all commands into the console.
         if(commands != null && commands.size() > 0)

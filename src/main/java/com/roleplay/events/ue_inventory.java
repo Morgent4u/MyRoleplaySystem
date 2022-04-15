@@ -56,6 +56,7 @@ public class ue_inventory implements Listener
                 {
                     //  Trigger the click-event for the inventory-child-object.
                     inv.ue_clickInventoryEvent(e.getClickedInventory(), e.getCurrentItem(), e.getSlot(), ps);
+                    e.setCancelled(true);
                 }
             }
         }

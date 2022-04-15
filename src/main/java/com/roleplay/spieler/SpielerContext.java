@@ -151,7 +151,7 @@ public class SpielerContext extends Objekt
             players.remove(ps.of_getName());
 
             //  Check player count.
-            if(players.size() == 0 && main.SQL != null && main.SQL.of_isConnected())
+            if(players.size() == 0 && main.SETTINGS.of_isUsingMySQL())
             {
                 //  Disconnect from the database.
                 main.SQL.of_closeConnection();
@@ -174,7 +174,7 @@ public class SpielerContext extends Objekt
 
         if(dbId > 0)
         {
-            String sqlInsert = "INSERT INTO mrs_user (user, name, uuid, firstConnection, lastConnection) VALUES ("+dbId+", '"+p.getName()+"', '"+p.getUniqueId().toString()+"', NOW(), NOW());";
+            String sqlInsert = "INSERT INTO mrs_user (user, name, uuid, firstConnection, lastConnection) VALUES ("+dbId+", '"+p.getName()+"', '"+p.getUniqueId()+"', NOW(), NOW());";
             boolean bool = main.SQL.of_run_update(sqlInsert);
 
             if(bool)
@@ -197,16 +197,19 @@ public class SpielerContext extends Objekt
     {
         if(ps != null)
         {
-            //	Update-Statement:
-            String sqlUpdate = "UPDATE mrs_user SET name = '"+ps.of_getName()+"'" +
-                    ", rang = "+ ps.of_getRangId() +
-                    ", job = "+ ps.of_getJobId() +
-                    ", atm = "+ ps.of_getMoneyATM() +
-                    ", money = "+ ps.of_getMoneyCash() +
-                    ", lastConnection = NOW()" +
-                    ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
+            if(main.SETTINGS.of_isUsingMySQL())
+            {
+                //	Update-Statement:
+                String sqlUpdate = "UPDATE mrs_user SET name = '"+ps.of_getName()+"'" +
+                        ", rang = "+ ps.of_getRangId() +
+                        ", job = "+ ps.of_getJobId() +
+                        ", atm = "+ ps.of_getMoneyATM() +
+                        ", money = "+ ps.of_getMoneyCash() +
+                        ", lastConnection = NOW()" +
+                        ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
 
-            main.SQL.of_run_update_suppress(sqlUpdate);
+                main.SQL.of_run_update_suppress(sqlUpdate);
+            }
 
             // TODO: Save the player data into the file-system.
 
