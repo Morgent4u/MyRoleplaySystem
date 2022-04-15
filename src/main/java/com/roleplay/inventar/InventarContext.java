@@ -2,8 +2,9 @@ package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
 import com.basis.sys.Sys;
-import com.roleplay.spieler.Spieler;
+import com.roleplay.inventar.normal.inv_menu;
 import org.bukkit.Bukkit;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
@@ -33,14 +34,8 @@ public class InventarContext extends Objekt
     {
         //	InventoryId: 1
         //	Description:
-        //  First inventory...
-
-        /*
-        Example:
-        inv_arena_select4invite inv_select4inv = new inv_arena_select4invite();
-        Datei datei = new Datei(directory.getPath() + "//" + inv_select4inv.of_getObjektName());
-        of_loadInventoryByFile(datei, inv_select4inv);
-        */
+        //  This inventory is the default menu for every player.
+        of_loadInventoryByFile(new inv_menu());
 
         return 1;
     }
@@ -51,22 +46,27 @@ public class InventarContext extends Objekt
 
     /**
      * This function loads an inventory from a file.
-     * @param datei The file to load the inventory from.
      * @param inventar The inventory to load.
-     * @return 1 if the inventory was loaded successfully. -1 if the inventory was not loaded.
      */
-    public int of_loadInventoryByFile(InventarDatei datei, Inventar inventar)
+    public void of_loadInventoryByFile(Inventar inventar)
     {
-        if(datei.of_fileExists())
+        Sys.of_debug("Inventar: " + inventar.of_getInvClassName());
+        InventarDatei invFile = new InventarDatei(Sys.of_getMainFilePath() + "//Inventories//" + inventar.of_getInvClassName());
+
+        if(invFile.of_fileExists())
         {
             String section = "Inventory";
 
             //  Get the inventory-name.
-            String invName = datei.of_getSetString(section + ".Name", "&cNo Inventory name");
+            String invName = invFile.of_getSetString(section + ".Name", "&cNo Inventory name");
             invName = invName.replace("&", "§");
 
+            String invClassification = invFile.of_getSetString(section + ".Classification", "DEFAULT").toUpperCase();
+            String invType = invFile.of_getSetString(section + ".Type", "CHEST").toUpperCase();
+            boolean useInventoryType = !invType.contains("CHEST");
+
             //  Get the inventory-size.s
-            int invSize = datei.of_getSetInt(section + ".Size", 27);
+            int invSize = invFile.of_getSetInt(section + ".Size", 27);
 
             if(invSize > 0)
             {
@@ -76,14 +76,14 @@ public class InventarContext extends Objekt
                 //  Get the inventory-items.
                 for(int i = 0; i < invSize; i++)
                 {
-                    ItemStack item = datei.of_getItemStackByKey(section + ".Items." + i);
+                    ItemStack item = invFile.of_getItemStackByKey(section + ".Items." + i);
 
                     if(item != null)
                     {
                         itemStacks[i] = item;
 
                         //  Check if the item has a defined command-set.
-                        String[] commandSet = datei.of_getStringArrayByKey(section + ".Items." + i + ".CommandSet");
+                        String[] commandSet = invFile.of_getStringArrayByKey(section + ".Items." + i + ".CommandSet");
 
                         if(commandSet != null && commandSet.length > 0)
                         {
@@ -92,17 +92,37 @@ public class InventarContext extends Objekt
                     }
                 }
 
+                Inventory inventory;
+
+                if(useInventoryType)
+                {
+                    try
+                    {
+                        InventoryType invTypeEnum = InventoryType.valueOf(invType);
+                        inventory = Bukkit.createInventory(null, invTypeEnum, invName);
+                    }
+                    catch(Exception e)
+                    {
+                        inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The inventory type '" + invType + "' is not defined.");
+                        return;
+                    }
+                }
+                else
+                {
+                    inventory = Bukkit.createInventory(null, invSize, invName);
+                }
+
                 //  Create the inventory and the inventar-instance.
-                Inventory inventory = Bukkit.createInventory(null, invSize, invName);
                 inventory.setStorageContents(itemStacks);
                 inventar.of_setInventarName(invName);
                 inventar.of_setInventory(inventory);
+                inventar.of_setInvClassification(invClassification);
             }
             //  An error occurred. No invSlot-size was defined.
             else
             {
-                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the file-inventory: " + datei.of_getFileName());
-                return -1;
+                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the file-inventory: " + invFile.of_getFileName());
+                return;
             }
         }
         // When the file does not exist, let the inventar-instance create a predefined inventory which
@@ -113,20 +133,28 @@ public class InventarContext extends Objekt
             inventar.of_load();
             inventar.of_defineCommands4Inventory();
 
+            // Validate the inventory.
+            String errorMessage = inventar.of_validate();
+
+            if(errorMessage != null)
+            {
+                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", errorMessage);
+                return;
+            }
+
             //  After the inventory is created, save it to the file.
-            int rc = of_saveInventory2File(inventar);
+            int rc = of_saveInventory2File(invFile, inventar);
 
             if(rc != 1)
             {
-                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The file-inventory could not be saved: " + datei.of_getFileName());
-                return -1;
+                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The file-inventory could not be saved: " + invFile.of_getFileName());
+                return;
             }
         }
 
         //  Add the inventory to the inventar-context (inventories).
         inventar.of_setObjectId(inventories.size() + 1);
         inventories.put(inventar.of_getObjectId(), inventar);
-        return 1;
     }
 
     /**
@@ -134,7 +162,7 @@ public class InventarContext extends Objekt
      * @param inventar The inventory to save.
      * @return 1 if the inventory was saved successfully. -1 if the inventory was not saved.
      */
-    public int of_saveInventory2File(Inventar inventar)
+    public int of_saveInventory2File(InventarDatei invFile, Inventar inventar)
     {
         //  Check if the inventory instance is valid.
         Inventory inventory = inventar.of_getInv();
@@ -144,15 +172,13 @@ public class InventarContext extends Objekt
             // Get the inventory contents and the inventory name from the inventory instance.
             ItemStack[] items = inventory.getStorageContents();
             String inventoryName = inventar.of_getInventarName();
-            String inventoryNameNormalized = Sys.of_getNormalizedString(inventoryName).toLowerCase();
             int invSize = inventory.getSize();
 
-            //  Create a new file.
-            InventarDatei datei = new InventarDatei(Sys.of_getMainFilePath() + "//" + inventoryNameNormalized);
             String section = "Inventory";
-
-            datei.of_set(section + ".Name", inventoryName.replace("§", "&"));
-            datei.of_set(section + ".Size", invSize);
+            invFile.of_set(section + ".Name", inventoryName.replace("§", "&"));
+            invFile.of_set(section + ".Size", invSize);
+            invFile.of_set(section + ".Classification", inventar.of_getInvClassification());
+            invFile.of_set(section + ".Type", inventory.getType().toString().toUpperCase());
 
             if(items.length > 0)
             {
@@ -163,7 +189,7 @@ public class InventarContext extends Objekt
                     if(item != null)
                     {
                         //  Save the item in the file.
-                        item = datei.of_getSetItemStack(section + ".Items." + i, item);
+                        item = invFile.of_getSetItemStack(section + ".Items." + i, item);
 
                         if(item != null)
                         {
@@ -172,7 +198,7 @@ public class InventarContext extends Objekt
 
                             if(commandSet != null && commandSet.length > 0)
                             {
-                                datei.of_set(section + ".Items." + i + ".CommandSet", commandSet);
+                                invFile.of_set(section + ".Items." + i + ".CommandSet", commandSet);
                             }
                         }
                         //  An error occurred.
@@ -185,10 +211,21 @@ public class InventarContext extends Objekt
                 }
             }
 
-            return datei.of_save("InventarContext.of_saveInventory2File(); File: " + inventoryNameNormalized);
+            return invFile.of_save("InventarContext.of_saveInventory2File(); File: " + invFile.of_getFileName());
         }
 
         return -1;
+    }
+
+    /* ************************************* */
+    /* DEBUG CENTER */
+    /* ************************************* */
+
+    @Override
+    public void of_sendDebugDetailInformation()
+    {
+        //  Send the debug information.
+        Sys.of_sendMessage("Loaded inventories: " + inventories.size());
     }
 
     /* ************************************* */
@@ -199,5 +236,4 @@ public class InventarContext extends Objekt
     {
        return inventories.get(invId);
     }
-
 }

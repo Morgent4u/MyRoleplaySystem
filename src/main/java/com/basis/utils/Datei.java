@@ -50,7 +50,7 @@ public class Datei
 
     /**
      * Constructor
-     * @param file File
+     * @param file File object.
      */
     public Datei(File file)
     {

@@ -6,6 +6,8 @@ import com.basis.sys.Sys;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.HashMap;
 
 /**
@@ -18,9 +20,11 @@ import java.util.HashMap;
 public class Inventar extends Objekt
 {
     //  Integer (invSlot) - Commands to execute.
+    public Inventory inv;
+
     HashMap<Integer, String[]> commands = new HashMap<>();
-    Inventory inv;
     String invName;
+    String invClassification = "DEFAULT";
 
     boolean ib_copyInv;
 
@@ -33,29 +37,39 @@ public class Inventar extends Objekt
      * So every inventory-child (or inherited-class) can react differently to this event.
      * @param openedInv The inventory from this event.
      * @param ps Player instance
-     * @return true if the event was handled.
      */
-    public boolean ue_openInventoryEvent(Inventory openedInv, Spieler ps)
+    public void ue_openInventoryEvent(Inventory openedInv, Spieler ps)
     {
-        return false;
+        //  This event need to override in the child class.
     }
 
     /**
      * This method is used to transfer the clickInventoryEvent to a specific inventory-child-instance.
      * So every inventory-child (or inherited-class) can react differently to this event.
-     * @param e Event-Instance this is used to get more information for this method.
-     * @param openedInv The inventory from this event.
+     * @param localInv The inventory from this event.
+     * @param clickedItem The item from this event.
+     * @param clickedSlot The item-slot from this event.
      * @param ps Player instance
-     * @return true if the event was handled.
      */
-    public boolean ue_itemClickEvent(InventoryClickEvent e, Inventory openedInv, Spieler ps)
+    public void ue_clickInventoryEvent(Inventory localInv, ItemStack clickedItem, int clickedSlot, Spieler ps)
     {
-        return false;
+        //  TODO: Ahnen skript die CMDs ausführen lassen....
     }
 
     /* ************************************* */
     /* OBJEKT-ANWEISUNGEN */
     /* ************************************* */
+
+    /**
+     * This function needs to be overridden in the child class so the
+     * inventory has a predefined gui.
+     * @return 1 if the inventory is created, -1 if not.
+     */
+    @Override
+    public int of_load()
+    {
+        return super.of_load();
+    }
 
     /**
      * This method can be overridden in the inherited (child)-class to
@@ -66,6 +80,22 @@ public class Inventar extends Objekt
         //  This should be overridden in the child-class.
     }
 
+    @Override
+    public String of_validate()
+    {
+        if(invName == null)
+        {
+            return "Inventory-Name is not set.";
+        }
+
+        if(commands.size() == 0)
+        {
+            return "No commands defined.";
+        }
+
+        return null;
+    }
+
     /* ************************************* */
     /* DEBUG CENTER */
     /* ************************************* */
@@ -73,7 +103,9 @@ public class Inventar extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
+        Sys.of_sendMessage("Inv-Id: " + of_getObjectId());
         Sys.of_sendMessage("InventoryName: "+of_getInventarName());
+        Sys.of_sendMessage("Inv-Classification: " + of_getInvClassification());
         Sys.of_sendMessage("CopyInv: "+of_isCopyInv());
 
         //  Print all commands into the console.
@@ -106,17 +138,13 @@ public class Inventar extends Objekt
      * This function is used to add dynamically a command to the inventory.
      * @param invSlot The ItemName to interact with.
      * @param cmds The commands to execute.
-     * @return true if the command was added.
      */
-    public boolean of_addCommands2ItemName(int invSlot, String[] cmds)
+    public void of_addCommands2ItemName(int invSlot, String[] cmds)
     {
         if(!commands.containsKey(invSlot))
         {
             commands.put(invSlot, cmds);
-            return true;
         }
-
-        return false;
     }
 
     /**
@@ -147,6 +175,16 @@ public class Inventar extends Objekt
     public void of_setCopyInv(boolean bool)
     {
         ib_copyInv = bool;
+    }
+
+    /**
+     * This function sets the inventory-classification-type.
+     * With the inventory-classification-type an inventory can be handled differently.
+     * @param invClassification The inventory-classification-type.
+     */
+    public void of_setInvClassification(String invClassification)
+    {
+        this.invClassification = invClassification.toUpperCase();
     }
 
     /* ************************************* */
@@ -196,6 +234,16 @@ public class Inventar extends Objekt
     public String of_getInventarName()
     {
         return invName;
+    }
+
+    public String of_getInvClassification()
+    {
+        return invClassification;
+    }
+
+    public String of_getInvClassName()
+    {
+        return getClass().getSimpleName();
     }
 
     /* ************************************* */

@@ -205,6 +205,7 @@ public class Settings extends Objekt
             main.SPIELERSERVICE.of_load();
 
             main.INVENTARSERVICE = new InventarService();
+            main.INVENTARSERVICE.of_load();
 
             return 1;
         }
@@ -275,6 +276,8 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-Enabled: "+of_isUsingVault());
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
+        Sys.of_sendMessage(blue+"▶ Inventories:"+white);
+        main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
         Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
     }
 

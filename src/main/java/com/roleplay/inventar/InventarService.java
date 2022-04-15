@@ -28,13 +28,18 @@ public class InventarService extends Objekt
     public InventarContext _CONTEXT;
 
     /* ************************************* */
-    /* CONSTRUCTOR */
+    /* CONSTRUCTOR // LOADER */
     /* ************************************* */
 
     public InventarService()
     {
         _CONTEXT = new InventarContext();
-        _CONTEXT.of_load();
+    }
+
+    @Override
+    public int of_load()
+    {
+        return _CONTEXT.of_load();
     }
 
     /* ************************************* */
