@@ -1,5 +1,8 @@
 package com.roleplay.cmds;
 
+import com.basis.main.main;
+import com.roleplay.objects.TextBlock;
+import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,6 +30,13 @@ public class CMD_Test implements CommandExecutor
                 {
                     if(args.length == 0)
                     {
+                        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(p.getName());
+
+                        if(ps != null)
+                        {
+                            TextBlock textBlock = new TextBlock("txt_test", ps);
+                            textBlock.of_sendMessage2Player();
+                        }
 
                         // Do not change this!
                         p.sendMessage("§cCommand has been executed!");

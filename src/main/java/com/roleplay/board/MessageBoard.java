@@ -4,6 +4,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
+import com.roleplay.objects.TextBlock;
 import com.roleplay.spieler.Spieler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
@@ -63,7 +64,29 @@ public class MessageBoard extends Objekt
         //  Add Sounds:
         of_addMessageOrSound2Board("Sound.NoPermissions", "block.sand.fall");
 
+        //  Load TextBlocks:
+        of_loadTextBlocks();
+
         return datei.of_save("MessageBoard.of_load();");
+    }
+
+    /**
+     * This function is used to load predefined TextBlocks.
+     */
+    private void of_loadTextBlocks()
+    {
+        //  Example:
+        /*
+        TextBlock textBlock = new TextBlock("txt_test");
+        textBlock.of_addMessage2Block("§fThis is a test message.");
+        textBlock.of_addMessage2Block("§dI hope this works!");
+        textBlock.of_addInteractiveChatMessage2Block("§8[§cClick§8]§f Click me :)", "§fThis is a hover text.", "gamemode creative");
+        textBlock.of_addMessage2Block("§eLets add a new line!");
+        textBlock.of_addMessage2Block("§dI hope this works! Again!");
+        textBlock.of_addInteractiveChatMessage2Block("§8[§cClick§8]§f Click me again :)", "§fThis is a hover text.", "gamemode survival");
+        textBlock.of_addCommandSet2Block(new String[] {"DEBUG"});
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+        */
     }
 
     /* ************************* */
