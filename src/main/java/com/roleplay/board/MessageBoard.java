@@ -6,6 +6,7 @@ import com.basis.sys.Sys;
 import com.basis.utils.Datei;
 import com.roleplay.spieler.Spieler;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,6 +120,25 @@ public class MessageBoard extends Objekt
         return message;
     }
 
+    /**
+     * This function is used to play a sound to the player.
+     * @param soundKey The sound key.
+     * @param ps The player instance.
+     */
+    public void of_playSoundByKey(String soundKey, Spieler ps)
+    {
+        String sound = messages.get(soundKey);
+
+        if(sound != null && !sound.isEmpty())
+        {
+            Player p = ps.of_getPlayer();
+
+            //  Play the sound...
+            sound = sound.toLowerCase();
+            p.playSound(p.getLocation(), sound, 1, 1);
+        }
+    }
+
     /* ************************* */
     /* DEBUG CENTER */
     /* ************************* */
@@ -159,7 +179,18 @@ public class MessageBoard extends Objekt
      */
     public String of_getMessageWithPlayerStats(String messageKey, Spieler ps)
     {
-        return of_translateMessageWithPlayerStats(of_getMessage(messageKey), ps);
+        String message  = of_translateMessageWithPlayerStats(of_getMessage(messageKey), ps);
+
+        //  Check if for this message is a sound available.
+        String[] messageData = messageKey.split("\\.", 1);
+
+        //  If the parameters are correct...
+        if(messageData.length >= 2)
+        {
+            of_playSoundByKey("Sound." + messageData[1], ps);
+        }
+
+        return message;
     }
 
     /**
