@@ -1,9 +1,11 @@
 package com.roleplay.board;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
 import com.roleplay.spieler.Spieler;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,6 +108,12 @@ public class MessageBoard extends Objekt
         message = message.replace("%jobId%", String.valueOf(ps.of_getJobId()));
         message = message.replace("%rangId%", String.valueOf(ps.of_getRangId()));
         message = message.replace("%id%", String.valueOf(ps.of_getObjectId()));
+
+        //  Use the PlaceholderAPI if it's enabled...
+        if(main.SETTINGS.of_isUsingPlaceholderAPI())
+        {
+            message = PlaceholderAPI.setPlaceholders(ps.of_getPlayer(), message);
+        }
 
         return message;
     }

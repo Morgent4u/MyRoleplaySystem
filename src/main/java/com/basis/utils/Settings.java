@@ -10,7 +10,6 @@ import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
-import me.clip.placeholderapi.PlaceholderAPI;
 
 /**
  * @Created 22.03.2022
