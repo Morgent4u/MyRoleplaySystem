@@ -57,7 +57,7 @@ public class SpielerContext extends Objekt
                     main.SQL.of_createConnection();
                 }
 
-                //	Gibt es den Spieler bereits?
+                //	Does the player already exist?
                 String sqlStatement = "SELECT user FROM mrs_user WHERE uuid = '"+uuid+"';";
                 dbId = Sys.of_getString2Int(main.SQL.of_getRowValue_suppress(sqlStatement, "user"));
 
@@ -90,17 +90,12 @@ public class SpielerContext extends Objekt
                 //  Switch to the file-system.
                 else
                 {
-                    // Disable the MySQL connection and switch to the file-system.
-                    main.SETTINGS.of_setUseMySQL(false);
-
-                    if(main.SQL != null && main.SQL.of_isConnected())
-                    {
-                        main.SQL.of_closeConnection();
-                        main.SQL = null;
-                    }
+                    //  Switch to the fileSystem because of a database error.
+                    of_swap2FileSystem();
 
                     //  File-System...
                     of_loadPlayer(p);
+                    return;
                 }
             }
             else
@@ -236,7 +231,15 @@ public class SpielerContext extends Objekt
                         ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
 
                 // Error handling in the run_update function.
-                main.SQL.of_run_update(sqlUpdate);
+                boolean bool = main.SQL.of_run_update(sqlUpdate);
+
+                if(!bool)
+                {
+                    //  Switch to the fileSystem because of a database error.
+                    of_swap2FileSystem();
+                    return of_savePlayer(ps);
+                }
+
                 return 1;
             }
             //  Store player data into the file-system.
@@ -275,6 +278,21 @@ public class SpielerContext extends Objekt
     public int of_savePlayer(String playerName)
     {
         return of_savePlayer(players.get(playerName));
+    }
+
+    /**
+     * This function is used to switch to the file-system.
+     */
+    private void of_swap2FileSystem()
+    {
+        // Disable the MySQL connection and switch to the file-system.
+        main.SETTINGS.of_setUseMySQL(false);
+
+        if(main.SQL != null && main.SQL.of_isConnected())
+        {
+            main.SQL.of_closeConnection();
+            main.SQL = null;
+        }
     }
 
     /* ************************************* */
