@@ -14,7 +14,7 @@ import java.util.Map;
  * @Created 15.04.2022
  * @Author Nihar
  * @Description
- * This function is used to create predefined messages which can be
+ * This object/class is used to create predefined messages which can be
  * edited in a config-file.
  */
 public class MessageBoard extends Objekt
@@ -129,9 +129,9 @@ public class MessageBoard extends Objekt
         Sys.of_sendMessage("Loaded messages/sounds: " + messages.size());
     }
 
-    /* ************************* */
+    /* **************************** */
     /* ADDER // SETTER // REMOVER */
-    /* ************************* */
+    /* *************************** */
 
     /**
      * This function adds the given configKey and message to the file if it doesn't exist.

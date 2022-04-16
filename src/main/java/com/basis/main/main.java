@@ -4,6 +4,7 @@ import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.board.MessageBoard;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.cmds.CMD_Test;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
@@ -32,15 +33,20 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class main extends JavaPlugin
 {
-    //	Instanz-Variabeln des Systems/Plugins.
+    //	Instances of the system.
     public static Plugin PLUGIN;
+
+    //  Dependencies:
     public static MySQL SQL;
-    public static Settings SETTINGS;
     public static Vault VAULT;
+    public static ProtocolLib PROTOCOLLIB;
+
+    //  Own services/objects:
+    public static Settings SETTINGS;
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
     public static MessageBoard MESSAGEBOARD;
-    public static ProtocolLib PROTOCOLLIB;
+    public static PermissionBoard PERMISSIONBOARD;
 
     /* ************************* */
     /* ENABLE */
