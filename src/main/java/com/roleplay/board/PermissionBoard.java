@@ -3,6 +3,7 @@ package com.roleplay.board;
 import com.basis.ancestor.Objekt;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
+import com.roleplay.spieler.Spieler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,19 +71,25 @@ public class PermissionBoard extends Objekt
     }
 
     /* **************************** */
-    /* GETTER */
+    /* BOOLS */
     /* *************************** */
 
-    public String of_getPermissionByKey(String permKey)
+    public boolean of_hasPermissions(Spieler ps, String permKey)
     {
         String permission = permissions.get(permKey);
 
-        //  If the permission is not found, return the admin permission.
+        //  If the permission is not found, use the admin permission.
         if(permission == null)
         {
-            return permissions.get("General.Admin.Permission");
+            permission = permissions.get("General.Admin.Permission");
         }
 
-        return permission;
+        return ps.of_getPlayer().hasPermission(permission);
     }
+
+    public boolean of_isAdmin(Spieler ps)
+    {
+        return of_hasPermissions(ps, "General.Admin.Permission");
+    }
+
 }

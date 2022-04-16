@@ -162,6 +162,10 @@ public class SpielerService extends Objekt
         return false;
     }
 
+    /* ************************************* */
+    /* SEND METHODS */
+    /* ************************************* */
+
     /**
      * This function sends an interactive-chat message to the player.
      * @param ps Player instance.
@@ -178,6 +182,29 @@ public class SpielerService extends Objekt
         tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command));
         tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
         ps.of_getPlayer().spigot().sendMessage(tc);
+    }
+
+    /**
+     * This function sends the message to the player which is defined when the player has no permissions.
+     * @param ps Player instance.
+     */
+    public void of_sendNoPermissionsMessage(Spieler ps)
+    {
+        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.NoPermissions", ps));
+    }
+
+    /**
+     * This function sends the message to the player which is defined when an error occurs.
+     * @param ps Player instance.
+     * @param errorMessage The error message which will be displayed.
+     */
+    public void of_sendErrorMessage(Spieler ps, String errorMessage)
+    {
+        //  Send the error message to the player.
+        String message = main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.ErrorMessage", ps);
+        message = message.replace("%errorMessage%", errorMessage);
+
+        ps.of_getPlayer().sendMessage(message);
     }
 
     /**

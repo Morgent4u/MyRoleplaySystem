@@ -24,45 +24,49 @@ public class CMD_Test implements CommandExecutor
         {
             if(sender instanceof Player)
             {
-                Player p = (Player) sender;
+                Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(sender.getName());
 
-                if(p.hasPermission("mrs.cmd.test"))
+                if(ps != null)
                 {
-                    if(args.length == 0)
-                    {
-                        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(p.getName());
+                    Player p = ps.of_getPlayer();
 
-                        if(ps != null)
+                    if(main.PERMISSIONBOARD.of_isAdmin(ps))
+                    {
+                        if(args.length == 0)
                         {
                             TextBlock textBlock = new TextBlock("txt_test", ps);
                             textBlock.of_sendMessage2Player();
+
+                            // Do not change this!
+                            p.sendMessage("§cCommand has been executed!");
+                            return true;
                         }
 
-                        // Do not change this!
-                        p.sendMessage("§cCommand has been executed!");
-                        return true;
+                        String first = args[0];
+
+                        if(args.length == 1)
+                        {
+
+                            // Do not change this!
+                            p.sendMessage("§cCommand has been executed! Args: 1");
+                            return true;
+                        }
+
+                        String second = args[1];
+
+                        if(args.length == 2)
+                        {
+
+
+
+                            // Do not change this!
+                            p.sendMessage("§cCommand has been executed! Args: 2");
+                            return true;
+                        }
                     }
-
-                    String first = args[0];
-
-                    if(args.length == 1)
+                    else
                     {
-
-                        // Do not change this!
-                        p.sendMessage("§cCommand has been executed! Args: 1");
-                        return true;
-                    }
-
-                    String second = args[1];
-
-                    if(args.length == 2)
-                    {
-
-
-
-                        // Do not change this!
-                        p.sendMessage("§cCommand has been executed! Args: 2");
-                        return true;
+                        main.SPIELERSERVICE.of_sendNoPermissionsMessage(ps);
                     }
                 }
             }
