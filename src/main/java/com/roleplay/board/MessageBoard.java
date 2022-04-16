@@ -99,6 +99,7 @@ public class MessageBoard extends Objekt
     {
         //  Default translation... do not call of_translateMessage(String) here!
         message = message.replace("&", "§");
+        message = message.replace("%prefix%", prefix);
 
         //  Player Stats:
         message = message.replace("%p%", ps.of_getPlayer().getName());
