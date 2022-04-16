@@ -4,8 +4,10 @@ import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.board.MessageBoard;
+import com.roleplay.cmds.CMD_Test;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
+import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
@@ -38,6 +40,7 @@ public class main extends JavaPlugin
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
     public static MessageBoard MESSAGEBOARD;
+    public static ProtocolLib PROTOCOLLIB;
 
     /* ************************* */
     /* ENABLE */
@@ -73,6 +76,9 @@ public class main extends JavaPlugin
                 //	Event und Befehle anmelden...
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
+
+                // Befehle:
+                getCommand("Test").setExecutor(new CMD_Test());
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 rc = SETTINGS.of_initSystemServices();

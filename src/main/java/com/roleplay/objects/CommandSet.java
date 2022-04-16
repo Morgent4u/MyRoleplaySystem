@@ -1,4 +1,4 @@
-package com.roleplay.object;
+package com.roleplay.objects;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;

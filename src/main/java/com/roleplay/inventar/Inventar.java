@@ -3,7 +3,7 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.object.CommandSet;
+import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

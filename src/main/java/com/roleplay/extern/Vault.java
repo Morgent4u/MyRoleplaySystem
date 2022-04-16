@@ -11,7 +11,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
  * @Author Nihar
  * @Description
  * This class is used to represent vault-objects.
- * In this case the PERMISSIONS-Object is used from the plugin vault.
+ * In this case the PERMISSIONS-/ECONOMY-Object is used from the plugin vault.
  */
 
 public class Vault extends Objekt

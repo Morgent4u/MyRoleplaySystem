@@ -4,4 +4,9 @@ main: com.basis.main.main
 api-version: 1.18
 authors: [ Nihar ]
 
-softdepend: [Vault, PlaceholderAPI]
+softdepend: [Vault, PlaceholderAPI, ProtocolLib]
+
+commands:
+  Test:
+    usuage: /Test
+    tab-complete: true

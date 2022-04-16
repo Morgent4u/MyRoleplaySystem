@@ -6,9 +6,11 @@ import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.MessageBoard;
+import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.spieler.SpielerService;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 /**
  * @Created 22.03.2022
@@ -32,9 +34,12 @@ public class Settings extends Objekt
     boolean ib_useMySQL;
     boolean ib_useVault;
     boolean ib_usePlaceholderApi;
-    boolean ib_useMenuOnSwap;
+    boolean ib_useProtocolLib;
 
     //  Setting-Attributes:
+    boolean ib_useMenuOnSwap;
+
+    //  Money-Attributes:
     boolean ib_useVaultMoney;
     double moneyDefaultATM = 0;
     double moneyDefaultCash = 0;
@@ -76,6 +81,7 @@ public class Settings extends Objekt
             String apiSection = sectionKey + ".API.";
             ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", true);
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
+            ib_useProtocolLib = datei.of_getSetBoolean(apiSection + "ProtocolLib.Use", true);
 
             //  Money-Section:
             String rpSection = sectionKey + ".RolePlay.";
@@ -213,7 +219,6 @@ public class Settings extends Objekt
 
             main.MESSAGEBOARD = new MessageBoard();
             main.MESSAGEBOARD.of_load();
-
             return 1;
         }
 
@@ -240,7 +245,30 @@ public class Settings extends Objekt
             if(!main.VAULT.of_hasAnError())
             {
                 //  Check for soft depends on plugins.
-                ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
+                if(of_isUsingPlaceholderAPI())
+                {
+                    ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
+                }
+
+                if(of_isUsingProtocolLib())
+                {
+                    ib_useProtocolLib = Sys.of_check4SpecificPluginOnServer("ProtocolLib");
+
+                    // If protocolLib is on the server we can initialize the protocolLib object.
+                    if(of_isUsingProtocolLib())
+                    {
+                        main.PROTOCOLLIB = new ProtocolLib();
+                        int rc = main.PROTOCOLLIB.of_load();
+
+                        //  If an error occurred while registering the protocolLib object we deactivate it.
+                        if(rc != 1)
+                        {
+                            main.PROTOCOLLIB = null;
+                            ib_useProtocolLib = false;
+                        }
+                    }
+                }
+
                 return 1;
             }
         }
@@ -283,6 +311,7 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-Enabled: "+of_isUsingVault());
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
+        Sys.of_sendMessage("ProtocolLib-Enabled: "+of_isUsingProtocolLib());
         Sys.of_sendMessage(blue+"» Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"» Message-/Soundboard:"+white);
@@ -359,5 +388,10 @@ public class Settings extends Objekt
     public boolean of_isUsingMenuOnSwap()
     {
         return ib_useMenuOnSwap;
+    }
+
+    public boolean of_isUsingProtocolLib()
+    {
+        return ib_useProtocolLib;
     }
 }
