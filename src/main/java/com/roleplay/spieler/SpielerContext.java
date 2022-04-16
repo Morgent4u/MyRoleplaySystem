@@ -23,6 +23,7 @@ public class SpielerContext extends Objekt
 {
     //	Attribute:
     private HashMap<String, Spieler> players = new HashMap<>();
+    private final String userdataPath = Sys.of_getMainFilePath() + "Userdata//";
 
     /* ************************************* */
     /* LOADER */
@@ -105,7 +106,7 @@ public class SpielerContext extends Objekt
             else
             {
                 //  File-System...
-                Datei user = new Datei(Sys.of_getMainFilePath() + "userdata//" + uuid + ".yml");
+                Datei user = new Datei(userdataPath + uuid + ".yml");
 
                 //  Set playerHasPlayedBefore state.
                 if(!user.of_fileExists())
@@ -120,14 +121,39 @@ public class SpielerContext extends Objekt
 
                 //  Player-Stuff
                 sectionKey = "Player";
+                user.of_set(sectionKey + ".Name", p.getName());
+                user.of_set(sectionKey + ".FirstConnection", Sys.of_getTimeStamp(true));
+                user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
                 moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", main.SETTINGS.of_getDefaultMoneyATM());
                 moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", main.SETTINGS.of_getDefaultMoneyCash());
+
+                int rc = user.of_save("SpielerContext.of_loadPlayer(Player);");
+
+                if(rc != 1)
+                {
+                    ps.of_sendErrorMessage(null, "SpielerContext.of_loadPlayer(Player);", "Error while saving the player data to the file-system.");
+                    return;
+                }
+            }
+
+            // Check if the player is new and the vault-economy-system is enabled.
+            if(!ps.of_hasPlayedBefore() && main.SETTINGS.of_isUsingVaultMoneySystem())
+            {
+                //  Set the money to the player instance.
+                main.SPIELERSERVICE.of_editPlayerMoney(ps, "atm", "add", moneyATM);
+                main.SPIELERSERVICE.of_editPlayerMoney(ps, "cash", "add", moneyCash);
             }
 
             //  Set player data to the player instance.
             ps.of_setRangId(rangId);
             ps.of_setJobId(jobId);
-            ps.of_setMoneyATM(moneyATM);
+
+            // If the server is not using the vault-economy-system, set the money to the player instance.
+            if(!main.SETTINGS.of_isUsingVaultMoneySystem())
+            {
+                ps.of_setMoneyATM(moneyATM);
+            }
+
             ps.of_setMoneyCash(moneyCash);
 
             ps.of_setObjectId(dbId);
@@ -209,12 +235,33 @@ public class SpielerContext extends Objekt
                         ", lastConnection = NOW()" +
                         ", WHERE mrs_user.user = " + ps.of_getObjectId() + ";";
 
-                main.SQL.of_run_update_suppress(sqlUpdate);
+                // Error handling in the run_update function.
+                main.SQL.of_run_update(sqlUpdate);
+                return 1;
             }
+            //  Store player data into the file-system.
+            else
+            {
+                //  File-System...
+                Datei user = new Datei(userdataPath + ps.of_getUUID() + ".yml");
 
-            // TODO: Save the player data into the file-system.
+                //  Default-Stuff
+                String sectionKey = "System";
+                user.of_set(sectionKey + ".RangId", ps.of_getRangId());
+                user.of_set(sectionKey + ".JobId", ps.of_getJobId());
 
-            return 1;
+                //  Player-Stuff
+                sectionKey = "Player";
+                //  We set the name again cause sometimes player change their name.
+                user.of_set(sectionKey + ".Name", ps.of_getName());
+
+                //  Set last connection date and the money-stuff.
+                user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
+                user.of_set(sectionKey + ".Money.ATM", ps.of_getMoneyATM());
+                user.of_set(sectionKey + ".Money.Cash", ps.of_getMoneyCash());
+
+                return user.of_save("SpielerContext.of_loadPlayer(Player);");
+            }
         }
 
         return -1;

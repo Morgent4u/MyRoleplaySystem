@@ -50,7 +50,16 @@ public class Vault extends Objekt
         }
         catch (Exception e)
         {
-            of_sendErrorMessage(e, "of_load();", "Error while registering the vault-service to this plugin.");
+            String extendedMessage = "";
+
+            //  If the economy system is used this can cause the error. So we add an extended message to the default message
+            //  to make sure that the server owner is using an economy system.
+            if(main.SETTINGS.of_isUsingVaultMoneySystem())
+            {
+                extendedMessage = "Please check if your server is using an economy plugin.";
+            }
+
+            of_sendErrorMessage(e, "of_load();", "Error while registering the vault-service to this plugin. " + extendedMessage);
         }
 
         return -1;

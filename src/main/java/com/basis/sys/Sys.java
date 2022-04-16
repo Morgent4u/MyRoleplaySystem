@@ -21,7 +21,7 @@ import com.google.common.base.Splitter;
 public class Sys
 {
     //	DebugMessages
-    private static ArrayList<String> debugMessagesBuffer = new ArrayList<String>();
+    private static ArrayList<String> debugMessagesBuffer = new ArrayList<>();
 
     //	Attribute der Systemklasse
     private static String paket;
@@ -213,7 +213,7 @@ public class Sys
         Sys.of_sendMessage(blue+"Invoker: "+white+invoker);
         Sys.of_sendMessage(blue+"Error message:");
         Sys.of_sendMessage(red+errorMessage);
-        Sys.of_sendMessage("Time: "+new SimpleDateFormat("HH:mm:ss").format(new Date()).toString());
+        Sys.of_sendMessage("Time: "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
         Sys.of_sendMessage("=====================================");
 
         if(exception != null)
@@ -309,7 +309,7 @@ public class Sys
      */
     public static ArrayList<String> of_getReplacedArrayList(ArrayList<String> list, String search, String replace)
     {
-        ArrayList<String> tmpList = new ArrayList<String>();
+        ArrayList<String> tmpList = new ArrayList<>();
 
         if(list != null)
         {
@@ -501,11 +501,11 @@ public class Sys
      */
     public static String of_getTimeStamp(boolean withDate, String dateFormat, String hourFormat)
     {
-        String timeStamp = new SimpleDateFormat(hourFormat).format(new Date()).toString();
+        String timeStamp = new SimpleDateFormat(hourFormat).format(new Date());
 
         if(withDate)
         {
-            timeStamp = new SimpleDateFormat(dateFormat).format(new Date()).toString() + " " +  timeStamp;
+            timeStamp = new SimpleDateFormat(dateFormat).format(new Date()) + " " +  timeStamp;
         }
 
         return timeStamp;
@@ -556,11 +556,11 @@ public class Sys
 
         if(Bukkit.getPluginManager().getPlugin(pluginName) != null)
         {
-            Sys.of_sendMessage("The plugin '"+pluginName+"' could be found on this server. All required functions has been enabled.");
+            Sys.of_sendMessage("§aThe plugin '"+pluginName+"' could be found on this server. All required functions has been enabled.");
             return true;
         }
 
-        Sys.of_sendWarningMessage("The plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Functions has been disabled for this runtime/uptime only!");
+        Sys.of_sendWarningMessage("§cThe plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Functions has been disabled for this runtime/uptime only!");
         return false;
     }
 

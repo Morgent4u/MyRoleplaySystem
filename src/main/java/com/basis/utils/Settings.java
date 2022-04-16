@@ -262,7 +262,7 @@ public class Settings extends Objekt
         String purple = "\u001B[35m";
         String blue = "\u001B[36m";
 
-        Sys.of_sendMessage("┏╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋");
+        Sys.of_sendMessage("┏╋━━━━━━━━ ◥◣◆◢◤ ━━━━━━━━╋");
         if(Sys.of_isHotfix())
         {
             Sys.of_sendMessage(red+"[Hotfix: "+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
@@ -272,8 +272,8 @@ public class Settings extends Objekt
             Sys.of_sendMessage(red+"["+green+Sys.of_getPaket()+" "+yellow+"v"+Sys.of_getVersion()+red+"]"+white);
         }
         Sys.of_sendMessage("Developed by:");
-        Sys.of_sendMessage("»"+purple+" Nihar"+white);
-        Sys.of_sendMessage(blue+"▶ Settings:"+white);
+        Sys.of_sendMessage(purple+"Nihar"+white);
+        Sys.of_sendMessage(blue+"» Settings:"+white);
         Sys.of_sendMessage("Plugin-Enabled: "+of_isUsingPlugin());
         Sys.of_sendMessage("MySQL-Enabled: "+of_isUsingMySQL());
         if(main.SQL != null)
@@ -283,11 +283,11 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-Enabled: "+of_isUsingVault());
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
-        Sys.of_sendMessage(blue+"▶ Inventories:"+white);
+        Sys.of_sendMessage(blue+"» Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
-        Sys.of_sendMessage(blue+"▶ Message-/Soundboard:"+white);
+        Sys.of_sendMessage(blue+"» Message-/Soundboard:"+white);
         main.MESSAGEBOARD.of_sendDebugDetailInformation();
-        Sys.of_sendMessage("┗╋━━━━━━━━◥◣◆◢◤━━━━━━━━╋┛");
+        Sys.of_sendMessage("┗╋━━━━━━━━ ◥◣◆◢◤ ━━━━━━━━╋┛");
     }
 
     /* ******************************* */

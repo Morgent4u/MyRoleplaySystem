@@ -87,7 +87,7 @@ public class SpielerService extends Objekt
      * @param moneyAmount The amount of money which will be added or removed.
      * @return TRUE if the operation was successful, FALSE if not.
      */
-    public boolean of_editPlayerMoney(Spieler ps, String moneyType, String removeAdd, int moneyAmount)
+    public boolean of_editPlayerMoney(Spieler ps, String moneyType, String removeAdd, double moneyAmount)
     {
         //  Check if money-amount is given.
         if(moneyAmount > 0)
@@ -106,7 +106,14 @@ public class SpielerService extends Objekt
                     {
                         if(ps.of_getMoneyATM() >= moneyAmount)
                         {
-                            ps.of_setMoneyATM(ps.of_getMoneyATM() - moneyAmount);
+                            if(main.SETTINGS.of_isUsingVaultMoneySystem())
+                            {
+                                main.VAULT.ECONOMY.withdrawPlayer(ps.of_getPlayer(), moneyAmount);
+                            }
+                            else
+                            {
+                                ps.of_setMoneyATM(ps.of_getMoneyATM() - moneyAmount);
+                            }
                         }
                         //  Set the money difference to the player.
                         else
@@ -117,7 +124,14 @@ public class SpielerService extends Objekt
                     }
                     else if(removeAdd.equals("add"))
                     {
-                        ps.of_setMoneyATM(ps.of_getMoneyATM() + moneyAmount);
+                        if(main.SETTINGS.of_isUsingVaultMoneySystem())
+                        {
+                            main.VAULT.ECONOMY.depositPlayer(ps.of_getPlayer(), moneyAmount);
+                        }
+                        else
+                        {
+                            ps.of_setMoneyATM(ps.of_getMoneyATM() + moneyAmount);
+                        }
                     }
                 case "cash":
                     //  Money-type need to be set to send a message to the player with the money-type.

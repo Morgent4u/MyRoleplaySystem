@@ -146,18 +146,11 @@ public class Spieler extends Objekt
 
     public double of_getMoneyCash()
     {
-        //  TODO: Check what is used for vault!
-        if(main.SETTINGS.of_isUsingVaultMoneySystem())
-        {
-            return main.VAULT.ECONOMY.getBalance(p);
-        }
-
         return moneyCash;
     }
 
     public double of_getMoneyATM()
     {
-        //  TODO: Check what is used for vault!
         if(main.SETTINGS.of_isUsingVaultMoneySystem())
         {
             return main.VAULT.ECONOMY.getBalance(p);
