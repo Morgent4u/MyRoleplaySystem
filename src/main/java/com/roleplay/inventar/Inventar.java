@@ -76,14 +76,19 @@ public class Inventar extends Objekt
     {
         String[] cmds = commands.get(clickedSlot);
 
+        boolean lb_openInv = false;
+
         if(cmds != null && cmds.length > 0)
         {
             //  Execute all given commands.
-            new CommandSet(cmds, ps).of_executeAllCommands();
+            CommandSet cmdSet = new CommandSet(cmds, ps);
+            lb_openInv = cmdSet.of_commandExists("OPEN");
+            cmdSet.of_executeAllCommands();
         }
 
         //  Closing after executing all commands.
-        if(of_isClickCloseInv())
+        //  If the CommandSet opens an inventory we do not close the current inventory.
+        if(of_isClickCloseInv() && !lb_openInv)
         {
             main.SPIELERSERVICE.of_closeInventory(ps);
         }

@@ -3,11 +3,14 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.basis.utils.Datei;
 import com.roleplay.inventar.normal.inv_menu;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +26,10 @@ import java.util.Map;
  */
 public class InventarContext extends Objekt
 {
+    //  Attributes:
     //  InvId - Inventar-Object
     Map<Integer, Inventar> inventories = new HashMap<>();
+    boolean ib_loadOwnInventories;
 
     /* ************************************* */
     /* LOADER */
@@ -36,7 +41,30 @@ public class InventarContext extends Objekt
         //	InventoryId: 1
         //	Description:
         //  This inventory is the default menu for every player.
-        of_loadInventoryByFile(new inv_menu());
+        of_loadInventoryByFile(new inv_menu(), null);
+
+        //  Load own inventories if its enabled.
+        if(of_isUsingOwnInventoriesAllowed())
+        {
+            //  Load the inventories.
+            File directory = new File( Sys.of_getMainFilePath() + "//Inventories//");
+            File[] files = directory.listFiles();
+
+            if(files != null && files.length > 0)
+            {
+                for(File file : files)
+                {
+                    if(file != null)
+                    {
+                        //  If the inventory has not been already loaded.
+                        if(!of_isFileInventoryAlreadyLoaded(file.getName()))
+                        {
+                            of_loadInventoryByFile(new Inventar(), file.getName());
+                        }
+                    }
+                }
+            }
+        }
 
         return 1;
     }
@@ -49,9 +77,16 @@ public class InventarContext extends Objekt
      * This function loads an inventory from a file.
      * @param inventar The inventory to load.
      */
-    public void of_loadInventoryByFile(Inventar inventar)
+    public void of_loadInventoryByFile(Inventar inventar, String fileName)
     {
-        InventarDatei invFile = new InventarDatei(Sys.of_getMainFilePath() + "//Inventories//" + inventar.of_getInvClassName());
+        //  Set the fileName, if it's not set use the inventar-instance name instead.
+        if(fileName == null)
+        {
+            fileName = inventar.of_getInvClassName();
+        }
+
+        //  Get the file or create it.
+        InventarDatei invFile = new InventarDatei(Sys.of_getMainFilePath() + "//Inventories//" + fileName);
 
         if(invFile.of_fileExists())
         {
@@ -66,7 +101,7 @@ public class InventarContext extends Objekt
             boolean useInventoryType = !invType.contains("CHEST");
             boolean lb_closeOnClick = invFile.of_getSetBoolean(section + ".CloseOnClick", true);
 
-            //  Get the inventory-size.s
+            //  Get the inventory-size.
             int invSize = invFile.of_getSetInt(section + ".Size", 27);
 
             if(invSize > 0)
@@ -100,6 +135,7 @@ public class InventarContext extends Objekt
                 {
                     try
                     {
+                        //  Use the given InventoryType
                         InventoryType invTypeEnum = InventoryType.valueOf(invType);
                         inventory = Bukkit.createInventory(null, invTypeEnum, invName);
                     }
@@ -109,6 +145,7 @@ public class InventarContext extends Objekt
                         return;
                     }
                 }
+                //  Default inventory-type (chest)
                 else
                 {
                     inventory = Bukkit.createInventory(null, invSize, invName);
@@ -170,6 +207,7 @@ public class InventarContext extends Objekt
         }
 
         //  Add the inventory to the inventar-context (inventories).
+        inventar.of_setInfo(fileName.toLowerCase().replace(".yml", ""));
         inventar.of_setObjectId(inventories.size() + 1);
         inventories.put(inventar.of_getObjectId(), inventar);
     }
@@ -244,14 +282,88 @@ public class InventarContext extends Objekt
     {
         //  Send the debug information.
         Sys.of_sendMessage("Loaded inventories: " + inventories.size());
+        Sys.of_sendMessage("Load own inventories: " + of_isUsingOwnInventoriesAllowed());
+    }
+
+    /* ************************************* */
+    /* SETTER */
+    /* ************************************* */
+
+    /**
+     * Allows loading own inventories from files.
+     * @param bool Allow/Disallow
+     */
+    public void of_setLoadOwnInventories(boolean bool)
+    {
+        ib_loadOwnInventories = bool;
     }
 
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
 
+    /**
+     * This function returns the inventory instance for the given id.
+     * @param invId The inventory id.
+     * @return The inventory instance.
+     */
     public Inventar of_getInv(int invId)
     {
        return inventories.get(invId);
+    }
+
+    /**
+     * This function is used to get an inventory by the file-name.
+     * This is used to get own created inventories.
+     * @param invName The name of the inventory.
+     * @return The inventory instance.
+     */
+    public Inventar of_getInvByName(String invName)
+    {
+        invName = invName.replace(".yml","");
+        invName = invName.toLowerCase();
+
+        for(Inventar inv : inventories.values())
+        {
+            if(inv.of_getInfo().equals(invName))
+            {
+                return inv;
+            }
+        }
+
+        return null;
+    }
+
+    /* ************************************* */
+    /* BOOLS */
+    /* ************************************* */
+
+    /**
+     * Check if for this file is already an inventory is loaded.
+     * @param fileName The file name.
+     * @return True if the inventory is already loaded.
+     */
+    public boolean of_isFileInventoryAlreadyLoaded(String fileName)
+    {
+        fileName = fileName.replace(".yml", "");
+        fileName = fileName.toLowerCase();
+
+        for(Inventar inv : inventories.values())
+        {
+            if(inv != null)
+            {
+                if(inv.of_getInfo().equals(fileName))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean of_isUsingOwnInventoriesAllowed()
+    {
+        return ib_loadOwnInventories;
     }
 }

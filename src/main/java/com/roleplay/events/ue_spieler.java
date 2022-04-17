@@ -58,7 +58,7 @@ public class ue_spieler implements Listener
 
             if(ps != null)
             {
-                main.INVENTARSERVICE.of_openInvById(ps, 1);
+                main.SPIELERSERVICE.of_openInvById(ps, 1);
             }
         }
     }

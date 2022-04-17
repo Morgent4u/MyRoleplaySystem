@@ -2,6 +2,7 @@ package com.roleplay.spieler;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.roleplay.inventar.Inventar;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -208,6 +209,39 @@ public class SpielerService extends Objekt
     }
 
     /**
+     * This function is used to open an inventory for a player.
+     * @param ps The player instance.
+     * @param invId The id of the inventory.
+     */
+    public void of_openInvById(Spieler ps, int invId)
+    {
+        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInv(invId);
+
+        if(inv != null)
+        {
+            ps.of_setInvId(invId);
+            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
+        }
+    }
+
+    /**
+     * This function is used to open an inventory by the fileName for the player.
+     * This method opens an own created inventory.
+     * @param ps The player instance.
+     * @param invFileName The fileName of the inventory.
+     */
+    public void of_openInvByName(Spieler ps, String invFileName)
+    {
+        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInvByName(invFileName);
+
+        if(inv != null)
+        {
+            ps.of_setInvId(inv.of_getObjectId());
+            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
+        }
+    }
+
+    /**
      * This function closes the inventory of the player.
      * @param ps Player instance.
      */
@@ -216,5 +250,4 @@ public class SpielerService extends Objekt
         ps.of_setInvId(-1);
         ps.of_getPlayer().closeInventory();
     }
-
 }

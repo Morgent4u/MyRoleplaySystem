@@ -74,7 +74,6 @@ public class CommandSet extends Objekt
                 return;
             }
         }
-
     }
 
     private int of_executeCommand(String category, String command)
@@ -95,6 +94,9 @@ public class CommandSet extends Objekt
                 return 1;
             case "CLOSE":
                 main.SPIELERSERVICE.of_closeInventory(ps);
+                return 1;
+            case "OPEN":
+                main.SPIELERSERVICE.of_openInvByName(ps, command);
                 return 1;
             case "DEBUG":
                 of_sendDebugInformation("CommandSet.of_executeCommand(); DEBUG");
@@ -144,5 +146,27 @@ public class CommandSet extends Objekt
                 Sys.of_sendMessage(i+": "+commands[i]);
             }
         }
+    }
+
+    /* ************************************* */
+    /* BOOLS */
+    /* ************************************* */
+
+    public boolean of_commandExists(String command)
+    {
+        command = command.toUpperCase();
+
+        if(commands != null && commands.length > 0)
+        {
+            for(String cmd : commands)
+            {
+                if(cmd.toUpperCase().split("=")[0].contains(command))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

@@ -40,6 +40,9 @@ public class InventarService extends Objekt
     @Override
     public int of_load()
     {
+        //  Allow loading own inventories from files.
+        _CONTEXT.of_setLoadOwnInventories(true);
+
         return _CONTEXT.of_load();
     }
 
@@ -213,22 +216,6 @@ public class InventarService extends Objekt
         catch (Exception ignored){}
 
         return item;
-    }
-
-    /**
-     * This function is used to open an inventory for a player.
-     * @param ps The player instance.
-     * @param invId The id of the inventory.
-     */
-    public void of_openInvById(Spieler ps, int invId)
-    {
-        Inventar inv = _CONTEXT.of_getInv(invId);
-
-        if(inv != null)
-        {
-            ps.of_setInvId(invId);
-            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
-        }
     }
 
     /* ************************************* */
