@@ -75,7 +75,99 @@ public class SpielerService extends Objekt
     }
 
     /* ************************************* */
-    /* OBJEKT-ANWEISUNGEN */
+    /* SEND METHODS */
+    /* ************************************* */
+
+    /**
+     * This function sends an interactive-chat message to the player.
+     * @param ps Player instance.
+     * @param chatText The text which will be displayed in the chat.
+     * @param hoverText The text which will be displayed if the cursor hovers over it.
+     * @param command The command which will be executed by the player if the user clicks on the message.
+     */
+    public void of_sendInteractiveMessage(Spieler ps, String chatText, String hoverText, String command)
+    {
+        //	Interaktive Chat-Nachricht!
+        TextComponent tc = new TextComponent();
+        tc.setText(chatText);
+        tc.setBold(true);
+        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command));
+        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
+        ps.of_getPlayer().spigot().sendMessage(tc);
+    }
+
+    /**
+     * This function sends the message to the player which is defined when an error occurs.
+     * @param ps Player instance.
+     * @param errorMessage The error message which will be displayed.
+     */
+    public void of_sendErrorMessage(Spieler ps, String errorMessage)
+    {
+        //  Send the error message to the player.
+        String message = main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.ErrorMessage", ps);
+        message = message.replace("%errorMessage%", errorMessage);
+
+        ps.of_getPlayer().sendMessage(message);
+    }
+
+    /**
+     * This function sends the message to the player which is defined when the player has no permissions.
+     * @param ps Player instance.
+     */
+    public void of_sendNoPermissionsMessage(Spieler ps)
+    {
+        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.NoPermissions", ps));
+    }
+
+    /* ************************************* */
+    /* INVENTORY METHODS */
+    /* ************************************* */
+
+    /**
+     * This function is used to open an inventory for a player.
+     * @param ps The player instance.
+     * @param invId The id of the inventory.
+     */
+    public void of_openInvById(Spieler ps, int invId)
+    {
+        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInv(invId);
+
+        if(inv != null)
+        {
+            ps.of_setInvId(invId);
+            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
+        }
+    }
+
+    /**
+     * This function is used to open an inventory by the fileName for the player.
+     * This method opens an own created inventory.
+     * @param ps The player instance.
+     * @param invFileName The fileName of the inventory.
+     */
+    public void of_openInvByName(Spieler ps, String invFileName)
+    {
+        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInvByName(invFileName);
+
+        if(inv != null)
+        {
+            ps.of_setInvId(inv.of_getObjectId());
+            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
+        }
+    }
+
+    /**
+     * This function closes the inventory of the player.
+     * @param ps Player instance.
+     */
+    public void of_closeInventory(Spieler ps)
+    {
+        ps.of_setInvId(-1);
+        ps.of_getPlayer().closeInventory();
+    }
+
+    /* ************************************* */
+    /* OBJECT METHODS */
     /* ************************************* */
 
     /**
@@ -161,93 +253,5 @@ public class SpielerService extends Objekt
         }
 
         return false;
-    }
-
-    /* ************************************* */
-    /* SEND METHODS */
-    /* ************************************* */
-
-    /**
-     * This function sends an interactive-chat message to the player.
-     * @param ps Player instance.
-     * @param chatText The text which will be displayed in the chat.
-     * @param hoverText The text which will be displayed if the cursor hovers over it.
-     * @param command The command which will be executed by the player if the user clicks on the message.
-     */
-    public void of_sendInteractiveMessage(Spieler ps, String chatText, String hoverText, String command)
-    {
-        //	Interaktive Chat-Nachricht!
-        TextComponent tc = new TextComponent();
-        tc.setText(chatText);
-        tc.setBold(true);
-        tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command));
-        tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
-        ps.of_getPlayer().spigot().sendMessage(tc);
-    }
-
-    /**
-     * This function sends the message to the player which is defined when the player has no permissions.
-     * @param ps Player instance.
-     */
-    public void of_sendNoPermissionsMessage(Spieler ps)
-    {
-        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.NoPermissions", ps));
-    }
-
-    /**
-     * This function sends the message to the player which is defined when an error occurs.
-     * @param ps Player instance.
-     * @param errorMessage The error message which will be displayed.
-     */
-    public void of_sendErrorMessage(Spieler ps, String errorMessage)
-    {
-        //  Send the error message to the player.
-        String message = main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.ErrorMessage", ps);
-        message = message.replace("%errorMessage%", errorMessage);
-
-        ps.of_getPlayer().sendMessage(message);
-    }
-
-    /**
-     * This function is used to open an inventory for a player.
-     * @param ps The player instance.
-     * @param invId The id of the inventory.
-     */
-    public void of_openInvById(Spieler ps, int invId)
-    {
-        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInv(invId);
-
-        if(inv != null)
-        {
-            ps.of_setInvId(invId);
-            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
-        }
-    }
-
-    /**
-     * This function is used to open an inventory by the fileName for the player.
-     * This method opens an own created inventory.
-     * @param ps The player instance.
-     * @param invFileName The fileName of the inventory.
-     */
-    public void of_openInvByName(Spieler ps, String invFileName)
-    {
-        Inventar inv = main.INVENTARSERVICE._CONTEXT.of_getInvByName(invFileName);
-
-        if(inv != null)
-        {
-            ps.of_setInvId(inv.of_getObjectId());
-            ps.of_getPlayer().openInventory(inv.of_getInv(ps));
-        }
-    }
-
-    /**
-     * This function closes the inventory of the player.
-     * @param ps Player instance.
-     */
-    public void of_closeInventory(Spieler ps)
-    {
-        ps.of_setInvId(-1);
-        ps.of_getPlayer().closeInventory();
     }
 }

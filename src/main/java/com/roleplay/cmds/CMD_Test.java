@@ -34,7 +34,7 @@ public class CMD_Test implements CommandExecutor
                     {
                         if(args.length == 0)
                         {
-                            TextBlock textBlock = new TextBlock("txt_test", ps);
+                            TextBlock textBlock = new TextBlock("txt_dataprotection", ps);
                             textBlock.of_sendMessage2Player();
 
                             // Do not change this!

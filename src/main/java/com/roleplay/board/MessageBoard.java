@@ -75,18 +75,22 @@ public class MessageBoard extends Objekt
      */
     private void of_loadTextBlocks()
     {
-        //  Example:
-        /*
-        TextBlock textBlock = new TextBlock("txt_test");
-        textBlock.of_addMessage2Block("§fThis is a test message.");
-        textBlock.of_addMessage2Block("§dI hope this works!");
-        textBlock.of_addInteractiveChatMessage2Block("§8[§cClick§8]§f Click me :)", "§fThis is a hover text.", "gamemode creative");
-        textBlock.of_addMessage2Block("§eLets add a new line!");
-        textBlock.of_addMessage2Block("§dI hope this works! Again!");
-        textBlock.of_addInteractiveChatMessage2Block("§8[§cClick§8]§f Click me again :)", "§fThis is a hover text.", "gamemode survival");
-        textBlock.of_addCommandSet2Block(new String[] {"DEBUG"});
+        //  Load TextBlocks:
+        TextBlock textBlock = new TextBlock("txt_dataprotection");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lData Protection§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fHello §d%p%§f,");
+        textBlock.of_addMessage2Block("§fwelcome to §6MyRoleplay§f!");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fBefore you can play on our server,");
+        textBlock.of_addMessage2Block("§fyou need to accept the §edata protection§f.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addInteractiveChatMessage2Block("§a§l§nAccept", "§fClick to §aaccept§f the data protection.", new String[] {"CMD=dse accept"});
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
         textBlock.of_save("MessageBoard.of_loadTextBlocks();");
-        */
     }
 
     /* ************************* */

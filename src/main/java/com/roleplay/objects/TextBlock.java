@@ -80,6 +80,7 @@ public class TextBlock extends Objekt
                         //  When the message is no interactive Chat message it could be an alternative placeholder.
                         if(lb_found)
                         {
+                            ps.of_setTextBlockAttribute(datei.of_getFileName());
                             continue;
                         }
                     }
@@ -121,17 +122,30 @@ public class TextBlock extends Objekt
                 //  Check for placeholder for the interactiveChat.
                 String text = datei.of_getString("InteractiveMessage." + key + ".Text");
                 String hoverText = datei.of_getString("InteractiveMessage." + key + ".HoverText");
-                String command = datei.of_getString("InteractiveMessage." + key + ".Command");
+                String[] commandSet = datei.of_getStringArrayByKey("InteractiveMessage." + key + ".CommandSet");
 
-                if(text != null && hoverText != null && command != null)
+                if(text != null && hoverText != null && commandSet != null && commandSet.length > 0)
                 {
                     //  Translate all three strings.
                     text = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(text, ps);
                     hoverText = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(hoverText, ps);
-                    command = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(command, ps);
+
+                    //  Translate every command...
+                    for(int i = 0; i < commandSet.length; i++)
+                    {
+                        commandSet[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(commandSet[i], ps);
+                    }
+
+                    //  Build the CommandSet into a String with a ';' as separator.
+                    StringBuilder command = new StringBuilder(commandSet[0]);
+
+                    for(int i = 1; i < commandSet.length; i++)
+                    {
+                        command.append(";").append(commandSet[i]);
+                    }
 
                     //  Add the message to the interactive chat messages.
-                    this.interactiveChatMessages.add(key + "|" + text + "|" + hoverText + "|" + command);
+                    this.interactiveChatMessages.add(key + "|" + text + "|" + hoverText + "|interaction textblock " + datei.of_getFileName() + " " + command);
                 }
             }
 
@@ -166,7 +180,12 @@ public class TextBlock extends Objekt
                 String configKey = "InteractiveMessage." + iChatData[0];
                 datei.of_set(configKey + ".Text", iChatData[1]);
                 datei.of_set(configKey + ".HoverText", iChatData[2]);
-                datei.of_set(configKey + ".Command", iChatData[3]);
+                String[] commands = iChatData[3].split(";");
+
+                if(commands.length > 0)
+                {
+                    datei.of_getSetStringArray(configKey + ".CommandSet", commands);
+                }
             }
         }
 
@@ -214,9 +233,9 @@ public class TextBlock extends Objekt
      * The specific id is used to predefine the interactive chat message.
      * @param displayMessage The message that will be displayed to the player.
      * @param hoverText The message that will be displayed when the player hovers over the message.
-     * @param command The command that will be executed when the player clicks on the message.
+     * @param cmdSet CommandSet which should be executed when the player clicks on the message.
      */
-    public void of_addInteractiveChatMessage2Block(String displayMessage, String hoverText, String command)
+    public void of_addInteractiveChatMessage2Block(String displayMessage, String hoverText, String[] cmdSet)
     {
         // Initialize the array list if it is null.
         of_initialize();
@@ -229,7 +248,17 @@ public class TextBlock extends Objekt
         //  Default translation...
         displayMessage = displayMessage.replace("§", "&");
         hoverText = hoverText.replace("§", "&");
-        command = command.replace("§", "&");
+
+        //  Build the CommandSet into a String with a ';' as separator.
+        StringBuilder command = new StringBuilder();
+
+        if(cmdSet != null && cmdSet.length > 0)
+        {
+            for (String cmd : cmdSet)
+            {
+                command.append(cmd).append(";");
+            }
+        }
 
         //  Add the interactive chat message to the array list.
         this.interactiveChatMessages.add(iChatId + "|" + displayMessage + "|" + hoverText + "|" + command);

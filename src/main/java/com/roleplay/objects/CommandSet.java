@@ -98,6 +98,9 @@ public class CommandSet extends Objekt
             case "OPEN":
                 main.SPIELERSERVICE.of_openInvByName(ps, command);
                 return 1;
+            case "TEXTBLOCK":
+                new TextBlock(command, ps).of_sendMessage2Player();
+                return 1;
             case "DEBUG":
                 of_sendDebugInformation("CommandSet.of_executeCommand(); DEBUG");
                 return 1;

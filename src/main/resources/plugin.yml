@@ -10,3 +10,6 @@ commands:
   Test:
     usuage: /Test
     tab-complete: true
+  Interaction:
+    usuage: /Interaction
+    tab-complete: false

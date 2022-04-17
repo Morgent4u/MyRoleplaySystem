@@ -20,6 +20,7 @@ public class Spieler extends Objekt
     //	Default-Attribute:
     String name;
     String uuid;
+    String textBlockAttribute;
 
     int rangId;
     int jobId;
@@ -120,6 +121,11 @@ public class Spieler extends Objekt
         this.invId = invId;
     }
 
+    public void of_setTextBlockAttribute(String textBlockName)
+    {
+        this.textBlockAttribute = textBlockName;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -187,6 +193,11 @@ public class Spieler extends Objekt
     public int of_getInvId()
     {
         return invId;
+    }
+
+    public String of_getTextBlockAttribute()
+    {
+        return textBlockAttribute;
     }
 
     /* ************************************* */

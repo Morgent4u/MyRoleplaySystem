@@ -5,6 +5,7 @@ import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
+import com.roleplay.cmds.CMD_Interaction;
 import com.roleplay.cmds.CMD_Test;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
@@ -85,6 +86,7 @@ public class main extends JavaPlugin
 
                 // Befehle:
                 getCommand("Test").setExecutor(new CMD_Test());
+                getCommand("Interaction").setExecutor(new CMD_Interaction());
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 rc = SETTINGS.of_initSystemServices();
