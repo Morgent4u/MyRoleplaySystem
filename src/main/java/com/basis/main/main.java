@@ -122,8 +122,11 @@ public class main extends JavaPlugin
     @Override
     public void onDisable()
     {
-        //  Entladen der Settings-klasse!
-        SETTINGS.of_unload();
+        //  If the object has been initialized lets unload it.
+        if(SETTINGS != null)
+        {
+            SETTINGS.of_unload();
+        }
 
         //	Ende.
         Sys.of_sendMessage("This plugin has been coded by Nihar! Thank you for using this plugin! :^)");
