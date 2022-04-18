@@ -3,7 +3,6 @@ package com.roleplay.spieler;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.roleplay.inventar.Inventar;
-import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -65,7 +64,7 @@ public class SpielerService extends Objekt
     {
         if(_CONTEXT != null)
         {
-            Collection<Spieler> players = _CONTEXT.of_getAllSpieler();
+            Collection<Spieler> players = _CONTEXT.of_getAllPlayers();
 
             for(Spieler ps : players)
             {

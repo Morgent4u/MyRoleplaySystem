@@ -50,7 +50,20 @@ public class TextBlock extends Objekt
         {
             boolean lb_check4InteractiveChat = of_loadInteractiveChatMessages();
             String[] chatMessages = datei.of_getStringArrayByKey("TextBlock");
-            String[] cmds = datei.of_getStringArrayByKey("CommandSet");
+            cmds = datei.of_getStringArrayByKey("CommandSet");
+
+            //  Check if a CommandSet is defined and execute it before sending the messages.
+            if(cmds != null && cmds.length > 0)
+            {
+                CommandSet cmdSet = new CommandSet(cmds, ps);
+                cmdSet.of_executeAllCommands();
+
+                //  If a kick statement is defined, don't send the messages.
+                if(cmdSet.of_commandExists("KICK"))
+                {
+                    return;
+                }
+            }
 
             if(chatMessages != null)
             {
@@ -94,12 +107,6 @@ public class TextBlock extends Objekt
             else
             {
                 main.SPIELERSERVICE.of_sendErrorMessage(ps, "There was an error while loading the text-block file. File: " + datei.of_getFileName());
-            }
-
-            //  Execute some Commands if they are defined.
-            if(cmds != null && cmds.length > 0)
-            {
-                new CommandSet(cmds, ps).of_executeAllCommands();
             }
         }
     }
@@ -290,5 +297,30 @@ public class TextBlock extends Objekt
         //  Initialize the array list if it is null
         if(this.predefinedMessages == null)
             this.predefinedMessages = new ArrayList<>();
+    }
+
+    /* ************************************* */
+    /* GETTER */
+    /* ************************************* */
+
+    /**
+     * Returns only translated messages with the player stats.
+     * @return The translated messages.
+     */
+    public String[] of_getTranslatedTextBlockLines()
+    {
+        String[] chatMessages = datei.of_getStringArrayByKey("TextBlock");
+
+        if(chatMessages != null && chatMessages.length > 0)
+        {
+            for(int i = 0; i < chatMessages.length; i++)
+            {
+                chatMessages[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(chatMessages[i], ps);
+            }
+
+            return chatMessages;
+        }
+
+        return null;
     }
 }

@@ -21,7 +21,7 @@ public class ue_inventory implements Listener
     @EventHandler
     public void ue_inventoryOpenEvent4MRS(InventoryOpenEvent e)
     {
-        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(e.getPlayer().getName());
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
 
         if(ps != null)
         {
@@ -43,7 +43,7 @@ public class ue_inventory implements Listener
     public void ue_inventoryClickEvent4MRS(InventoryClickEvent e)
     {
         //  Get player instance.
-        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(e.getWhoClicked().getName());
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getWhoClicked().getName());
 
         if(ps != null)
         {

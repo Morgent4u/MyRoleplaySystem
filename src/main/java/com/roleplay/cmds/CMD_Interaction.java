@@ -26,7 +26,7 @@ public class CMD_Interaction implements CommandExecutor
         {
             if(sender instanceof Player)
             {
-                Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(sender.getName());
+                Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(sender.getName());
 
                 if(ps != null)
                 {

@@ -2,7 +2,6 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.roleplay.objects.NPC;
-import com.roleplay.objects.TextBlock;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,7 +24,7 @@ public class CMD_Test implements CommandExecutor
         {
             if(sender instanceof Player)
             {
-                Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(sender.getName());
+                Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(sender.getName());
 
                 if(ps != null)
                 {

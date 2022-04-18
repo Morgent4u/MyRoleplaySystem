@@ -75,21 +75,64 @@ public class MessageBoard extends Objekt
      */
     private void of_loadTextBlocks()
     {
-        //  Load TextBlocks:
         TextBlock textBlock = new TextBlock("txt_dataprotection");
         textBlock.of_addMessage2Block("§7═════════════════════════");
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§8[§4§lData Protection§8]");
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§fHello §d%p%§f,");
-        textBlock.of_addMessage2Block("§fwelcome to §6MyRoleplay§f!");
+        textBlock.of_addMessage2Block("§fwelcome to our §6server§f!");
         textBlock.of_addMessage2Block("");
-        textBlock.of_addMessage2Block("§fBefore you can play on our server,");
-        textBlock.of_addMessage2Block("§fyou need to accept the §edata protection§f.");
+        textBlock.of_addMessage2Block("§fTo secure our server, you need to accept our §edata protection§f.");
+        textBlock.of_addMessage2Block("§fWe only need to store the following data:");
+        textBlock.of_addMessage2Block("§7-§9 Minecraft name");
+        textBlock.of_addMessage2Block("§7-§9 IP-Address");
+        textBlock.of_addMessage2Block("§7-§9 UUID");
+        textBlock.of_addMessage2Block("§7-§9 Last logout");
         textBlock.of_addMessage2Block("");
-        textBlock.of_addInteractiveChatMessage2Block("§a§l§nAccept", "§fClick to §aaccept§f the data protection.", new String[] {"CMD=dse accept"});
+        textBlock.of_addInteractiveChatMessage2Block("§a§nAccept our data protection.", "§fClick to §aaccept§f the data protection.", new String[] {"CMD=dataprotection accept"});
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addInteractiveChatMessage2Block("§c§nDecline our data protection.", "§fClick to §cdecline§f the data protection.", new String[] {"CMD=dataprotection"});
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        // DataProtection: Accept
+        textBlock = new TextBlock("txt_dataprotection_accepted");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lData Protection§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§d%p%§f, you have accepted the");
+        textBlock.of_addMessage2Block("§edata protection§f.");
+        textBlock.of_addMessage2Block("§fAccept date: §a%dataProtectionDate%");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fWe hope you enjoy our server.");
+        textBlock.of_addMessage2Block("§fIf you have any questions, feel free to");
+        textBlock.of_addMessage2Block("§fask us in our discord server.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§5Discord:§a https://discord.gg/QWQWQWQ");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        //  Double IP-Address:
+        textBlock = new TextBlock("txt_double_ipaddress");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lDouble IP-Address§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§d%p%§f, our system has detect that");
+        textBlock.of_addMessage2Block("§fyou are using the same §eIP-Address");
+        textBlock.of_addMessage2Block("§fas §c%otherPlayer%" + "§f.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fTo get a §awhitelist§f please contact");
+        textBlock.of_addMessage2Block("§four staff members.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§5Discord:§a https://discord.gg/QWQWQWQ");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addCommandSet2Block(new String[] {"KICK=txt_double_ipaddress"});
         textBlock.of_save("MessageBoard.of_loadTextBlocks();");
     }
 
@@ -137,6 +180,17 @@ public class MessageBoard extends Objekt
         message = message.replace("%jobId%", String.valueOf(ps.of_getJobId()));
         message = message.replace("%rangId%", String.valueOf(ps.of_getRangId()));
         message = message.replace("%id%", String.valueOf(ps.of_getObjectId()));
+
+        //  Check for other player...
+        if(ps.of_getDbIdOtherPlayer() != 0)
+        {
+            Spieler ds = main.SPIELERSERVICE._CONTEXT.of_getPlayerById(ps.of_getDbIdOtherPlayer());
+
+            if(ds != null)
+            {
+                message = message.replace("%otherPlayer%", ds.of_getPlayer().getName());
+            }
+        }
 
         //  Use the PlaceholderAPI if it's enabled...
         if(main.SETTINGS.of_isUsingPlaceholderAPI())

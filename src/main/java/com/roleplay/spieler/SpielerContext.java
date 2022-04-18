@@ -299,13 +299,26 @@ public class SpielerContext extends Objekt
     /* GETTER */
     /* ************************************* */
 
-    public Collection<Spieler> of_getAllSpieler()
+    public Collection<Spieler> of_getAllPlayers()
     {
         return players.values();
     }
 
-    public Spieler of_getSpieler(String playerName)
+    public Spieler of_getPlayer(String playerName)
     {
         return players.get(playerName);
+    }
+
+    public Spieler of_getPlayerById(int objectId)
+    {
+        for(Spieler ps : players.values())
+        {
+            if(ps.of_getObjectId() == objectId)
+            {
+                return ps;
+            }
+        }
+
+        return null;
     }
 }

@@ -46,6 +46,7 @@ public class PermissionBoard extends Objekt
         //  Load specific Permissions (Role play):
         of_addPermissions2Board("Command.Permission.Test", "mrs.command.test");
         of_addPermissions2Board("Command.Permission.Interaction", "mrs.command.interaction");
+        of_addPermissions2Board("Command.Permission.Dataprotection", "mrs.command.dataprotection");
         of_addPermissions2Board("Command.Permission.Showinfo", "mrs.command.showinfo");
 
         return datei.of_save("PermissionBoard.of_load();");

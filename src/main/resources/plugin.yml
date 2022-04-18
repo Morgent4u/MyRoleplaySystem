@@ -13,3 +13,6 @@ commands:
   Interaction:
     usuage: /Interaction
     tab-complete: false
+  Dataprotection:
+    usuage: /Dataprotection
+    tab-complete: true

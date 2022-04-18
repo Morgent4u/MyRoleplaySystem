@@ -35,7 +35,7 @@ public class ue_spieler implements Listener
     public void ue_playerQuit4MRS(PlayerQuitEvent e)
     {
         //  Unload all player specific data from the player-context.
-        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(e.getPlayer().getName());
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
 
         if(ps != null)
         {
@@ -52,7 +52,7 @@ public class ue_spieler implements Listener
     {
         if(main.SETTINGS.of_isUsingMenuOnSwap())
         {
-            Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getSpieler(e.getPlayer().getName());
+            Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
 
             if(ps != null)
             {
