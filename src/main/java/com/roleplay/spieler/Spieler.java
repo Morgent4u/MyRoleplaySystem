@@ -4,6 +4,8 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 /**
  * @Created 20.03.2022
  * @Author Nihar
@@ -198,6 +200,11 @@ public class Spieler extends Objekt
     public String of_getTextBlockAttribute()
     {
         return textBlockAttribute;
+    }
+
+    public String of_getPlayerIPAsString()
+    {
+        return Objects.requireNonNull(p.getAddress()).getAddress().toString();
     }
 
     /* ************************************* */

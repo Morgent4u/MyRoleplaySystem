@@ -90,6 +90,7 @@ public class Settings extends Objekt
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
 
             //	MySQL-Attribute einlesen:
+
             String externalSection = sectionKey + ".External.";
             ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
             String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");

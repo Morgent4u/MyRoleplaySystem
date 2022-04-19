@@ -2,6 +2,8 @@ package com.roleplay.spieler;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.sys.Sys;
+import com.basis.utils.Datei;
 import com.roleplay.inventar.Inventar;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -252,5 +254,80 @@ public class SpielerService extends Objekt
         }
 
         return false;
+    }
+
+    /* ************************************* */
+    /* ADDER // SETTER // REMOVER */
+    /* ************************************* */
+
+    /**
+     * This function is used to add an entryKey and a value to the player InternList.
+     * @param ps Player instance.
+     * @param entryKey The entryKey for example: 'IPLink'.
+     * @param entryValue The value for example: '192.168.43.122.yml'.
+     * @return 1 if the operation was successful, -1 if not, 0 if the entryKey already exists.
+     */
+    public int of_addDataEntry4PlayerInternList(Spieler ps, String entryKey, String entryValue)
+    {
+        // Check if the EntryKey is already in the list.
+        String currentValue = of_getPlayerInternListData(ps, entryKey);
+
+        //  If the EntryKey is not in the list, add it.
+        if(currentValue == null)
+        {
+            Datei user = _CONTEXT.of_getPlayerFile(ps);
+            String[] internList = user.of_getStringArrayByKey("System.InternList");
+
+            if(internList == null || internList.length == 0)
+            {
+                internList = new String[0];
+            }
+
+            //  Add the EntryKey to the list.
+            internList = Sys.of_addArrayValue(internList, entryKey + "=" + entryValue);
+            user.of_getSetStringArray("System.InternList", internList);
+
+            //  Save the changes.
+            return user.of_save("SpielerService.of_addDataEntry4PlayerInternList(); Adding the EntryKey to the InternList. EntryKey: " + entryKey + " EntryValue: " + entryValue);
+        }
+
+        //  EntryKey is already in the list.
+        return 0;
+    }
+
+    /* ************************************* */
+    /* GETTER */
+    /* ************************************* */
+
+    /**
+     * This function is used to get a specific player data from the InternList.
+     * The InternList is used to check for example if the player has already accepted the data protection.
+     * @param ps Own instance of the player (Spieler).
+     * @param entryKey The value of the entry. (e.g. "IPLink")
+     * @return The value of the entry or null if the entry is not given.
+     */
+    public String of_getPlayerInternListData(Spieler ps, String entryKey)
+    {
+        Datei user = _CONTEXT.of_getPlayerFile(ps);
+
+        if(user.of_fileExists())
+        {
+            String[] internList = user.of_getStringArrayByKey("System.InternList");
+
+            if(internList != null && internList.length > 0)
+            {
+                entryKey = entryKey.toLowerCase();
+
+                for(String internKey : internList)
+                {
+                    if(internKey.split("=")[0].toLowerCase().equals(entryKey))
+                    {
+                        return internKey.split("=")[1];
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
