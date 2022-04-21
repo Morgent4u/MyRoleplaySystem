@@ -90,6 +90,8 @@ public class InventarContext extends Objekt
 
         if(invFile.of_fileExists())
         {
+            //  Create the inventory-instance.
+            Inventory inventory;
             String section = "Inventory";
 
             //  Get the inventory-name.
@@ -98,7 +100,7 @@ public class InventarContext extends Objekt
 
             String invClassification = invFile.of_getSetString(section + ".Classification", "DEFAULT").toUpperCase();
             String invType = invFile.of_getSetString(section + ".Type", "CHEST").toUpperCase();
-            boolean useInventoryType = !invType.contains("CHEST");
+            boolean lb_useInventoryType = !invType.contains("CHEST");
             boolean lb_closeOnClick = invFile.of_getSetBoolean(section + ".CloseOnClick", true);
 
             //  Get the inventory-size.
@@ -106,6 +108,31 @@ public class InventarContext extends Objekt
 
             if(invSize > 0)
             {
+                //  If the inventory-type is not a chest get the inventory-type by the name.
+                if(lb_useInventoryType)
+                {
+                    try
+                    {
+                        //  Use the given InventoryType
+                        InventoryType invTypeEnum = InventoryType.valueOf(invType);
+                        inventory = Bukkit.createInventory(null, invTypeEnum, invName);
+
+                        // Get the size of the inventory-type to avoid errors.
+                        invSize = inventory.getSize();
+                    }
+                    //  An error occurred.
+                    catch(Exception e)
+                    {
+                        inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The inventory type '" + invType + "' is not defined.");
+                        return;
+                    }
+                }
+                //  Default inventory-type (chest)
+                else
+                {
+                    inventory = Bukkit.createInventory(null, invSize, invName);
+                }
+
                 //  Create an array of ItemStacks.
                 ItemStack[] itemStacks = new ItemStack[invSize];
 
@@ -126,29 +153,6 @@ public class InventarContext extends Objekt
                             inventar.of_addCommands2ItemName(i, commandSet);
                         }
                     }
-                }
-
-                //  Create the inventory and the inventar-instance.
-                Inventory inventory;
-
-                if(useInventoryType)
-                {
-                    try
-                    {
-                        //  Use the given InventoryType
-                        InventoryType invTypeEnum = InventoryType.valueOf(invType);
-                        inventory = Bukkit.createInventory(null, invTypeEnum, invName);
-                    }
-                    catch(Exception e)
-                    {
-                        inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The inventory type '" + invType + "' is not defined.");
-                        return;
-                    }
-                }
-                //  Default inventory-type (chest)
-                else
-                {
-                    inventory = Bukkit.createInventory(null, invSize, invName);
                 }
 
                 // Check if the inventory need to be a copyInv.
