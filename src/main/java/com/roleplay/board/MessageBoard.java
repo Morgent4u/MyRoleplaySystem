@@ -181,6 +181,17 @@ public class MessageBoard extends Objekt
         message = message.replace("%rangId%", String.valueOf(ps.of_getRangId()));
         message = message.replace("%id%", String.valueOf(ps.of_getObjectId()));
 
+        //  Check for the DataProtectionDate...
+        if(message.contains("%dataProtectionDate%"))
+        {
+            String dataProtectionDate = main.SPIELERSERVICE.of_getPlayerInternListData(ps, "DataProtection");
+
+            if(dataProtectionDate != null)
+            {
+                message = message.replace("%dataProtectionDate%", dataProtectionDate);
+            }
+        }
+
         //  Check for other player...
         if(ps.of_getDbIdOtherPlayer() != 0)
         {

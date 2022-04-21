@@ -19,6 +19,7 @@ public class TextBlock extends Objekt
     private ArrayList<String> predefinedMessages = null;
     private ArrayList<String> interactiveChatMessages = null;
     private String[] cmds;
+    private String[] placeholders;
     private Datei datei;
     private Spieler ps;
 
@@ -71,6 +72,9 @@ public class TextBlock extends Objekt
 
                 for (String chatMessage : chatMessages)
                 {
+                    //  Check own replacements...
+                    chatMessage = of_translateMessageWithOwnPlaceholder(chatMessage);
+
                     //  Check for placeholder for the interactiveChat.
                     if(chatMessage.contains("%") && lb_check4InteractiveChat)
                     {
@@ -216,6 +220,31 @@ public class TextBlock extends Objekt
         return null;
     }
 
+    /**
+     * This function translates the message with own specified replacements.
+     * @param translateMessage The message to translate.
+     * @return The translated message.
+     */
+    private String of_translateMessageWithOwnPlaceholder(String translateMessage)
+    {
+        // Check own placeholders...
+        if(placeholders != null && placeholders.length > 0)
+        {
+            //  Check own placeholders...
+            for (String placeholder : placeholders)
+            {
+                String[] placeholderSplit = placeholder.split("=");
+
+                if(placeholderSplit.length == 2)
+                {
+                    return translateMessage.replace( placeholderSplit[0], placeholderSplit[1]);
+                }
+            }
+        }
+
+        return translateMessage;
+    }
+
     /* ************************************* */
     /* ADDER // SETTER */
     /* ************************************* */
@@ -272,6 +301,16 @@ public class TextBlock extends Objekt
     }
 
     /**
+     * This function is used to add a specific placeholder with the replacementValue.
+     * @param placeholder The placeholder to replace.
+     * @param replacementValue The value that will be used to replace the placeholder.
+     */
+    public void of_addPlaceholder2TextBlock(String placeholder, String replacementValue)
+    {
+        placeholders = Sys.of_addArrayValue(placeholders, placeholder + "=" + replacementValue);
+    }
+
+    /**
      * This function is used to define a CommandSet for the text block.
      * After getting the messages the CommandSet will be executed.
      * @param commandSet The CommandSet to set.
@@ -315,7 +354,18 @@ public class TextBlock extends Objekt
         {
             for(int i = 0; i < chatMessages.length; i++)
             {
-                chatMessages[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(chatMessages[i], ps);
+                //  Check own placeholder...
+                chatMessages[i] = of_translateMessageWithOwnPlaceholder(chatMessages[i]);
+
+                if(ps == null)
+                {
+                    chatMessages[i] = main.MESSAGEBOARD.of_translateMessage(chatMessages[i]);
+                }
+                //  If the player is given, translate the stats :)
+                else
+                {
+                    chatMessages[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(chatMessages[i], ps);
+                }
             }
 
             return chatMessages;

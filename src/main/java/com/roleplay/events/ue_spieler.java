@@ -1,6 +1,7 @@
 package com.roleplay.events;
 
 import com.basis.main.main;
+import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +26,25 @@ public class ue_spieler implements Listener
     {
         //  Load all player specific data from database / file-system and store the instance in the player-context.
         main.SPIELERSERVICE._CONTEXT.of_loadPlayer(e.getPlayer());
+
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
+
+        if(ps != null)
+        {
+            boolean lb_sendText4DataProtection = !( main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps) || main.SPIELERSERVICE.of_hasAlreadyIPLink(ps) );
+
+            if(lb_sendText4DataProtection)
+            {
+                //  Send the textBlock for the dataProtection agreement.
+                new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection"}, ps).of_executeAllCommands();
+            }
+            //  Check for the IP...
+            else
+            {
+                // Check if the player has already played before.
+                main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+            }
+        }
     }
 
     /**

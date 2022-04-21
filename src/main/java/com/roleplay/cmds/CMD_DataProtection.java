@@ -1,6 +1,8 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
+import com.basis.sys.Sys;
+import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,7 +33,38 @@ public class CMD_DataProtection implements CommandExecutor
 
                     if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.Dataprotection"))
                     {
-                        //  TODO: Implement some logic here...
+                        //   If the player has already accepted the data protection.
+                        if(main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps))
+                        {
+                            new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection_accepted"}, ps).of_executeAllCommands();
+                            return true;
+                        }
+
+                        if(args.length == 0)
+                        {
+                            //   Send the player the message that he has to accept the data protection.
+                            new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection"}, ps).of_executeAllCommands();
+                            return true;
+                        }
+
+                        //  Accept the data protection.
+                        if(args.length == 1)
+                        {
+                            if(args[0].equalsIgnoreCase("accept"))
+                            {
+                                // Add the necessary attributes to the InternList.
+                                main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "DataProtection", Sys.of_getTimeStamp(true));
+                                main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "IPLink", ps.of_getPlayerIPAsString());
+
+                                //  Send the accept message...
+                                new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection_accepted"}, ps).of_executeAllCommands();
+
+                                // Check if the player has already played before.
+                                main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+                            }
+                        }
+
+                        return true;
                     }
                     else
                     {

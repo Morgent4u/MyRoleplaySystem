@@ -204,7 +204,7 @@ public class Spieler extends Objekt
 
     public String of_getPlayerIPAsString()
     {
-        return Objects.requireNonNull(p.getAddress()).getAddress().toString();
+        return Objects.requireNonNull(p.getAddress()).getAddress().toString().replace("/", "");
     }
 
     /* ************************************* */

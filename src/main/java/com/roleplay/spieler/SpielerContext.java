@@ -205,6 +205,11 @@ public class SpielerContext extends Objekt
         return new Datei(userdataPath + ps.of_getUUID() + ".yml");
     }
 
+    public Datei of_getPlayerFileByUUID(String uuid)
+    {
+        return new Datei(userdataPath + uuid + ".yml");
+    }
+
     public Datei of_getPlayerIPFile(Spieler ps)
     {
         return new Datei(userdataPath + "IpAddresses//" + ps.of_getPlayerIPAsString() + ".yml");
