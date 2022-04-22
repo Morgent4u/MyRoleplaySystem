@@ -48,6 +48,7 @@ public class PermissionBoard extends Objekt
         of_addPermissions2Board("Command.Permission.Interaction", "mrs.command.interaction");
         of_addPermissions2Board("Command.Permission.Dataprotection", "mrs.command.dataprotection");
         of_addPermissions2Board("Command.Permission.Showinfo", "mrs.command.showinfo");
+        of_addPermissions2Board("Command.Permission.Textblock", "mrs.command.textblock");
 
         return datei.of_save("PermissionBoard.of_load();");
     }

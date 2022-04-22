@@ -121,6 +121,18 @@ public class SpielerService extends Objekt
         ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.NoPermissions", ps));
     }
 
+    /**
+     * This function is used to send a message to the player without using predefined messages.
+     * This should only be used if the messages are for the staff members.
+     * @param ps Player instance.
+     * @param message The message which will be displayed.
+     */
+    public void of_sendPluginMessage2Player(Spieler ps, String message)
+    {
+        message = main.MESSAGEBOARD.of_translateMessage(message);
+        ps.of_getPlayer().sendMessage(message);
+    }
+
     /* ************************************* */
     /* INVENTORY METHODS */
     /* ************************************* */

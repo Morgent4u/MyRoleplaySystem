@@ -8,6 +8,7 @@ import com.roleplay.board.PermissionBoard;
 import com.roleplay.cmds.CMD_DataProtection;
 import com.roleplay.cmds.CMD_Interaction;
 import com.roleplay.cmds.CMD_Test;
+import com.roleplay.cmds.CMD_Textblock;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
@@ -89,6 +90,7 @@ public class main extends JavaPlugin
                 getCommand("Test").setExecutor(new CMD_Test());
                 getCommand("Interaction").setExecutor(new CMD_Interaction());
                 getCommand("Dataprotection").setExecutor(new CMD_DataProtection());
+                getCommand("Textblock").setExecutor(new CMD_Textblock());
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 rc = SETTINGS.of_initSystemServices();

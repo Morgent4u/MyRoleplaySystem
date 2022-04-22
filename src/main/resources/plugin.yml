@@ -16,3 +16,6 @@ commands:
   Dataprotection:
     usuage: /Dataprotection
     tab-complete: true
+  Textblock:
+    usuage: /Textblock
+    aliases: [text]
