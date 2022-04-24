@@ -108,6 +108,7 @@ public class SpielerService extends Objekt
         //  Send the error message to the player.
         String message = main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.ErrorMessage", ps);
         message = message.replace("%errorMessage%", errorMessage);
+        message = message.replace("%errormessage%", errorMessage);
 
         ps.of_getPlayer().sendMessage(message);
     }

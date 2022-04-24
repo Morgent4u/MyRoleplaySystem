@@ -55,7 +55,7 @@ public class CommandSet extends Objekt
         //  No validation error, continue...
         for(String command : commands)
         {
-            String[] commandData = command.split("=", 1);
+            String[] commandData = command.split("=", 2);
 
             //  This need to be an empty string.
             String cmd = "";
