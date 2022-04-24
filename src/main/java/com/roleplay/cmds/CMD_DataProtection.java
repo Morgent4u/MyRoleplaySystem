@@ -36,6 +36,7 @@ public class CMD_DataProtection implements CommandExecutor
                         //   If the player has already accepted the data protection.
                         if(main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps))
                         {
+                            //  Send the player the defined textblock.
                             new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection_accepted"}, ps).of_executeAllCommands();
                             return true;
                         }
@@ -52,6 +53,9 @@ public class CMD_DataProtection implements CommandExecutor
                         {
                             if(args[0].equalsIgnoreCase("accept"))
                             {
+                                //  Allow the player to move.
+                                ps.of_setBlockedMoving(false);
+
                                 // Add the necessary attributes to the InternList.
                                 main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "DataProtection", Sys.of_getTimeStamp(true));
                                 main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "IPLink", ps.of_getPlayerIPAsString());

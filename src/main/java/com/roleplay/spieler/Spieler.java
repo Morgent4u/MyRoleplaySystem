@@ -38,6 +38,7 @@ public class Spieler extends Objekt
 
     boolean ib_playedBefore = true;
     boolean ib_newbie;
+    boolean ib_blockedMoving;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -126,6 +127,11 @@ public class Spieler extends Objekt
     public void of_setTextBlockAttribute(String textBlockName)
     {
         this.textBlockAttribute = textBlockName;
+    }
+
+    public void of_setBlockedMoving(boolean bool)
+    {
+        this.ib_blockedMoving = bool;
     }
 
     /* ************************************* */
@@ -219,5 +225,10 @@ public class Spieler extends Objekt
     public boolean of_isNewbie()
     {
         return ib_newbie;
+    }
+
+    public boolean of_isBlockedMovingEnabled()
+    {
+        return ib_blockedMoving;
     }
 }

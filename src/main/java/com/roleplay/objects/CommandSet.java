@@ -55,7 +55,7 @@ public class CommandSet extends Objekt
         //  No validation error, continue...
         for(String command : commands)
         {
-            String[] commandData = command.split("=");
+            String[] commandData = command.split("=", 1);
 
             //  This need to be an empty string.
             String cmd = "";
@@ -100,6 +100,9 @@ public class CommandSet extends Objekt
                 return 1;
             case "TEXTBLOCK":
                 new TextBlock(command, ps).of_sendMessage2Player();
+                return 1;
+            case "CHATCLEAR":
+                main.SPIELERSERVICE.of_clearChat(ps);
                 return 1;
             case "DEBUG":
                 of_sendDebugInformation("CommandSet.of_executeCommand(); DEBUG");

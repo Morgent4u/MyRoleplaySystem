@@ -337,6 +337,18 @@ public class SpielerService extends Objekt
         return false;
     }
 
+    /**
+     * This function clears the player's chat.
+     * @param ps Player instance.
+     */
+    public void of_clearChat(Spieler ps)
+    {
+        for(int i = 0; i < 100; i++)
+        {
+            ps.of_getPlayer().sendMessage("");
+        }
+    }
+
     /* ************************************* */
     /* ADDER // SETTER // REMOVER */
     /* ************************************* */

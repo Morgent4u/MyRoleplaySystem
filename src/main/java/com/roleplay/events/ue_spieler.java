@@ -6,6 +6,7 @@ import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
@@ -35,6 +36,9 @@ public class ue_spieler implements Listener
 
             if(lb_sendText4DataProtection)
             {
+                //  Disallow the player to move.
+                ps.of_setBlockedMoving(true);
+
                 //  Send the textBlock for the dataProtection agreement.
                 new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection"}, ps).of_executeAllCommands();
             }
@@ -78,6 +82,21 @@ public class ue_spieler implements Listener
             {
                 main.SPIELERSERVICE.of_openInvById(ps, 1);
             }
+        }
+    }
+
+    /**
+     * This event is used to interact with the player while he moves.
+     * @param e Event instance.
+     */
+    @EventHandler
+    public void ue_playerMove4MRS(PlayerMoveEvent e)
+    {
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
+
+        if(ps != null)
+        {
+            e.setCancelled(ps.of_isBlockedMovingEnabled());
         }
     }
 }
