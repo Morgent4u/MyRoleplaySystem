@@ -170,43 +170,48 @@ public class TextBlock extends Objekt
     @Override
     public int of_save(String invoker)
     {
-        String errorMessage = of_validate();
-
-        if(errorMessage != null)
+        if(!datei.of_fileExists())
         {
-            of_sendErrorMessage(null, "TextBlock.of_save(String); Invoker: " + invoker, errorMessage);
-            return -1;
-        }
+            String errorMessage = of_validate();
 
-        // Save the predefined messages.
-        datei.of_getSetStringArrayList("TextBlock", this.predefinedMessages);
-
-        // Save the interactive chat messages.
-        for (String interactiveChatMessage : this.interactiveChatMessages)
-        {
-            String[] iChatData = interactiveChatMessage.split("\\|");
-
-            if(iChatData.length == 4)
+            if(errorMessage != null)
             {
-                String configKey = "InteractiveMessage." + iChatData[0];
-                datei.of_set(configKey + ".Text", iChatData[1]);
-                datei.of_set(configKey + ".HoverText", iChatData[2]);
-                String[] commands = iChatData[3].split(";");
+                of_sendErrorMessage(null, "TextBlock.of_save(String); Invoker: " + invoker, errorMessage);
+                return -1;
+            }
 
-                if(commands.length > 0)
+            // Save the predefined messages.
+            datei.of_getSetStringArrayList("TextBlock", this.predefinedMessages);
+
+            // Save the interactive chat messages.
+            for (String interactiveChatMessage : this.interactiveChatMessages)
+            {
+                String[] iChatData = interactiveChatMessage.split("\\|");
+
+                if(iChatData.length == 4)
                 {
-                    datei.of_getSetStringArray(configKey + ".CommandSet", commands);
+                    String configKey = "InteractiveMessage." + iChatData[0];
+                    datei.of_set(configKey + ".Text", iChatData[1]);
+                    datei.of_set(configKey + ".HoverText", iChatData[2]);
+                    String[] commands = iChatData[3].split(";");
+
+                    if(commands.length > 0)
+                    {
+                        datei.of_getSetStringArray(configKey + ".CommandSet", commands);
+                    }
                 }
             }
+
+            //  Set the CommandSet if it is not empty.
+            if(cmds != null && cmds.length > 0)
+            {
+                datei.of_getSetStringArray("CommandSet", cmds);
+            }
+
+            return datei.of_save("TextBlock.of_save(String); Invoker: " + invoker);
         }
 
-        //  Set the CommandSet if it is not empty.
-        if(cmds != null && cmds.length > 0)
-        {
-            datei.of_getSetStringArray("CommandSet", cmds);
-        }
-
-        return datei.of_save("TextBlock.of_save(String); Invoker: " + invoker);
+        return 0;
     }
 
     @Override
