@@ -1,4 +1,4 @@
-package com.roleplay.inventar;
+package com.roleplay.extended;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;

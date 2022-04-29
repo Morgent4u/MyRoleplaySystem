@@ -3,6 +3,8 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.cmds.CMD_DataProtection;
@@ -14,6 +16,7 @@ import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
+import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -50,6 +53,7 @@ public class main extends JavaPlugin
     public static InventarService INVENTARSERVICE;
     public static MessageBoard MESSAGEBOARD;
     public static PermissionBoard PERMISSIONBOARD;
+    public static NPCService NPCSERVICE;
 
     /* ************************* */
     /* ENABLE */

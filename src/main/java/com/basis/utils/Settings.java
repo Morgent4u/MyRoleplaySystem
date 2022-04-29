@@ -5,11 +5,22 @@ import com.basis.extern.MySQL;
 import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
+import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
+import com.roleplay.npc.NPC;
+import com.roleplay.npc.NPCService;
+import com.roleplay.spieler.Spieler;
 import com.roleplay.spieler.SpielerService;
 
 /**
@@ -223,6 +234,9 @@ public class Settings extends Objekt
 
             main.PERMISSIONBOARD = new PermissionBoard();
             main.PERMISSIONBOARD.of_load();
+
+            main.NPCSERVICE = new NPCService();
+            main.NPCSERVICE.of_load();
 
             return 1;
         }

@@ -3,13 +3,12 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.roleplay.extended.InventarDatei;
 import com.roleplay.inventar.normal.inv_menu;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

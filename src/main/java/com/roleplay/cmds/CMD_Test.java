@@ -1,7 +1,6 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
-import com.roleplay.objects.NPC;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,23 +35,10 @@ public class CMD_Test implements CommandExecutor
                         {
                             if(ps.of_getPowerObject() == null)
                             {
-                                NPC npc = new NPC(p);
-                                npc.of_createNPC();
-                                npc.of_setSkin(p.getName());
-
-                                ps.of_setPowerObject(npc);
                                 p.sendMessage("§aNPC created...");
                             }
                             else
                             {
-                                NPC npc = (NPC) ps.of_getPowerObject();
-
-                                if(npc != null)
-                                {
-                                    npc.of_destroyNPC();
-                                }
-
-                                ps.of_setPowerObject(null);
                                 p.sendMessage("§aNPC Destroyed.");
                             }
 
