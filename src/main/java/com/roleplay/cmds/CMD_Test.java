@@ -33,15 +33,6 @@ public class CMD_Test implements CommandExecutor
                     {
                         if(args.length == 0)
                         {
-                            if(ps.of_getPowerObject() == null)
-                            {
-                                p.sendMessage("§aNPC created...");
-                            }
-                            else
-                            {
-                                p.sendMessage("§aNPC Destroyed.");
-                            }
-
                             // Do not change this!
                             p.sendMessage("§cCommand has been executed!");
                             return true;

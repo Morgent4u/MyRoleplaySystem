@@ -1,10 +1,15 @@
 package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.roleplay.inventar.InventarContext;
-
+import com.roleplay.spieler.Spieler;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.network.PlayerConnection;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,6 +41,80 @@ public class NPCService extends Objekt
     /* ************************************* */
     /* OBJECT METHODS */
     /* ************************************* */
+
+    /**
+     * This function is used to load all NPCs for the given player.
+     * @param ps The player to load the NPCs for.
+     */
+    public void of_showAllNPCs2Player(Spieler ps)
+    {
+        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        {
+            Player p = ps.of_getPlayer();
+
+            //  Create the connection and the packet.
+            PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
+
+            for(NPC npc : _CONTEXT.of_getLoadedNPCs())
+            {
+                EntityPlayer entityPlayer = npc.of_getEntityNPC();
+
+                //  Send packet...
+                connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer));
+                connection.a(new PacketPlayOutNamedEntitySpawn(entityPlayer));
+                connection.a(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (npc.of_getLocation().getYaw() * 256 / 360)));
+            }
+        }
+    }
+
+    /**
+     * This function is used to remove all NPCs for the given player.
+     * @param ps The player to remove the NPCs from.
+     */
+    public void of_removeAllNPCsFromPlayer(Spieler ps)
+    {
+        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        {
+            Player p = ps.of_getPlayer();
+
+            //  Create the connection and the packet.
+            PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
+
+            for(NPC npc : _CONTEXT.of_getLoadedNPCs())
+            {
+                //  Send the destory-packet.
+                connection.a(new PacketPlayOutEntityDestroy(npc.of_getEntityNPC().ae()));
+            }
+        }
+    }
+
+    /**
+     * This function is used to load all NPCs for each player.
+     */
+    public void of_showAllNPCs2AllOnlinePlayers()
+    {
+        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        {
+            for(Spieler ps : main.SPIELERSERVICE._CONTEXT.of_getAllPlayers())
+            {
+                of_showAllNPCs2Player(ps);
+            }
+        }
+    }
+
+    /**
+     * This function is used to remove all NPCs for each player.
+     */
+    public void of_removeAllNPCsFromAllOnlinePlayers()
+    {
+        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        {
+            for(Spieler ps : main.SPIELERSERVICE._CONTEXT.of_getAllPlayers())
+            {
+                of_removeAllNPCsFromPlayer(ps);
+            }
+        }
+    }
 
     /**
      * This function is used to create a GameProfile by using the SkinName.

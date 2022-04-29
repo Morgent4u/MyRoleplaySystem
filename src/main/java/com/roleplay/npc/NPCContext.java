@@ -91,10 +91,7 @@ public class NPCContext extends Objekt
             if(location != null && commandSet != null && displayName != null)
             {
                 //  Set the SkinName to NULL if it is set to 'None'.
-                if(skinName.equalsIgnoreCase("None"))
-                {
-                    skinName = null;
-                }
+                skinName = skinName.equalsIgnoreCase("None") ? null : skinName;
 
                 //  Load the NPC. The SkinName can be null.
                 NPC npc = new NPC(location, displayName, skinName);
@@ -108,6 +105,10 @@ public class NPCContext extends Objekt
                 {
                     EntityPlayer entityPlayer = of_createEntityPlayer2World(npc);
                     npc.of_setEntityNPC(entityPlayer);
+
+                    //  Teleport the EntityPlayer to the given location.
+                    Location loc = npc.of_getLocation();
+                    entityPlayer.b(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 
                     //  Add the NPC to the list.
                     npcs.put(npc.of_getObjectId(), npc);
@@ -135,8 +136,7 @@ public class NPCContext extends Objekt
     {
         //  Create an NPC.
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        Location loc = npc.of_getLocation();
-        WorldServer world = ((CraftWorld) Objects.requireNonNull(loc.getWorld())).getHandle();
+        WorldServer world = ((CraftWorld) Objects.requireNonNull(npc.of_getLocation().getWorld())).getHandle();
 
         //  Set the GameProfile and the EntityPlayer.
         GameProfile gameProfile = main.NPCSERVICE.of_createGameProfile(npc.of_getSkinName());
@@ -194,8 +194,18 @@ public class NPCContext extends Objekt
     /* GETTER */
     /* ************************************* */
 
+    public NPC of_getNPCByEntityId(int entityId)
+    {
+        return npcs.get(entityId);
+    }
+
     public int of_getLoadedNPCsSize()
     {
         return npcs.size();
+    }
+
+    public NPC[] of_getLoadedNPCs()
+    {
+        return npcs.values().toArray(new NPC[0]);
     }
 }

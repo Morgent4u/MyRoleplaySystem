@@ -48,6 +48,12 @@ public class ue_spieler implements Listener
                 // Check if the player has already played before.
                 main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
             }
+
+            //  Check for the NPCs...
+            if(main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            {
+                main.NPCSERVICE.of_showAllNPCs2Player(ps);
+            }
         }
     }
 

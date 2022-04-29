@@ -5,22 +5,12 @@ import com.basis.extern.MySQL;
 import com.basis.extern.UPDService;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
-import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.inventar.InventarService;
-import com.roleplay.npc.NPC;
 import com.roleplay.npc.NPCService;
-import com.roleplay.spieler.Spieler;
 import com.roleplay.spieler.SpielerService;
 
 /**
@@ -194,6 +184,12 @@ public class Settings extends Objekt
     @Override
     public void of_unload()
     {
+        //  If ProtocolLib and NPCs are loaded/enabled then remove the NPCs from the player.
+        if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null && main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+        {
+            main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
+        }
+
         if(main.SPIELERSERVICE != null)
         {
             main.SPIELERSERVICE.of_unload();
@@ -226,17 +222,28 @@ public class Settings extends Objekt
             main.SPIELERSERVICE = new SpielerService();
             main.SPIELERSERVICE.of_load();
 
+            //  Load own inventories or predefined ones.
             main.INVENTARSERVICE = new InventarService();
             main.INVENTARSERVICE.of_load();
 
+            //  Load the message-board.
             main.MESSAGEBOARD = new MessageBoard();
             main.MESSAGEBOARD.of_load();
 
+            //  Load the permissions-board.
             main.PERMISSIONBOARD = new PermissionBoard();
             main.PERMISSIONBOARD.of_load();
 
             main.NPCSERVICE = new NPCService();
             main.NPCSERVICE.of_load();
+            //  Load all NPCs for each player.
+            main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
+
+            //  After loading all needed services we load the ProtocolLib-Specific Listeners.
+            if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null)
+            {
+                main.PROTOCOLLIB.ue_addSpecificPacketListeners2ProtocolLibManager();
+            }
 
             return 1;
         }
