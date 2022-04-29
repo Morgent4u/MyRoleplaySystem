@@ -3,6 +3,8 @@ package com.roleplay.npc;
 import com.basis.ancestor.Objekt;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.roleplay.inventar.InventarContext;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,28 @@ import java.util.UUID;
 
 public class NPCService extends Objekt
 {
+    //  Attributes:
+    public NPCContext _CONTEXT;
+
+    /* ************************************* */
+    /* CONSTRUCTOR // LOADER */
+    /* ************************************* */
+
+    public NPCService()
+    {
+        _CONTEXT = new NPCContext();
+    }
+
+    @Override
+    public int of_load()
+    {
+        return _CONTEXT.of_load();
+    }
+
+    /* ************************************* */
+    /* OBJECT METHODS */
+    /* ************************************* */
+
     /**
      * This function is used to create a GameProfile by using the SkinName.
      * If no SkinName is given it only creates the GameProfile.

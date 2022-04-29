@@ -7,10 +7,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
-import com.roleplay.cmds.CMD_DataProtection;
-import com.roleplay.cmds.CMD_Interaction;
-import com.roleplay.cmds.CMD_Test;
-import com.roleplay.cmds.CMD_Textblock;
+import com.roleplay.cmds.*;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
@@ -78,6 +75,9 @@ public class main extends JavaPlugin
         {
             //  Deaktiviere um alle Debug-Nachrichten im Buffer zu haben, da wir reloaden!
             boolean useDebugMode = Sys.of_isDebugModeEnabled();
+
+            //  TODO: Fix this problem with the debug-mode!
+            //  of_sendDetailDebug while reloading should be stored in the buffer and displayed after reloading!
             Sys.of_setDebugMode(false);
 
             //  Einstellungen laden...
@@ -95,6 +95,7 @@ public class main extends JavaPlugin
                 getCommand("Interaction").setExecutor(new CMD_Interaction());
                 getCommand("Dataprotection").setExecutor(new CMD_DataProtection());
                 getCommand("Textblock").setExecutor(new CMD_Textblock());
+                getCommand("NPC").setExecutor(new CMD_NPC());
 
                 //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
                 rc = SETTINGS.of_initSystemServices();

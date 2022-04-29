@@ -337,6 +337,8 @@ public class Settings extends Objekt
         main.MESSAGEBOARD.of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"» Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
+        Sys.of_sendMessage(blue+"» NPCs:"+white);
+        main.NPCSERVICE._CONTEXT.of_sendDebugDetailInformation();
         Sys.of_sendMessage("┗╋━━━━━━━━ ◥◣◆◢◤ ━━━━━━━━╋┛");
     }
 

@@ -46,11 +46,6 @@ public class NPC extends Objekt
     @Override
     public String of_validate()
     {
-        if(entityNpc == null)
-        {
-            return "The entityNPC is null.";
-        }
-
         if(loc == null)
         {
             return "The location is null.";
@@ -127,6 +122,11 @@ public class NPC extends Objekt
     public void of_setCommandSet(String[] cmdSet)
     {
         this.cmds = cmdSet;
+    }
+
+    public void of_setSkinName(String skinName)
+    {
+        this.skinName = skinName;
     }
 
     /* ************************************* */

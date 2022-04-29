@@ -52,7 +52,7 @@ public class NPCContext extends Objekt
                 {
                     int rc = of_loadNPCByFile(file);
 
-                    //  If an error occurred, stop the loading.
+                    //  If an error occurred, stop the loading process.
                     if(rc != 1)
                     {
                         of_sendErrorMessage(null, "NPCContext.of_load();", "There was an error while loading the NPC from the following file: " + file.getName());
@@ -90,6 +90,12 @@ public class NPCContext extends Objekt
 
             if(location != null && commandSet != null && displayName != null)
             {
+                //  Set the SkinName to NULL if it is set to 'None'.
+                if(skinName.equalsIgnoreCase("None"))
+                {
+                    skinName = null;
+                }
+
                 //  Load the NPC. The SkinName can be null.
                 NPC npc = new NPC(location, displayName, skinName);
                 npc.of_setCommandSet(commandSet);
@@ -146,7 +152,7 @@ public class NPCContext extends Objekt
     public int of_saveNPC2File(NPC npc)
     {
         String fileName = npc.of_getDisplayName();
-        fileName = Sys.of_getNormalizedString(fileName);
+        fileName = Sys.of_getNormalizedString(fileName).toLowerCase();
         fileName = "npc_" + fileName + ".yml";
 
         // Create the file.
@@ -156,6 +162,12 @@ public class NPCContext extends Objekt
         {
             //  Save the NPC.
             datei.of_set("DisplayName", npc.of_getDisplayName());
+
+            if(npc.of_getSkinName() == null)
+            {
+                npc.of_setSkinName("None");
+            }
+
             datei.of_set("SkinName", npc.of_getSkinName());
             datei.of_getSetStringArray("CommandSet", npc.of_getCommandSet());
             datei.of_setLocation("Location", npc.of_getLocation());
