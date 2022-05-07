@@ -9,6 +9,7 @@ import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
+import com.roleplay.hologram.HologramService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
@@ -195,6 +196,11 @@ public class Settings extends Objekt
             main.SPIELERSERVICE.of_unload();
         }
 
+        if(main.HOLOGRAMSERVICE != null)
+        {
+            main.HOLOGRAMSERVICE.of_unload();
+        }
+
         //  Nach dem SpielerService etc.
         if(main.SQL != null && of_isUsingMySQL() && main.SQL.of_isConnected())
         {
@@ -234,16 +240,23 @@ public class Settings extends Objekt
             main.PERMISSIONBOARD = new PermissionBoard();
             main.PERMISSIONBOARD.of_load();
 
-            main.NPCSERVICE = new NPCService();
-            main.NPCSERVICE.of_load();
-            //  Load all NPCs for each player.
-            main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
-
             //  After loading all needed services we load the ProtocolLib-Specific Listeners.
             if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null)
             {
+                //  Create the NPCService if ProtoclLib has been loaded.
+                main.NPCSERVICE = new NPCService();
+                main.NPCSERVICE.of_load();
+
+                //  Load all NPCs for each player.
+                main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
+
+                //  Load the ProtocolLib-Specific Listeners.
                 main.PROTOCOLLIB.ue_addSpecificPacketListeners2ProtocolLibManager();
             }
+
+            //  Load the Hologram-Service.
+            main.HOLOGRAMSERVICE = new HologramService();
+            main.HOLOGRAMSERVICE.of_load();
 
             return 1;
         }
@@ -286,7 +299,7 @@ public class Settings extends Objekt
                         main.PROTOCOLLIB = new ProtocolLib();
                         int rc = main.PROTOCOLLIB.of_load();
 
-                        //  If an error occurred while registering the protocolLib object we deactivate it.
+                        //  If an error occurred while registering the protocolLib object, we're going to deactivate it.
                         if(rc != 1)
                         {
                             main.PROTOCOLLIB = null;
@@ -344,8 +357,14 @@ public class Settings extends Objekt
         main.MESSAGEBOARD.of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"» Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
-        Sys.of_sendMessage(blue+"» NPCs:"+white);
-        main.NPCSERVICE._CONTEXT.of_sendDebugDetailInformation();
+        //  The NPCService can be null if ProtocolLib has been disabled.
+        if(main.NPCSERVICE != null)
+        {
+            Sys.of_sendMessage(blue+"» NPCs:"+white);
+            main.NPCSERVICE._CONTEXT.of_sendDebugDetailInformation();
+        }
+        Sys.of_sendMessage(blue+"» Holograms:"+white);
+        main.HOLOGRAMSERVICE._CONTEXT.of_sendDebugDetailInformation();
         Sys.of_sendMessage("┗╋━━━━━━━━ ◥◣◆◢◤ ━━━━━━━━╋┛");
     }
 

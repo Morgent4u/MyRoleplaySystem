@@ -5,6 +5,7 @@ import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
 import com.roleplay.extended.LocationDatei;
+import com.roleplay.hologram.Hologram;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
@@ -85,16 +86,15 @@ public class NPCContext extends Objekt
             //  Get all important information.
             Location location = datei.of_getLocationByKey("Location");
             String[] commandSet = datei.of_getStringArrayByKey("CommandSet");
-            String displayName = datei.of_getString("DisplayName");
             String skinName = datei.of_getString("SkinName");
 
-            if(location != null && commandSet != null && displayName != null)
+            if(location != null && commandSet != null)
             {
                 //  Set the SkinName to NULL if it is set to 'None'.
                 skinName = skinName.equalsIgnoreCase("None") ? null : skinName;
 
                 //  Load the NPC. The SkinName can be null.
-                NPC npc = new NPC(location, displayName, skinName);
+                NPC npc = new NPC(location, skinName);
                 npc.of_setCommandSet(commandSet);
 
                 // Check if the NPC is valid.
@@ -104,6 +104,8 @@ public class NPCContext extends Objekt
                 if(errorMessage == null)
                 {
                     EntityPlayer entityPlayer = of_createEntityPlayer2World(npc);
+
+                    // This function also sets the ObjectId (EntityId)!
                     npc.of_setEntityNPC(entityPlayer);
 
                     //  Teleport the EntityPlayer to the given location.
@@ -151,7 +153,9 @@ public class NPCContext extends Objekt
      */
     public int of_saveNPC2File(NPC npc)
     {
-        String fileName = npc.of_getDisplayName();
+        //  The info-attribute contains the given name (which has been defined by the player).
+        //  Normalize the fileName.
+        String fileName = npc.of_getInfo();
         fileName = Sys.of_getNormalizedString(fileName).toLowerCase();
         fileName = "npc_" + fileName + ".yml";
 
@@ -160,9 +164,9 @@ public class NPCContext extends Objekt
 
         if(!datei.of_fileExists())
         {
-            //  Save the NPC.
-            datei.of_set("DisplayName", npc.of_getDisplayName());
+            Location loc = npc.of_getLocation();
 
+            //  Save the NPC.
             if(npc.of_getSkinName() == null)
             {
                 npc.of_setSkinName("None");
@@ -170,10 +174,67 @@ public class NPCContext extends Objekt
 
             datei.of_set("SkinName", npc.of_getSkinName());
             datei.of_getSetStringArray("CommandSet", npc.of_getCommandSet());
-            datei.of_setLocation("Location", npc.of_getLocation());
+            datei.of_setLocation("Location", loc);
 
-            // Save the file.
-            return datei.of_save("NPCContext.of_saveNPC2File();");
+            //  Manipulate the location because we want to save a hologram to this NPc.
+            loc.setY(loc.getY() + 1.0);
+
+            // Create a hologram-object to represent all information.
+            Hologram holo = new Hologram(loc, 0.26);
+            holo = main.HOLOGRAMSERVICE.of_addHologramLine(holo, npc.of_getInfo());
+
+            if(holo != null)
+            {
+                //  Save the hologram to the file.
+                int rc = main.HOLOGRAMSERVICE._CONTEXT.of_saveHologram2File(fileName, holo);
+
+                // Unload the hologram.
+                holo.of_unload();
+
+                // If the hologram was saved load the hologram from the file.
+                if(rc == 1)
+                {
+                    //  Load the hologram by using the load system on the context.
+                    main.HOLOGRAMSERVICE._CONTEXT.of_loadHologramFromFile(new LocationDatei(new File(holo.of_getFilePath())));
+                }
+
+                // Save the NPC-Stuff into the file.
+                rc = datei.of_save("NPCContext.of_saveNPC2File();");
+
+                if(rc == 1)
+                {
+                    // After saving the NPC successfully we load it from the file and show the created NPC, to all online players.
+                    rc = of_loadNPCByFile(datei.of_getFile().getAbsoluteFile());
+
+                    if(rc == 1)
+                    {
+                        //  Show the NPC for all online players.
+                        // Send the remove packets...
+                        main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
+
+                        //  Send the create packets...
+                        main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
+                        return 1;
+                    }
+                    //  If the NPC could not be loaded from the file.
+                    else
+                    {
+                        of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "The NPC could not be loaded from the file.");
+                    }
+                }
+                //  If file could not be saved...
+                else
+                {
+                    of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "File could not be saved.");
+                }
+            }
+            // If the hologram could not be created, do not save the npc!
+            else
+            {
+                of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "Hologram could not be created!");
+            }
+
+            return -1;
         }
 
         return -2;

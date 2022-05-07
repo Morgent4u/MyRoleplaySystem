@@ -2,22 +2,40 @@ package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.roleplay.spieler.Spieler;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.scores.ScoreboardTeam;
+import net.minecraft.world.scores.ScoreboardTeamBase;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R1.scoreboard.CraftScoreboard;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * @Created 17.04.2022
+ * @Author Nihar
+ * @Description
+ * In this class are several functions/methods which are used
+ * to handle NPC-Stuff.
+ *
+ */
 public class NPCService extends Objekt
 {
     //  Attributes:
@@ -52,17 +70,54 @@ public class NPCService extends Objekt
         {
             Player p = ps.of_getPlayer();
 
-            //  Create the connection and the packet.
+            //  Create the connection to the player-client to send the packets.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
             for(NPC npc : _CONTEXT.of_getLoadedNPCs())
             {
                 EntityPlayer entityPlayer = npc.of_getEntityNPC();
 
-                //  Send packet...
+                //  Create the Team which is used to hide the NameTag and the DataWatcher to build the full skin of the NPC.
+                ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard()).getHandle(), p.getName());
+                DataWatcher watcher = new DataWatcher(entityPlayer);
+
+                //  Disallow the NameTagVisibility of the team.
+                team.a(ScoreboardTeamBase.EnumNameTagVisibility.b);
+
+                //  DataWatcher is needed to build the full skin of the NPC.
+                watcher.a(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
+
+                // This packet adds the NPC to the player.
                 connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer));
+                //  This packet shows the NPC to the player.
                 connection.a(new PacketPlayOutNamedEntitySpawn(entityPlayer));
+                //  This packet corrects the NPC-head rotation.
                 connection.a(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (npc.of_getLocation().getYaw() * 256 / 360)));
+                // This packet is used to build the full skin of the NPC.
+                connection.a(new PacketPlayOutEntityMetadata(entityPlayer.ae(), watcher, false));
+
+                //  Remove the NameTag of the NPC.
+                PacketPlayOutScoreboardTeam teamPacket1 = PacketPlayOutScoreboardTeam.a(team);
+                PacketPlayOutScoreboardTeam teamPacket2 = PacketPlayOutScoreboardTeam.a(team, true);
+                PacketPlayOutScoreboardTeam teamPacket3 = PacketPlayOutScoreboardTeam.a(team, entityPlayer.getBukkitEntity().getName(), PacketPlayOutScoreboardTeam.a.a);
+
+                //  Send the packets which hide the NameTag of the NPC.
+                connection.a(teamPacket1);
+                connection.a(teamPacket2);
+                connection.a(teamPacket3);
+
+                //  Remove the NPC-Name from the tab-list.
+                new BukkitRunnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        //  This packet must be sent a little later.
+                        connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer));
+                    }
+
+                }.runTaskLater(main.PLUGIN, 20L);
             }
         }
     }
@@ -124,7 +179,8 @@ public class NPCService extends Objekt
      */
     public GameProfile of_createGameProfile(String skinName)
     {
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
+        // We need a blank GameProfile.
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
 
         if(skinName != null)
         {

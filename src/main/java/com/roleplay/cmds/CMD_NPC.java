@@ -35,13 +35,44 @@ public class CMD_NPC implements CommandExecutor
 
                     if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.NPC"))
                     {
+                        //  Check if the NPCService is valid!
+                        if(main.NPCSERVICE == null)
+                        {
+                            main.SPIELERSERVICE.of_sendErrorMessage(ps, "§cThe NPC service is not enabled because ProtocolLib is not used.");
+                            return true;
+                        }
+
                         if(args.length == 1)
                         {
                             String first = args[0];
 
                             if(first.equalsIgnoreCase("list"))
                             {
-                                //  TODO: List all NPCs.
+                                //  Get all current loaded NPCs and send a list into the players chat.
+                                NPC[] npcs = main.NPCSERVICE._CONTEXT.of_getLoadedNPCs();
+                                int size = npcs.length;
+
+                                if(size > 0)
+                                {
+                                    //  Messages
+                                    p.sendMessage("§7═════════════════════════");
+                                    p.sendMessage("");
+                                    p.sendMessage("§8[§4§lNPC - List§8]");
+                                    p.sendMessage("");
+                                    p.sendMessage("§9TeleportId - DisplayName");
+                                    for(int i = 0; i < size; i++)
+                                    {
+                                        p.sendMessage("§f" + (i + 1) + " §8- §7" + npcs[i].of_getInfo());
+                                    }
+                                    p.sendMessage("");
+                                    p.sendMessage("§7═════════════════════════");
+                                }
+                                //  If no NPCs has been loaded.
+                                else
+                                {
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo NPCs are loaded.");
+                                }
+
                                 return true;
                             }
                         }
@@ -62,28 +93,28 @@ public class CMD_NPC implements CommandExecutor
                                     third = args[2];
                                 }
 
-                                NPC npc = new NPC(p.getLocation(), second, third);
+                                //  Set the INFO-Attribute it's used as the fileName!
+                                NPC npc = new NPC(p.getLocation(), third);
+                                npc.of_setInfo(second);
 
                                 //  Add a default CommandSet.
                                 npc.of_setCommandSet(new String[] {"OPEN=inv_menu"});
 
+                                //  Save the new NPC.
                                 int rc = main.NPCSERVICE._CONTEXT.of_saveNPC2File(npc);
 
-                                //  If the NPC was saved successfully.
-                                //  TODO: Switch? :)
-                                if(rc == 1)
+                                //  Check the result of the save-function and send a specified message.
+                                switch (rc)
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aThe NPC was created successfully.");
-                                }
-                                //  If the NPC already exist.
-                                else if(rc == -2)
-                                {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe NPC with the name §d" + second + "§f already exists.");
-                                }
-                                //  A general error occurred.
-                                else
-                                {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the NPC.");
+                                    case 1:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aThe NPC was created successfully.");
+                                        break;
+                                    case -2:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe NPC with the name §d" + second + "§f already exists.");
+                                        break;
+                                    default:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the NPC.");
+                                        break;
                                 }
 
                                 return true;
@@ -95,11 +126,33 @@ public class CMD_NPC implements CommandExecutor
 
                                 if(objectId != -1)
                                 {
-                                    //  TODO: Teleport to the NPC.
+                                    // Get all loaded NPCs.
+                                    NPC[] npcs = main.NPCSERVICE._CONTEXT.of_getLoadedNPCs();
+                                    int size = npcs.length;
+
+                                    if(size > 0)
+                                    {
+                                        //  The objectId is the index value which is entered by the user.
+                                        if(objectId > 0 && objectId <= size)
+                                        {
+                                            NPC npc = npcs[objectId - 1];
+                                            p.teleport(npc.of_getLocation());
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aYou have been teleported to the NPC §d" + npc.of_getInfo() + "§a.");
+                                        }
+                                        // If the given ID is out of range.
+                                        else
+                                        {
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe given ID §d" + second + "§f is out of range.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo NPCs are loaded.");
+                                    }
                                 }
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "The given ID is not a valid number.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe given ID is not a valid number.");
                                 }
 
                                 return true;
@@ -126,6 +179,7 @@ public class CMD_NPC implements CommandExecutor
         return false;
     }
 
+    //  Send the default CMD-HelperText if some command arguments are wrong.
     private void of_sendCMDHelperText(Player p)
     {
         p.sendMessage("§7═════════════════════════");
@@ -141,5 +195,4 @@ public class CMD_NPC implements CommandExecutor
         p.sendMessage("");
         p.sendMessage("§7═════════════════════════");
     }
-
 }

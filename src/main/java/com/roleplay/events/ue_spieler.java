@@ -50,7 +50,7 @@ public class ue_spieler implements Listener
             }
 
             //  Check for the NPCs...
-            if(main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
             {
                 main.NPCSERVICE.of_showAllNPCs2Player(ps);
             }

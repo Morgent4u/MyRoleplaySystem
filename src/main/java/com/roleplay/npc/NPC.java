@@ -22,20 +22,18 @@ public class NPC extends Objekt
     Location loc;
 
     String[] cmds;
-    String displayName;
     String skinName;
 
     /* ************************************* */
     /* CONSTRUCTOR */
     /* ************************************* */
 
-    public NPC(Location spawnLoc, String displayName, String skinName)
+    public NPC(Location spawnLoc, String skinName)
     {
         //  Set the location.
         loc = spawnLoc;
 
-        //  Set the display name and skin name.
-        this.displayName = displayName;
+        //  Set the skin name.
         this.skinName = skinName;
     }
 
@@ -49,11 +47,6 @@ public class NPC extends Objekt
         if(loc == null)
         {
             return "The location is null.";
-        }
-
-        if(displayName == null)
-        {
-            return "The display name is null.";
         }
 
         if(cmds == null || cmds.length == 0)
@@ -73,7 +66,6 @@ public class NPC extends Objekt
     {
         //  Send the information.
         Sys.of_sendMessage("EntityId: " + ( ( entityNpc != null ) ? entityNpc.getBukkitEntity().getEntityId() : "-1" ));
-        Sys.of_sendMessage("NPC-Display name: " + displayName);
         Sys.of_sendMessage("Location: " + loc.getX() + ", " + loc.getY() + ", " + loc.getZ());
         Sys.of_sendMessage("Skin: " + skinName);
 
@@ -141,11 +133,6 @@ public class NPC extends Objekt
     public Location of_getLocation()
     {
         return loc;
-    }
-
-    public String of_getDisplayName()
-    {
-        return displayName;
     }
 
     public String of_getSkinName()

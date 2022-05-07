@@ -12,6 +12,7 @@ import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
+import com.roleplay.hologram.HologramService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
@@ -51,6 +52,7 @@ public class main extends JavaPlugin
     public static MessageBoard MESSAGEBOARD;
     public static PermissionBoard PERMISSIONBOARD;
     public static NPCService NPCSERVICE;
+    public static HologramService HOLOGRAMSERVICE;
 
     /* ************************* */
     /* ENABLE */

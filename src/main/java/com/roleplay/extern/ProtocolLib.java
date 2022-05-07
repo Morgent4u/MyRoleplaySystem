@@ -54,7 +54,7 @@ public class ProtocolLib extends Objekt
             // Only enable this packet listener if NPCs has been created.
             if(main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
             {
-                //  @PacketListener => This PacketListener is used to listen between Packets of the player and the NPC.
+                //  @PacketListener | This PacketListener is used to listen between Packets of the player and the NPC.
                 PROTOCOLMANAGER.addPacketListener(new PacketAdapter(main.PLUGIN, ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY)
                 {
                     @Override
@@ -74,17 +74,21 @@ public class ProtocolLib extends Objekt
 
                             if(npc != null)
                             {
-                                new BukkitRunnable()
+                                //  Only let the player interact when he is near the npc.
+                                if(npc.of_getLocation().distance(ps.of_getPlayer().getLocation()) <= 2)
                                 {
-
-                                    @Override
-                                    public void run()
+                                    new BukkitRunnable()
                                     {
-                                        //  Execute all given Commands for this specific NPC.
-                                        new CommandSet(npc.of_getCommandSet(), ps).of_executeAllCommands();
-                                    }
 
-                                }.runTask(main.PLUGIN);
+                                        @Override
+                                        public void run()
+                                        {
+                                            //  Execute all given Commands for this specific NPC.
+                                            new CommandSet(npc.of_getCommandSet(), ps).of_executeAllCommands();
+                                        }
+
+                                    }.runTask(main.PLUGIN);
+                                }
                             }
                         }
                     }
