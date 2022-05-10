@@ -9,13 +9,10 @@ softdepend: [Vault, PlaceholderAPI, ProtocolLib]
 commands:
   Test:
     usuage: /Test
-    tab-complete: true
   Interaction:
     usuage: /Interaction
-    tab-complete: false
   Dataprotection:
     usuage: /Dataprotection
-    tab-complete: true
   Textblock:
     usuage: /Textblock
     aliases: [text]

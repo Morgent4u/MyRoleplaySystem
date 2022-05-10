@@ -86,4 +86,31 @@ public class CMD_DataProtection implements CommandExecutor
 
         return false;
     }
+
+    /* ************************* */
+    /* TAB COMPLETE */
+    /* ************************* */
+
+    /*
+    // Attributes:
+    private static final Iterable<String> firstCompleteAttributes = Arrays.asList("accept");
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args)
+    {
+        List<String> list = new ArrayList<>();
+
+        //  We react when the second-arguments are needed!
+        if(args.length == 1)
+        {
+            // Check for the start letter of the arguments.
+            StringUtil.copyPartialMatches(args[0], firstCompleteAttributes, list);
+        }
+
+        // Sort the elements in the list.
+        Collections.sort(list);
+
+        return list;
+    }
+     */
 }

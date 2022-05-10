@@ -51,8 +51,6 @@ public class CMD_Test implements CommandExecutor
 
                         if(args.length == 2)
                         {
-
-
                             // Do not change this!
                             p.sendMessage("§cCommand has been executed! Args: 2");
                             return true;

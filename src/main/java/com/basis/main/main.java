@@ -20,6 +20,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 /**
  * @Created 02.04.2022
  * @Author Nihar
@@ -67,46 +69,46 @@ public class main extends JavaPlugin
     @Override
     public void onEnable()
     {
-        //	Initialisierungen:
+        //	Initalize the plugin.
         PLUGIN = this;
 
-        //	Überprüfen ob die Versions-Nummer stimmt...
+        //  Check if the plugin is compatible with the version.
         boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.02", "plugins");
 
         if(lb_continue)
         {
-            //  Deaktiviere um alle Debug-Nachrichten im Buffer zu haben, da wir reloaden!
             boolean useDebugMode = Sys.of_isDebugModeEnabled();
 
             //  TODO: Fix this problem with the debug-mode!
             //  of_sendDetailDebug while reloading should be stored in the buffer and displayed after reloading!
             Sys.of_setDebugMode(false);
 
-            //  Einstellungen laden...
+            //  Load the default settings.
             SETTINGS = new Settings(Sys.of_getMainFilePath());
             int rc = SETTINGS.of_load();
 
             if(rc == 1)
             {
-                //	Event und Befehle anmelden...
+                //  Register some events :)
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
 
-                // Befehle:
+                //  Register some commands:
                 getCommand("Test").setExecutor(new CMD_Test());
                 getCommand("Interaction").setExecutor(new CMD_Interaction());
                 getCommand("Dataprotection").setExecutor(new CMD_DataProtection());
                 getCommand("Textblock").setExecutor(new CMD_Textblock());
                 getCommand("NPC").setExecutor(new CMD_NPC());
 
-                //  Initalisierungen von Objekten in dieser Klasse via. des SETTINGS-Objekts.
+                // Initialize own services or dependencies.
                 rc = SETTINGS.of_initSystemServices();
 
                 if(rc == 1)
                 {
-                    //	Statusbericht an die Konsole:
+                    //  Loading was successful, so we can send a report to the console.
                     SETTINGS.of_printStatusReport2Console();
                 }
+                //  If an error occured, we send a hint to the console and disable the plugin.
                 else
                 {
                     Sys.of_sendWarningMessage("System has been disabled by the plugin. A required function or object is missing!");
@@ -119,7 +121,7 @@ public class main extends JavaPlugin
                 Bukkit.getPluginManager().disablePlugin(this);
             }
 
-            //  Alle gespeicherten Debug-Meldungen ausgeben.
+            //  Print all stored messages.
             Sys.of_setDebugMode(useDebugMode);
         }
     }
@@ -137,7 +139,7 @@ public class main extends JavaPlugin
             SETTINGS.of_unload();
         }
 
-        //	Ende.
+        //  End.
         Sys.of_sendMessage("This plugin has been coded by Nihar! Thank you for using this plugin! :^)");
     }
 }

@@ -23,7 +23,7 @@ public class Sys
     //	DebugMessages
     private static ArrayList<String> debugMessagesBuffer = new ArrayList<>();
 
-    //	Attribute der Systemklasse
+    //  Attributes:
     private static String paket;
     private static String programVersion;
     private static String version;
@@ -34,7 +34,7 @@ public class Sys
     private static int debugCounter;
 
     /* ************************************* */
-    /* ANWEISUNGEN */
+    /* MAIN METHOD */
     /* ************************************* */
 
     /**
@@ -51,57 +51,57 @@ public class Sys
     {
         boolean versionCompatible = false;
 
-        //	Paket & Ordner-Hauptverzeichnis bestimmten.
+        //  Get the paket and main-folder.
         paket = paketName;
         version = versionNummer;
         programVersion = of_getPaket() + " v"+version;
         mainRootPath = fileRootPath + "//"+paketName+"//";
 
-        //	Datei: version.yml erstellen oder Versions-Nummer überprüfen...
+        //  Create or load the version.yml to check the compatibility.
         Datei datei = new Datei(mainRootPath + "version.yml");
 
-        //	Attribute der Systemversion einholen...
+        //  Get the information about the version.
         String oldVersion = datei.of_getSetString("Version", of_getProgramVersion());
         ib_debug = datei.of_getSetBoolean("DebugMessages", true);
         datei.of_save("Sys.of_isSystemVersionCompatible();");
 
-        //	Beispiel:
+        //	Example:
         //	Current-Version: 22.1.[1].[01]
         //	Old-Version:	 21.1.[1].[22]
-        //	Das Erste  [] => Hotfix-Version
-        //	Das Zweite [] => Programmversions-Nummer
+        //	The first  [] => hotfix
+        //	The second [] => programm version
 
         String[] currentSysVersion = version.split("\\.");
         String[] oldSysVersion = oldVersion.replace(of_getPaket(), "").replace(" v", "").split("\\.");
 
-        //	Sicherstellen, dass es eine derzeitige System-Versionsnummer und vergangene System-Versionsnummer gibt.
+        // Check if the base version-stuff is valid.
         if(currentSysVersion.length == 4 && oldSysVersion.length == 4)
         {
-            //	Die ersten 2-Stellen müssen identisch sein.
-            //	Beispiel:
+            //	The first second numbers must be equal!
+            //	Example:
             //  22.1 equals 22.1
-            //	Die Erstestelle: Jahrgang
-            //	Die Zweitestelle: Release-Nummer
+            //	The first number: Year
+            //	The second number: release-number (e.g 1, 2)
 
+            //  Does the first 2 numbers match?
             if(currentSysVersion[0].equals(oldSysVersion[0]) && currentSysVersion[1].equals(oldSysVersion[1]))
             {
-                //	Sicherstellen, dass die aktuelle Programmversions-Nummer gleich oder neuer als die alte Programmversions-Nummer ist.
-                //	Das ist die 3te Stelle im !Array!, siehe obriges Beispiel!
+                //  Get the third number from the version and check if the plugin version is newer or equal than the file-version.
                 int currentProgrammVersionNumber = Integer.parseInt(currentSysVersion[3]);
                 int oldProgrammVersionNumber = Integer.parseInt(oldSysVersion[3]);
 
-                //	Version ist Kompatibel?
+                //  All fine?
                 if(currentProgrammVersionNumber >= oldProgrammVersionNumber)
                 {
                     versionCompatible = true;
 
-                    //	Hinweis-Meldung ausgeben, dass die Dateien veraltet sind.
+                    //  The plugin version is newer than the file-version, send a hint that this can cause some problems.
                     if(currentProgrammVersionNumber > oldProgrammVersionNumber)
                     {
                         of_sendWarningMessage("This plugin-version is newer than your system files. This can possible cause some problems.");
                     }
 
-                    //	Ist diese PL-Version eine Hotfix?
+                    //  If this plugin is a hotfix?
                     if(currentSysVersion[2].equals("1"))
                     {
                         ib_hotfix = true;
@@ -110,7 +110,7 @@ public class Sys
             }
         }
 
-        //	Version ist nicht kompatibel.
+        //  If the version is not compatible, send a warning message.
         if(!versionCompatible)
         {
             of_sendErrorMessage(null, "Sys", "Versionscheck", "This plugin-version does not match with the 'version.yml'. To continue with a not supported plugin-version, you can delete the 'version.yml' and reload the server.");
@@ -120,12 +120,12 @@ public class Sys
     }
 
     /* ************************************* */
-    /* ANWEISUNGEN DER KLASSE */
+    /* METHODS OF THE CLASS */
     /* ************************************* */
 
     /**
      * This function sends stored debug-messages (while reloading the server)
-     * to the console after the reload is done.
+     * to the console after to reload is done.
      */
     public static void of_sendDebugMessages2Console()
     {
