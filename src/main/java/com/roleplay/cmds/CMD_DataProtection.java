@@ -7,8 +7,13 @@ import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @Created 18.04.2022
@@ -16,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * @Description
  * This command is used to accept the data protection.
  */
-public class CMD_DataProtection implements CommandExecutor
+public class CMD_DataProtection implements CommandExecutor, TabCompleter
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -91,9 +96,8 @@ public class CMD_DataProtection implements CommandExecutor
     /* TAB COMPLETE */
     /* ************************* */
 
-    /*
     // Attributes:
-    private static final Iterable<String> firstCompleteAttributes = Arrays.asList("accept");
+    private static final Iterable<String> firstCompleteAttributes = Collections.singletonList("accept");
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args)
@@ -112,5 +116,4 @@ public class CMD_DataProtection implements CommandExecutor
 
         return list;
     }
-     */
 }
