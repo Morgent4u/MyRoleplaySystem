@@ -50,6 +50,7 @@ public class PermissionBoard extends Objekt
         of_addPermissions2Board("Command.Permission.Showinfo", "mrs.command.showinfo");
         of_addPermissions2Board("Command.Permission.Textblock", "mrs.command.textblock");
         of_addPermissions2Board("Command.Permission.NPC", "mrs.command.npc");
+        of_addPermissions2Board("Command.Permission.Hologram", "mrs.command.hologram");
 
         return datei.of_save("PermissionBoard.of_load();");
     }

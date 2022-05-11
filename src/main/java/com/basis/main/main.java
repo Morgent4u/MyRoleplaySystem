@@ -99,6 +99,7 @@ public class main extends JavaPlugin
                 getCommand("Dataprotection").setExecutor(new CMD_DataProtection());
                 getCommand("Textblock").setExecutor(new CMD_Textblock());
                 getCommand("NPC").setExecutor(new CMD_NPC());
+                getCommand("Hologram").setExecutor(new CMD_Hologram());
 
                 // Initialize own services or dependencies.
                 rc = SETTINGS.of_initSystemServices();

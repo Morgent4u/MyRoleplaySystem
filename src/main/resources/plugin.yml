@@ -16,5 +16,8 @@ commands:
   Textblock:
     usuage: /Textblock
     aliases: [text]
+  Hologram:
+    usuage: /Hologram
+    aliases: [holo, hd]
   NPC:
     usuage: /NPC

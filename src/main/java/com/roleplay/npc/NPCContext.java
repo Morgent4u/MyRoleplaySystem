@@ -181,7 +181,7 @@ public class NPCContext extends Objekt
 
             // Create a hologram-object to represent all information.
             Hologram holo = new Hologram(loc, 0.26);
-            holo = main.HOLOGRAMSERVICE.of_addHologramLine(holo, npc.of_getInfo());
+            holo = main.HOLOGRAMSERVICE.of_addHologramLine(holo, "&8[&4&l"+npc.of_getInfo()+"&8]");
 
             if(holo != null)
             {
@@ -203,7 +203,7 @@ public class NPCContext extends Objekt
 
                 if(rc == 1)
                 {
-                    // After saving the NPC successfully we load it from the file and show the created NPC, to all online players.
+                    // After saving the NPC successfully, we load it from the file and show the created NPC, to all online players.
                     rc = of_loadNPCByFile(datei.of_getFile().getAbsoluteFile());
 
                     if(rc == 1)

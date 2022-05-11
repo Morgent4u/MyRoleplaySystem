@@ -188,7 +188,7 @@ public class CMD_NPC implements CommandExecutor
         p.sendMessage("");
         p.sendMessage("§fHello §d"+p.getName() + "§f,");
         p.sendMessage("§fyou can use the following commands:");
-        p.sendMessage("§c/NPC §7- This command.");
+        p.sendMessage("§c/NPC §7- Shows the help text.");
         p.sendMessage("§c/NPC list §7- Get a list of all created NPCs.");
         p.sendMessage("§c/NPC create <DisplayName> <SkinName> §7- Create a new NPC.");
         p.sendMessage("§c/NPC tp <Id> §7- Teleport to the NPC.");

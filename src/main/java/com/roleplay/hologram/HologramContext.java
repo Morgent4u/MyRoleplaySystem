@@ -87,9 +87,11 @@ public class HologramContext extends Objekt
                     //  Iterate all lines and add them to the hologram. The add function also creates the hologram.
                     for(String line : holoLines)
                     {
-                        main.HOLOGRAMSERVICE.of_addHologramLine(hologram, line);
+                        hologram = main.HOLOGRAMSERVICE.of_addHologramLine(hologram, line);
                     }
 
+                    //  Store the filepath, this is used to delete the hologram file.
+                    hologram.of_setFilePath(datei.of_getFile().getAbsolutePath());
                     of_addHologram2Context(hologram);
                     return 1;
                 }
@@ -133,6 +135,10 @@ public class HologramContext extends Objekt
     public int of_saveHologram2File(String fileName, Hologram hologram)
     {
         //  Normalize filename.
+        if(!fileName.endsWith(".yml"))
+        {
+            fileName = fileName + ".yml";
+        }
         fileName = Sys.of_getNormalizedString(fileName);
         fileName = fileName.toLowerCase();
 
@@ -171,6 +177,31 @@ public class HologramContext extends Objekt
         return -2;
     }
 
+    /**
+     * This function is used to delete a hologram file.
+     * @param holo The hologram to delete.
+     * @return 1 if successful, -1 if an error occurred.
+     */
+    public int of_deleteHologram(Hologram holo)
+    {
+        // Call the unload function of the hologram object to delete all armor-stand entities.
+        holo.of_unload();
+
+        //  Now we can delete the file.
+        File file = new File(holo.of_getFilePath());
+
+        if(file.length() > 0)
+        {
+            if(file.delete())
+            {
+                holograms.remove(holo.of_getObjectId());
+                return 1;
+            }
+        }
+
+        return -1;
+    }
+
     /* ************************************* */
     /* DEBUG-CENTER */
     /* ************************************* */
@@ -203,4 +234,15 @@ public class HologramContext extends Objekt
     {
         return holograms.size();
     }
+
+    public Hologram of_getHologramById(int id)
+    {
+        return holograms.get(id);
+    }
+
+    public Hologram[] of_getAllHolograms()
+    {
+        return holograms.values().toArray(new Hologram[0]);
+    }
+
 }
