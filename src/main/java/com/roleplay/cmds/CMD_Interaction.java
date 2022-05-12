@@ -39,7 +39,7 @@ public class CMD_Interaction implements CommandExecutor
                             //  Check if the CommandSet comes from the TextBlock-Object.
                             if(args[0].equalsIgnoreCase("textblock"))
                             {
-                                //  Check if the given TextBlock-File is the same which is store as the textBlock attribute from the player.
+                                //  Check if the given TextBlock-File is the same which is stored as the textBlock attribute from the player.
                                 if(ps.of_getTextBlockAttribute().equals(args[1]))
                                 {
                                     // Check if commands are defined.

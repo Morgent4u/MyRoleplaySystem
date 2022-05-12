@@ -5,7 +5,7 @@ import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
 import com.roleplay.extended.LocationDatei;
-import com.roleplay.hologram.Hologram;
+import com.roleplay.spieler.Spieler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
@@ -151,7 +151,7 @@ public class NPCContext extends Objekt
      * @param npc The NPC to store into a file.
      * @return 1 = Ok, -1 = Error, -2 = NPC already exists.
      */
-    public int of_saveNPC2File(NPC npc)
+    public int of_saveNPC2File(NPC npc, Spieler ps)
     {
         //  The info-attribute contains the given name (which has been defined by the player).
         //  Normalize the fileName.
@@ -176,62 +176,41 @@ public class NPCContext extends Objekt
             datei.of_getSetStringArray("CommandSet", npc.of_getCommandSet());
             datei.of_setLocation("Location", loc);
 
-            //  Manipulate the location because we want to save a hologram to this NPc.
-            loc.setY(loc.getY() + 1.0);
+            // Save the NPC-Stuff into the file.
+            int rc = datei.of_save("NPCContext.of_saveNPC2File();");
 
-            // Create a hologram-object to represent all information.
-            Hologram holo = new Hologram(loc, 0.26);
-            holo = main.HOLOGRAMSERVICE.of_addHologramLine(holo, "&8[&4&l"+npc.of_getInfo()+"&8]");
-
-            if(holo != null)
+            if(rc == 1)
             {
-                //  Save the hologram to the file.
-                int rc = main.HOLOGRAMSERVICE._CONTEXT.of_saveHologram2File(fileName, holo);
-
-                // Unload the hologram.
-                holo.of_unload();
-
-                // If the hologram was saved load the hologram from the file.
-                if(rc == 1)
-                {
-                    //  Load the hologram by using the load system on the context.
-                    main.HOLOGRAMSERVICE._CONTEXT.of_loadHologramFromFile(new LocationDatei(new File(holo.of_getFilePath())));
-                }
-
-                // Save the NPC-Stuff into the file.
-                rc = datei.of_save("NPCContext.of_saveNPC2File();");
+                // After saving the NPC successfully, we load it from the file and show the created NPC, to all online players.
+                rc = of_loadNPCByFile(datei.of_getFile().getAbsoluteFile());
 
                 if(rc == 1)
                 {
-                    // After saving the NPC successfully, we load it from the file and show the created NPC, to all online players.
-                    rc = of_loadNPCByFile(datei.of_getFile().getAbsoluteFile());
+                    //  Show the NPC for all online players.
+                    // Send the remove packets...
+                    main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
 
-                    if(rc == 1)
-                    {
-                        //  Show the NPC for all online players.
-                        // Send the remove packets...
-                        main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
+                    //  Send the create packets...
+                    main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
 
-                        //  Send the create packets...
-                        main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
-                        return 1;
-                    }
-                    //  If the NPC could not be loaded from the file.
-                    else
+                    //  Perform a command to create the hologram. This is used to avoid the problem with the name of the npc.
+                    if(ps != null)
                     {
-                        of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "The NPC could not be loaded from the file.");
+                        ps.of_getPlayer().performCommand("hd create " + fileName + " &8[&cNPC: &f"+npc.of_getInfo()+"&8]");
                     }
+
+                    return 1;
                 }
-                //  If file could not be saved...
+                //  If the NPC could not be loaded from the file.
                 else
                 {
-                    of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "File could not be saved.");
+                    of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "The NPC could not be loaded from the file.");
                 }
             }
-            // If the hologram could not be created, do not save the npc!
+            //  If file could not be saved...
             else
             {
-                of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "Hologram could not be created!");
+                of_sendErrorMessage(null, "NPCContext.of_saveNPC2File();", "File could not be saved.");
             }
 
             return -1;

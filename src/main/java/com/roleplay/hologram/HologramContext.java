@@ -87,7 +87,7 @@ public class HologramContext extends Objekt
                     //  Iterate all lines and add them to the hologram. The add function also creates the hologram.
                     for(String line : holoLines)
                     {
-                        hologram = main.HOLOGRAMSERVICE.of_addHologramLine(hologram, line);
+                        hologram = main.HOLOGRAMSERVICE.of_addLine2Hologram(hologram, line);
                     }
 
                     //  Store the filepath, this is used to delete the hologram file.
@@ -174,6 +174,30 @@ public class HologramContext extends Objekt
             return -1;
         }
 
+        return -2;
+    }
+
+    /**
+     * This function is used to update the hologram-file with the new hologram-titles.
+     * @param holo The hologram to update.
+     * @return 1 if successful, -1 if an error occurred., -2 If the file does not exist.
+     */
+    public int of_updateHologram2File(Hologram holo)
+    {
+        //  Get the hologram-file.
+        LocationDatei datei = new LocationDatei(new File(holo.of_getFilePath()));
+
+        if(datei.of_fileExists())
+        {
+            //  Get the hologram-titles.
+            ArrayList<String> lines = holo.of_getHologramTitles();
+            lines = Sys.of_getReplacedArrayList(lines, "§", "&");
+            datei.of_set("Hologram.Titles", lines);
+
+            return datei.of_save("HologramContext.of_updateHologram2File();");
+        }
+
+        //  Only existing holograms can be updated.
         return -2;
     }
 

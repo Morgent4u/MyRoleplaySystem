@@ -1,5 +1,6 @@
 package com.basis.ancestor;
 
+import com.basis.main.main;
 import com.basis.sys.Sys;
 
 import java.text.SimpleDateFormat;
@@ -106,7 +107,7 @@ public class Objekt
      */
     public void of_sendDebugInformation(String invoker)
     {
-        if(Sys.of_isDebugModeEnabled())
+        if(Sys.of_isDebugModeEnabled() || main.of_isReloading())
         {
             //	Farbcodes
             String white = "\u001B[0m";

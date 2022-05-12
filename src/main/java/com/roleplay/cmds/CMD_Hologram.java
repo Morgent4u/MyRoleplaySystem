@@ -89,29 +89,13 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                             {
                                 // First = tp
                                 // Second = <id>
-                                int id = Sys.of_getString2Int(second);
+                                Hologram holo = of_getHologramByPlayerInput(ps, second);
 
-                                if(id != -1)
+                                if(holo != null)
                                 {
-                                    //  Get the hologram with the id.
-                                    Hologram hologram = main.HOLOGRAMSERVICE._CONTEXT.of_getHologramById(id);
-
-                                    if(hologram != null)
-                                    {
-                                        //  Teleport the player to the hologram.
-                                        p.teleport(hologram.of_getSpawnLocation());
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aTeleported to hologram with id: §f" + id);
-                                    }
-                                    // If the hologram with the id is not found.
-                                    else
-                                    {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram with the id §f" + id + " §cis not found.");
-                                    }
-                                }
-                                // An invalid id has been entered.
-                                else
-                                {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cInvalid id.");
+                                    //  Teleport the player to the hologram.
+                                    p.teleport(holo.of_getSpawnLocation());
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aTeleported to hologram with id: §f" + second);
                                 }
 
                                 return true;
@@ -121,33 +105,22 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                             {
                                 // First = delete
                                 // Second = <id>
-                                int id = Sys.of_getString2Int(second);
+                                Hologram holo = of_getHologramByPlayerInput(ps, second);
 
-                                if(id != -1)
+                                if(holo != null)
                                 {
-                                    //  Get the hologram with the id.
-                                    Hologram hologram = main.HOLOGRAMSERVICE._CONTEXT.of_getHologramById(id);
+                                    //  Delete the hologram.
+                                    int rc = main.HOLOGRAMSERVICE._CONTEXT.of_deleteHologram(holo);
 
-                                    if(hologram != null)
+                                    if(rc == 1)
                                     {
-                                        //  Delete the hologram.
-                                        int rc = main.HOLOGRAMSERVICE._CONTEXT.of_deleteHologram(hologram);
-
-                                        if(rc == 1)
-                                        {
-                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aHologram with the id §f" + id + "§a has been successfully deleted!");
-                                        }
-                                        // An error has occurred.
-                                        else
-                                        {
-                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error has occurred.");
-                                        }
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aHologram with the id §f" + second + "§a has been successfully deleted!");
                                     }
-                                }
-                                // An invalid id has been entered.
-                                else
-                                {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cInvalid id.");
+                                    // An error has occurred.
+                                    else
+                                    {
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error has occurred.");
+                                    }
                                 }
 
                                 return true;
@@ -167,7 +140,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                                 // Second = fileName
                                 // Third = Text
 
-                                //  Create a hologram.
+                                //  Create the text (first line) for the hologram.
                                 for(int i = 3; i < args.length; i++)
                                 {
                                     third.append(" ").append(args[i]);
@@ -180,7 +153,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
 
                                 //  Create the hologram.
                                 Hologram holo = new Hologram(loc, 0.26);
-                                holo = main.HOLOGRAMSERVICE.of_addHologramLine(holo, text);
+                                holo = main.HOLOGRAMSERVICE.of_addLine2Hologram(holo, text);
 
                                 if(holo != null)
                                 {
@@ -218,6 +191,166 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
 
                                 return true;
                             }
+                            else if(first.equalsIgnoreCase("add"))
+                            {
+                                // First = Add
+                                // Id = HologramId
+                                // Third = Text
+
+                                Hologram holo = of_getHologramByPlayerInput(ps, second);
+
+                                if(holo != null)
+                                {
+                                    //  Create the line which will be added to the hologram.
+                                    for(int i = 3; i < args.length; i++)
+                                    {
+                                        third.append(" ").append(args[i]);
+                                    }
+
+                                    // The line which will be added.
+                                    String text = third.toString().replace("&", "§");
+                                    holo = main.HOLOGRAMSERVICE.of_addLine2Hologram(holo, text);
+
+                                    //  Update the hologram to the file.
+                                    int rc = main.HOLOGRAMSERVICE._CONTEXT.of_updateHologram2File(holo);
+
+                                    switch (rc)
+                                    {
+                                        case 1:
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aHologram §f"+second+" §aupdated (line added).");
+                                            break;
+                                        case -1:
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram could not be updated.");
+                                            holo.of_sendDebugInformation("CMD_Hologram: by "+ps.of_getPlayer().getName() + " > ADD > "+text);
+                                            break;
+                                        case -2:
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram does not exist.");
+                                            break;
+                                    }
+                                }
+
+                                return true;
+                            }
+                            else if(first.equalsIgnoreCase("remove"))
+                            {
+                                // First = Remove
+                                // Id = HologramId
+                                // Third = LineId
+
+                                // Remove the hologram.
+                                Hologram holo = of_getHologramByPlayerInput(ps, second);
+
+                                if(holo != null)
+                                {
+                                    // The line which will be removed.
+                                    int line = Sys.of_getString2Int(third.toString());
+
+                                    // Remove the line from the hologram.
+                                    if(line != -1)
+                                    {
+                                        holo = main.HOLOGRAMSERVICE.of_removeLineFromHologram(holo, line);
+
+                                        if(holo != null)
+                                        {
+                                            int rc = main.HOLOGRAMSERVICE._CONTEXT.of_updateHologram2File(holo);
+
+                                            //  If the hologram has been deleted in the of_removeLineFromHologram function the file does not exist.
+                                            //  So we get the returnCode -2, and we can live with it (it is not necessary to specify a message).
+                                            if(rc == 1 || rc == -2)
+                                            {
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aHologram §f"+second+" §aupdated (line removed).");
+                                            }
+                                            //  If the file could not be updated (no permissions), we send a message.
+                                            else
+                                            {
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram could not be updated.");
+                                            }
+                                        }
+                                        // If the line is not found.
+                                        else
+                                        {
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cLine does not exist.");
+                                        }
+                                    }
+                                    // If the line does not exist.
+                                    else
+                                    {
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cLine does not exist.");
+                                    }
+                                }
+
+                                return true;
+                            }
+                        }
+
+                        if(args.length >= 4)
+                        {
+                            String first = args[0];
+                            String second = args[1];
+                            StringBuilder third = new StringBuilder(args[2]);
+                            StringBuilder fourth = new StringBuilder(args[3]);
+
+                            if(first.equalsIgnoreCase("edit"))
+                            {
+                                // First = Edit
+                                // Id = HologramId
+                                // Second = LineId
+                                // Third = Text
+
+                                Hologram holo = of_getHologramByPlayerInput(ps, second);
+
+                                if(holo != null)
+                                {
+                                    // The line which will be edited.
+                                    int line = Sys.of_getString2Int(third.toString());
+
+                                    // Edit the line in the hologram.
+                                    if(line != -1)
+                                    {
+                                        // Build the text which will be replaced.
+                                        for (int i = 4; i < args.length; i++)
+                                        {
+                                            fourth.append(" ").append(args[i]);
+                                        }
+
+                                        String text = fourth.toString();
+
+                                        //  Edit the line.
+                                        int rc = main.HOLOGRAMSERVICE.of_editHologramLine(holo, line, text);
+
+                                        if(rc == 1)
+                                        {
+                                            rc = main.HOLOGRAMSERVICE._CONTEXT.of_updateHologram2File(holo);
+
+                                            switch (rc)
+                                            {
+                                                case 1:
+                                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aHologram §f"+second+" §aupdated (line edited).");
+                                                    break;
+                                                case -1:
+                                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram could not be updated.");
+                                                    break;
+                                                case -2:
+                                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cA general error occurred. Print a report to the console.");
+                                                    holo.of_sendDebugInformation("This has been called by the hd-editing-process by the player " + ps.of_getPlayer().getName() + ".");
+                                                    break;
+                                            }
+
+                                        }
+                                        // When the line could not be edited.
+                                        else
+                                        {
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cLine could not be edited. Does the line exist?");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cLine does not exist.");
+                                    }
+                                }
+
+                                return true;
+                            }
                         }
 
                         //  If no arguments are given send the default CMD-Help-Text.
@@ -241,6 +374,10 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
         return false;
     }
 
+    /* ************************* */
+    /* SEND CMD-HELPER */
+    /* ************************* */
+
     //  Send the default CMD-HelperText if some command arguments are wrong.
     private void of_sendCMDHelperText(Player p)
     {
@@ -254,11 +391,43 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
         p.sendMessage("§c/HD create <fileName> [...] §7- Create a new hologram.");
         p.sendMessage("§c/HD delete <id> §7- Delete a hologram.");
         p.sendMessage("§c/HD add <id> [...] §7- Add a line to a hologram.");
-        p.sendMessage("§c/HD remove <id> §7- Remove a line from a hologram.");
+        p.sendMessage("§c/HD remove <id> <line> §7- Remove a line from a hologram.");
+        p.sendMessage("§c/HD edit <id> <line> <text> §7- Edit a line in a hologram.");
         p.sendMessage("§c/HD list §7- Get a list of all created holograms.");
         p.sendMessage("§c/HD tp <id> §7- Teleport to the hologram.");
         p.sendMessage("");
         p.sendMessage("§7═════════════════════════");
+    }
+
+    /* ************************* */
+    /* OBJECT-METHODS */
+    /* ************************* */
+
+    private Hologram of_getHologramByPlayerInput(Spieler ps, String holoStringId)
+    {
+        int id = Sys.of_getString2Int(holoStringId);
+
+        if(id != -1)
+        {
+            Hologram holo = main.HOLOGRAMSERVICE._CONTEXT.of_getHologramById(id);
+
+            if(holo != null)
+            {
+                return holo;
+            }
+            //  If the hologram does not exist.
+            else
+            {
+                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram with the id §f" + id + " §cis not found.");
+            }
+        }
+        // An invalid id has been entered.
+        else
+        {
+            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cInvalid id.");
+        }
+
+        return null;
     }
 
     /* ************************* */
@@ -268,6 +437,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
     // Attributes:
     private static final Iterable<String> firstCompleteAttributes = Arrays.asList("delete", "create", "add", "remove", "list", "tp");
     private static final Iterable<String> secondCompleteAttributes = Arrays.asList("<id>", "<fileName>");
+    private static final Iterable<String> thirdCompleteAttributes = Collections.singletonList("&aYour text here");
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args)
@@ -283,6 +453,10 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
         else if(args.length == 2)
         {
             StringUtil.copyPartialMatches(args[1], secondCompleteAttributes, list);
+        }
+        else if(args.length == 3)
+        {
+            StringUtil.copyPartialMatches(args[2], thirdCompleteAttributes, list);
         }
 
         // Sort the elements in the list.

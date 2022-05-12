@@ -101,7 +101,7 @@ public class CMD_NPC implements CommandExecutor
                                 npc.of_setCommandSet(new String[] {"OPEN=inv_menu"});
 
                                 //  Save the new NPC.
-                                int rc = main.NPCSERVICE._CONTEXT.of_saveNPC2File(npc);
+                                int rc = main.NPCSERVICE._CONTEXT.of_saveNPC2File(npc, ps);
 
                                 //  Check the result of the save-function and send a specified message.
                                 switch (rc)

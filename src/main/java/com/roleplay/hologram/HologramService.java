@@ -113,12 +113,12 @@ public class HologramService extends Objekt
 
     /**
      * This function adds a new hologram to the world.
-     * Or adds to a hologram which already exist a new line.
+     * Or adds to an existing hologram a new line.
      * @param holo The hologram.
      * @param title The title of the hologram.
      * @return The given hologram.
      */
-    public Hologram of_addHologramLine(Hologram holo, String title)
+    public Hologram of_addLine2Hologram(Hologram holo, String title)
     {
         // Get the last location of the hologram.
         Location loc = holo.of_getLastArmorStandLocation();
@@ -153,10 +153,29 @@ public class HologramService extends Objekt
      * @param indexId The index-number of the hologram.
      * @return The hologram if the index-number is valid, null if the index-number is invalid.
      */
-    public Hologram of_removeHologramLineById(Hologram holo, int indexId)
+    public Hologram of_removeLineFromHologram(Hologram holo, int indexId)
     {
+        //  We subtract 1 from the indexId because the input of the player is 1-based.
+        indexId--;
+
         if(indexId < holo.of_getArmorStandSize())
         {
+            // If only one armorStand is left, we delete the whole hologram.
+            if(holo.of_getArmorStandSize() == 1)
+            {
+                int rc = _CONTEXT.of_deleteHologram(holo);
+
+                if(rc == 1)
+                {
+                    return holo;
+                }
+                //  An error occurred.
+                else
+                {
+                    holo.of_sendErrorMessage(null, "HologramService.of_removeLineFromHologram();", "An error occurred while deleting the hologram. This error can be ignored!");
+                }
+            }
+
             holo.of_removeArmorStand(indexId);
 
             //  Normalize the armorStands.

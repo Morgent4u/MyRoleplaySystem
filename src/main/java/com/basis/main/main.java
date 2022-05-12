@@ -41,6 +41,7 @@ public class main extends JavaPlugin
 {
     //	Instances of the system.
     public static Plugin PLUGIN;
+    private static boolean ib_reload;
 
     //  Dependencies:
     public static MySQL SQL;
@@ -71,6 +72,7 @@ public class main extends JavaPlugin
     {
         //	Initalize the plugin.
         PLUGIN = this;
+        ib_reload = true;
 
         //  Check if the plugin is compatible with the version.
         boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.02", "plugins");
@@ -79,8 +81,7 @@ public class main extends JavaPlugin
         {
             boolean useDebugMode = Sys.of_isDebugModeEnabled();
 
-            //  TODO: Fix this problem with the debug-mode!
-            //  of_sendDetailDebug while reloading should be stored in the buffer and displayed after reloading!
+            //  Disable the debugMode and enable it later to print all stored messages.
             Sys.of_setDebugMode(false);
 
             //  Load the default settings.
@@ -125,6 +126,8 @@ public class main extends JavaPlugin
             //  Print all stored messages.
             Sys.of_setDebugMode(useDebugMode);
         }
+
+        ib_reload = false;
     }
 
     /* ************************* */
@@ -142,5 +145,14 @@ public class main extends JavaPlugin
 
         //  End.
         Sys.of_sendMessage("This plugin has been coded by Nihar! Thank you for using this plugin! :^)");
+    }
+
+    /* ************************* */
+    /* BOOLS */
+    /* ************************* */
+
+    public static boolean of_isReloading()
+    {
+        return ib_reload;
     }
 }
