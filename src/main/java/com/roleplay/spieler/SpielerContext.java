@@ -102,6 +102,13 @@ public class SpielerContext extends Objekt
             //  Add the player instance to the player list.
             ps.of_setObjectId(dbId);
             players.put(p.getName(), ps);
+
+            //  After this is done, we load the scoreBoard to the player.
+            //  Check if scoreBoard is null because in the reload-process it's null!
+            if(main.SETTINGS.of_isUsingScoreboard() && main.SCOREBOARD != null)
+            {
+                main.SCOREBOARD.of_sendScoreboard2Player(ps);
+            }
         }
     }
 

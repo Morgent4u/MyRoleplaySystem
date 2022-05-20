@@ -7,6 +7,7 @@ import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
+import com.roleplay.board.ScoreBoard;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
@@ -29,6 +30,7 @@ public class Settings extends Objekt
     //	Attribute:
     Datei datei;
 
+    String[] scoreboardLines;
     String sectionKey;
 
     //  Dependencies:
@@ -40,6 +42,7 @@ public class Settings extends Objekt
 
     //  Setting-Attributes:
     boolean ib_useMenuOnSwap;
+    boolean ib_useScoreboard;
 
     //  Money-Attributes:
     boolean ib_useVaultMoney;
@@ -81,7 +84,7 @@ public class Settings extends Objekt
         {
             //  Einstellungen einlesen...
             String apiSection = sectionKey + ".API.";
-            ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", true);
+            ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", false);
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
             ib_useProtocolLib = datei.of_getSetBoolean(apiSection + "ProtocolLib.Use", true);
 
@@ -90,9 +93,21 @@ public class Settings extends Objekt
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
+            ib_useScoreboard = datei.of_getSetBoolean(rpSection + "Scoreboard.Use", true);
+
+            if(of_isUsingScoreboard())
+            {
+                String[] lines = new String[]{"&c"+Sys.of_getProgramVersion(), "&fThis is a test.", "&fChange me &e:)"};
+                scoreboardLines = datei.of_getSetStringArray(rpSection + "Scoreboard.Lines", lines);
+
+                if(scoreboardLines == null || scoreboardLines.length == 0)
+                {
+                    ib_useScoreboard = false;
+                    Sys.of_debug("Deactivated the scoreboard-system because no lines are defined or the entry does not exist!");
+                }
+            }
 
             //	MySQL-Attribute einlesen:
-
             String externalSection = sectionKey + ".External.";
             ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
             String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");
@@ -209,7 +224,7 @@ public class Settings extends Objekt
     }
 
     /* ************************* */
-    /* OBJEKT-ANWEISUNGEN */
+    /* OBJECT METHODS */
     /* ************************* */
 
     /**
@@ -222,23 +237,25 @@ public class Settings extends Objekt
         //  Check for the required components before registering own services.
         int rc = of_checkExternComponents();
 
+        //  Initializes own services.
         if(rc == 1)
         {
-            //  Initializes own services.
+            //  First step, load the PermissionsBoard to make sure that
+            //  we have permissions for player-stuff.
+            main.PERMISSIONBOARD = new PermissionBoard();
+            main.PERMISSIONBOARD.of_load();
+
+            //  Load all predefined messages...
+            main.MESSAGEBOARD = new MessageBoard();
+            main.MESSAGEBOARD.of_load();
+
+            //  Load the player service...
             main.SPIELERSERVICE = new SpielerService();
             main.SPIELERSERVICE.of_load();
 
             //  Load own inventories or predefined ones.
             main.INVENTARSERVICE = new InventarService();
             main.INVENTARSERVICE.of_load();
-
-            //  Load the message-board.
-            main.MESSAGEBOARD = new MessageBoard();
-            main.MESSAGEBOARD.of_load();
-
-            //  Load the permissions-board.
-            main.PERMISSIONBOARD = new PermissionBoard();
-            main.PERMISSIONBOARD.of_load();
 
             //  After loading all needed services we load the ProtocolLib-Specific Listeners.
             if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null)
@@ -257,6 +274,13 @@ public class Settings extends Objekt
             //  Load the Hologram-Service.
             main.HOLOGRAMSERVICE = new HologramService();
             main.HOLOGRAMSERVICE.of_load();
+
+            //  Create the scoreBoard for each online-player if it's enabled!
+            if(of_isUsingScoreboard())
+            {
+                main.SCOREBOARD = new ScoreBoard(scoreboardLines);
+                main.SCOREBOARD.of_loadScoreboard2AllPlayers();
+            }
 
             return 1;
         }
@@ -442,5 +466,10 @@ public class Settings extends Objekt
     public boolean of_isUsingProtocolLib()
     {
         return ib_useProtocolLib;
+    }
+
+    public boolean of_isUsingScoreboard()
+    {
+        return ib_useScoreboard;
     }
 }

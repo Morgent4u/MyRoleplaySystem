@@ -3,10 +3,9 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
+import com.roleplay.board.ScoreBoard;
 import com.roleplay.cmds.*;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
@@ -19,8 +18,6 @@ import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 /**
  * @Created 02.04.2022
@@ -56,6 +53,7 @@ public class main extends JavaPlugin
     public static PermissionBoard PERMISSIONBOARD;
     public static NPCService NPCSERVICE;
     public static HologramService HOLOGRAMSERVICE;
+    public static ScoreBoard SCOREBOARD;
 
     /* ************************* */
     /* ENABLE */
@@ -75,7 +73,7 @@ public class main extends JavaPlugin
         ib_reload = true;
 
         //  Check if the plugin is compatible with the version.
-        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.02", "plugins");
+        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.03", "plugins");
 
         if(lb_continue)
         {

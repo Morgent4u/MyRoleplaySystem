@@ -261,24 +261,39 @@ public class Sys
     {
         if(myArray != null && myArray.length > 0)
         {
-            String[] newArray = new String[ myArray.length - 1];
-
-            //	Sicherstellen, dass wir min. 2 Einträge haben und nur 1x entfernen!
-            if(newArray.length != 0)
+            for(int i = 0; i < myArray.length; i++)
             {
-                for(int i = 0; i < myArray.length; i++)
+                if(myArray[i].equals(removeValue))
                 {
-                    if(!myArray[i].equals(removeValue))
-                    {
-                        newArray[i] = myArray[i];
-                    }
+                    return of_removeArrayValueByIndex(myArray, i);
                 }
-
-                return newArray;
             }
         }
 
         return new String[0];
+    }
+
+    /**
+     * This function is used to remove an array entry by using the given index.
+     * @param myArray The Array from which a value needs to be removed.
+     * @param indexId The index-id of the array-element.
+     * @return Array with the removed element-value.
+     */
+    public static String[] of_removeArrayValueByIndex(String[] myArray, int indexId)
+    {
+        //  Check if index is valid.
+        if(myArray == null || indexId < 0 || indexId >= myArray.length)
+        {
+            return new String[0];
+        }
+
+        String[] temp = new String[myArray.length - 1];
+        System.arraycopy(myArray, 0, temp, 0, indexId);
+        System.arraycopy(myArray, indexId + 1, temp, indexId, myArray.length - indexId - 1);
+
+        myArray = temp;
+
+        return myArray;
     }
 
     /**

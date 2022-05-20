@@ -96,6 +96,7 @@ public class NPCContext extends Objekt
                 //  Load the NPC. The SkinName can be null.
                 NPC npc = new NPC(location, skinName);
                 npc.of_setCommandSet(commandSet);
+                npc.of_setInfo(datei.of_getFileName());
 
                 // Check if the NPC is valid.
                 String errorMessage = npc.of_validate();
