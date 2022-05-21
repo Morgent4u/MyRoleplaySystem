@@ -12,6 +12,7 @@ import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
 import com.roleplay.inventar.InventarService;
+import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
 
@@ -31,6 +32,7 @@ public class Settings extends Objekt
     Datei datei;
 
     String[] scoreboardLines;
+    String[] joinQuitMessage;
     String sectionKey;
 
     //  Dependencies:
@@ -43,6 +45,8 @@ public class Settings extends Objekt
     //  Setting-Attributes:
     boolean ib_useMenuOnSwap;
     boolean ib_useScoreboard;
+    boolean ib_useTablist;
+    boolean ib_useJoinQuitMsg;
 
     //  Money-Attributes:
     boolean ib_useVaultMoney;
@@ -93,6 +97,8 @@ public class Settings extends Objekt
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
+
+            //  Load the Scoreboard-Settings:
             ib_useScoreboard = datei.of_getSetBoolean(rpSection + "Scoreboard.Use", true);
 
             if(of_isUsingScoreboard())
@@ -105,6 +111,27 @@ public class Settings extends Objekt
                     ib_useScoreboard = false;
                     Sys.of_debug("Deactivated the scoreboard-system because no lines are defined or the entry does not exist!");
                 }
+            }
+
+            //  Load the tab-list setting (can we use the tab-list?):
+            ib_useTablist = datei.of_getSetBoolean(rpSection + "Tablist.Use", true);
+
+            //  Load the tab-list if it is enabled:
+            if(of_isUsingTablist())
+            {
+                //  Load the tab-list.
+                main.TABLISTMANAGER = new TablistManager();
+                main.TABLISTMANAGER.of_loadPredefinedTeams(datei, rpSection + "Tablist");
+            }
+
+            //  Enable or disable the join- and quit-message.
+            ib_useJoinQuitMsg = datei.of_getSetBoolean(rpSection + "JoinQuitMsg.Use", true);
+
+            if(of_isUsingJoinAndQuitMessage())
+            {
+                joinQuitMessage = new String[2];
+                joinQuitMessage[0] = datei.of_getSetString(rpSection + "JoinQuitMsg.Join", "&aWelcome to our server, &e%p%&a!");
+                joinQuitMessage[1] = datei.of_getSetString(rpSection + "JoinQuitMsg.Quit", "&cGoodbye &e%p%&c!");
             }
 
             //	MySQL-Attribute einlesen:
@@ -282,6 +309,12 @@ public class Settings extends Objekt
                 main.SCOREBOARD.of_loadScoreboard2AllPlayers();
             }
 
+            //  We create for every player the tab-list.
+            if(of_isUsingTablist())
+            {
+                main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
+            }
+
             return 1;
         }
 
@@ -366,6 +399,8 @@ public class Settings extends Objekt
         Sys.of_sendMessage(purple+"Nihar"+white);
         Sys.of_sendMessage(blue+"[*] Settings:"+white);
         Sys.of_sendMessage("Plugin-Enabled: "+of_isUsingPlugin());
+        //  We don't show the debug-mode because we deactivated it in the reload-process.
+        // Sys.of_sendMessage("DebugMode-Enabled: "+Sys.of_isDebugModeEnabled());
         Sys.of_sendMessage("MySQL-Enabled: "+of_isUsingMySQL());
         if(main.SQL != null)
         {
@@ -375,9 +410,9 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage("ProtocolLib-Enabled: "+of_isUsingProtocolLib());
-        Sys.of_sendMessage(blue+"[*] Permission board:"+white);
+        Sys.of_sendMessage(blue+"[*] Permissions-board:"+white);
         main.PERMISSIONBOARD.of_sendDebugDetailInformation();
-        Sys.of_sendMessage(blue+"[*] Message-/Soundboard:"+white);
+        Sys.of_sendMessage(blue+"[*] Message-/Sound-board:"+white);
         main.MESSAGEBOARD.of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"[*] Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
@@ -429,6 +464,34 @@ public class Settings extends Objekt
         return moneyDefaultCash;
     }
 
+    /**
+     * This function returns the join message for the player.
+     * @return The join message.
+     */
+    public String of_getJoinMessage()
+    {
+        if(joinQuitMessage != null && joinQuitMessage.length > 0)
+        {
+            return joinQuitMessage[0];
+        }
+
+        return "";
+    }
+
+    /**
+     * This function returns the quit message for the player.
+     * @return The quit message.
+     */
+    public String of_getQuitMessage()
+    {
+        if(joinQuitMessage != null && joinQuitMessage.length > 0)
+        {
+            return joinQuitMessage[1];
+        }
+
+        return "";
+    }
+
     /* ************************* */
     /* BOOLS */
     /* ************************* */
@@ -471,5 +534,15 @@ public class Settings extends Objekt
     public boolean of_isUsingScoreboard()
     {
         return ib_useScoreboard;
+    }
+
+    public boolean of_isUsingTablist()
+    {
+        return ib_useTablist;
+    }
+
+    public boolean of_isUsingJoinAndQuitMessage()
+    {
+        return ib_useJoinQuitMsg;
     }
 }

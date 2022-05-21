@@ -54,6 +54,18 @@ public class ue_spieler implements Listener
             {
                 main.NPCSERVICE.of_showAllNPCs2Player(ps);
             }
+
+            //  When we are using the tab-list manager we need to update/create the tab-list for the player :)!
+            if(main.SETTINGS.of_isUsingTablist())
+            {
+                main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
+            }
+
+            //  If we use the joinQuitMessage, we send them into the chat.
+            if(main.SETTINGS.of_isUsingJoinAndQuitMessage())
+            {
+                e.setJoinMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getJoinMessage(), ps));
+            }
         }
     }
 
@@ -69,6 +81,12 @@ public class ue_spieler implements Listener
 
         if(ps != null)
         {
+            //  If we use the joinQuitMessage, we send them into the chat.
+            if(main.SETTINGS.of_isUsingJoinAndQuitMessage())
+            {
+                e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getQuitMessage(), ps));
+            }
+
             main.SPIELERSERVICE._CONTEXT.of_unloadPlayer(ps);
         }
     }

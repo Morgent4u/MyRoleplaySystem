@@ -13,6 +13,7 @@ import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
 import com.roleplay.inventar.InventarService;
+import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
@@ -54,6 +55,7 @@ public class main extends JavaPlugin
     public static NPCService NPCSERVICE;
     public static HologramService HOLOGRAMSERVICE;
     public static ScoreBoard SCOREBOARD;
+    public static TablistManager TABLISTMANAGER;
 
     /* ************************* */
     /* ENABLE */

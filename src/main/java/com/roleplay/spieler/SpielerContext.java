@@ -1,9 +1,7 @@
 package com.roleplay.spieler;
 
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.HashMap;
-
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;

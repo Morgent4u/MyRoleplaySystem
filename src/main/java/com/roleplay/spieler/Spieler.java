@@ -23,6 +23,7 @@ public class Spieler extends Objekt
     String name;
     String uuid;
     String textBlockAttribute;
+    String input4Commands = "";
 
     int rangId;
     int jobId;
@@ -39,6 +40,7 @@ public class Spieler extends Objekt
     boolean ib_playedBefore = true;
     boolean ib_newbie;
     boolean ib_blockedMoving;
+    boolean ib_wait4Input;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -134,6 +136,16 @@ public class Spieler extends Objekt
         this.ib_blockedMoving = bool;
     }
 
+    public void of_setInput4Commands(String input)
+    {
+        input4Commands = input;
+    }
+
+    public void of_setWaiting4Input(boolean bool)
+    {
+        ib_wait4Input = bool;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -213,6 +225,11 @@ public class Spieler extends Objekt
         return Objects.requireNonNull(p.getAddress()).getAddress().toString().replace("/", "");
     }
 
+    public String of_getInput4Commands()
+    {
+        return input4Commands;
+    }
+
     /* ************************************* */
     /* BOOLS */
     /* ************************************* */
@@ -230,5 +247,10 @@ public class Spieler extends Objekt
     public boolean of_isBlockedMovingEnabled()
     {
         return ib_blockedMoving;
+    }
+
+    public boolean of_isWaiting4Input()
+    {
+        return ib_wait4Input;
     }
 }

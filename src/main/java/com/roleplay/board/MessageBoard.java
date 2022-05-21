@@ -174,6 +174,7 @@ public class MessageBoard extends Objekt
 
         //  Player Stats:
         message = message.replace("%p%", ps.of_getPlayer().getName());
+        message = message.replace("%displayName%", ps.of_getPlayer().getDisplayName());
         message = message.replace("%uuid%", ps.of_getUUID());
         message = message.replace("%moneyATM%", String.valueOf(ps.of_getMoneyATM()));
         message = message.replace("%moneyCash%", String.valueOf(ps.of_getMoneyCash()));
