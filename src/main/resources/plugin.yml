@@ -21,3 +21,5 @@ commands:
     aliases: [holo, hd]
   NPC:
     usuage: /NPC
+  IField:
+    usuage: /IField

@@ -19,7 +19,7 @@ public class ue_inventory implements Listener
      * @param e The event which is triggered.
      */
     @EventHandler
-    public void ue_inventoryOpenEvent4MRS(InventoryOpenEvent e)
+    public void ue_inventoryOpen4MRS(InventoryOpenEvent e)
     {
         Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
 
@@ -40,7 +40,7 @@ public class ue_inventory implements Listener
      * @param e The event which is triggered.
      */
     @EventHandler
-    public void ue_inventoryClickEvent4MRS(InventoryClickEvent e)
+    public void ue_inventoryClick4MRS(InventoryClickEvent e)
     {
         //  Get player instance.
         Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getWhoClicked().getName());

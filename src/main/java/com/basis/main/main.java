@@ -7,11 +7,13 @@ import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.board.ScoreBoard;
 import com.roleplay.cmds.*;
+import com.roleplay.events.ue_ifields;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
+import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
@@ -48,14 +50,19 @@ public class main extends JavaPlugin
 
     //  Own services/objects:
     public static Settings SETTINGS;
+
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
+    public static HologramService HOLOGRAMSERVICE;
+    public static NPCService NPCSERVICE;
+    public static IFieldService IFIELDSERVICE;
+
     public static MessageBoard MESSAGEBOARD;
     public static PermissionBoard PERMISSIONBOARD;
-    public static NPCService NPCSERVICE;
-    public static HologramService HOLOGRAMSERVICE;
     public static ScoreBoard SCOREBOARD;
+
     public static TablistManager TABLISTMANAGER;
+
 
     /* ************************* */
     /* ENABLE */
@@ -93,6 +100,7 @@ public class main extends JavaPlugin
                 //  Register some events :)
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
+                Bukkit.getPluginManager().registerEvents(new ue_ifields(), this);
 
                 //  Register some commands:
                 getCommand("Test").setExecutor(new CMD_Test());
@@ -101,6 +109,7 @@ public class main extends JavaPlugin
                 getCommand("Textblock").setExecutor(new CMD_Textblock());
                 getCommand("NPC").setExecutor(new CMD_NPC());
                 getCommand("Hologram").setExecutor(new CMD_Hologram());
+                getCommand("IField").setExecutor(new CMD_IField());
 
                 // Initialize own services or dependencies.
                 rc = SETTINGS.of_initSystemServices();

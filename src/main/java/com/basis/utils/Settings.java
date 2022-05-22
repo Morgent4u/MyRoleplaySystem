@@ -11,6 +11,7 @@ import com.roleplay.board.ScoreBoard;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
+import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
@@ -47,6 +48,10 @@ public class Settings extends Objekt
     boolean ib_useScoreboard;
     boolean ib_useTablist;
     boolean ib_useJoinQuitMsg;
+    boolean ib_useIField;
+
+    //  Module-Attributes:
+    boolean ib_moduleIDCard;
 
     //  Money-Attributes:
     boolean ib_useVaultMoney;
@@ -92,15 +97,19 @@ public class Settings extends Objekt
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
             ib_useProtocolLib = datei.of_getSetBoolean(apiSection + "ProtocolLib.Use", true);
 
-            //  Money-Section:
+            //  RolePlay-Section:
             String rpSection = sectionKey + ".RolePlay.";
+
+            //  First check for defined modules...
+            of_check4Modules(rpSection);
+
+            //  Default-Money-Attributes:
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
 
             //  Load the Scoreboard-Settings:
             ib_useScoreboard = datei.of_getSetBoolean(rpSection + "Scoreboard.Use", true);
-
             if(of_isUsingScoreboard())
             {
                 String[] lines = new String[]{"&c"+Sys.of_getProgramVersion(), "&fThis is a test.", "&fChange me &e:)"};
@@ -115,7 +124,6 @@ public class Settings extends Objekt
 
             //  Load the tab-list setting (can we use the tab-list?):
             ib_useTablist = datei.of_getSetBoolean(rpSection + "Tablist.Use", true);
-
             //  Load the tab-list if it is enabled:
             if(of_isUsingTablist())
             {
@@ -126,13 +134,15 @@ public class Settings extends Objekt
 
             //  Enable or disable the join- and quit-message.
             ib_useJoinQuitMsg = datei.of_getSetBoolean(rpSection + "JoinQuitMsg.Use", true);
-
             if(of_isUsingJoinAndQuitMessage())
             {
                 joinQuitMessage = new String[2];
                 joinQuitMessage[0] = datei.of_getSetString(rpSection + "JoinQuitMsg.Join", "&aWelcome to our server, &e%p%&a!");
                 joinQuitMessage[1] = datei.of_getSetString(rpSection + "JoinQuitMsg.Quit", "&cGoodbye &e%p%&c!");
             }
+
+            //  Enable or disable iField-System:
+            ib_useIField = datei.of_getSetBoolean(rpSection + "IField.Use", true);
 
             //	MySQL-Attribute einlesen:
             String externalSection = sectionKey + ".External.";
@@ -315,6 +325,12 @@ public class Settings extends Objekt
                 main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
             }
 
+            if(of_isUsingIField())
+            {
+                main.IFIELDSERVICE = new IFieldService();
+                main.IFIELDSERVICE.of_load();
+            }
+
             return 1;
         }
 
@@ -373,6 +389,32 @@ public class Settings extends Objekt
     }
 
     /**
+     * This method is used to initialize some modules which can be disabled or enabled by the settings.
+     * @param configSection The config section which contains the settings.
+     */
+    private void of_check4Modules(String configSection)
+    {
+        //  Define some attributes for the module-system:
+        String moduleFolder = Sys.of_getMainFilePath() + "Modules//";
+        configSection = configSection + "Module";
+
+        //  Check for the idCard-Module:
+        ib_moduleIDCard = datei.of_getSetBoolean(configSection + ".IDCard.Use", true);
+
+        if(of_isUsingModuleIDCard())
+        {
+            //  Create the idCard-Module-Folder.
+            Datei module = new Datei(moduleFolder + "//IDCard//IDCard.yml");
+
+            if(!module.of_fileExists())
+            {
+                module.of_set("Test", "test");
+                module.of_save("Settings.of_check4Modules(); IDCard.yml");
+            }
+        }
+    }
+
+    /**
      * This function sends a status report to the console after
      * successfully loading all objects or required methods for the plugin.
      */
@@ -424,6 +466,11 @@ public class Settings extends Objekt
         }
         Sys.of_sendMessage(blue+"[*] Holograms:"+white);
         main.HOLOGRAMSERVICE._CONTEXT.of_sendDebugDetailInformation();
+        if(of_isUsingIField())
+        {
+            Sys.of_sendMessage(blue+"[*] IFields:"+white);
+            main.IFIELDSERVICE.of_sendDebugDetailInformation();
+        }
         Sys.of_sendMessage("========================================================");
     }
 
@@ -544,5 +591,15 @@ public class Settings extends Objekt
     public boolean of_isUsingJoinAndQuitMessage()
     {
         return ib_useJoinQuitMsg;
+    }
+
+    public boolean of_isUsingModuleIDCard()
+    {
+        return ib_moduleIDCard;
+    }
+
+    public boolean of_isUsingIField()
+    {
+        return ib_useIField;
     }
 }
