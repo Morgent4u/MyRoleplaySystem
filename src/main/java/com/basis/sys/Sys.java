@@ -572,11 +572,13 @@ public class Sys
 
         if(Bukkit.getPluginManager().getPlugin(pluginName) != null)
         {
-            Sys.of_sendMessage("§aThe plugin '"+pluginName+"' could be found on this server. All required functions has been enabled.");
+            String green = "\u001B[32m";
+            Sys.of_sendMessage(green + "The plugin '"+pluginName+"' could be found on this server. All required functions has been enabled.");
             return true;
         }
 
-        Sys.of_sendWarningMessage("§cThe plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Functions has been disabled for this runtime/uptime only!");
+        String red = "\u001B[31m";
+        Sys.of_sendWarningMessage(red + "The plugin '"+pluginName+"' couldn't be found on this server. "+pluginName+"-Functions has been disabled for this runtime/uptime only!");
         return false;
     }
 

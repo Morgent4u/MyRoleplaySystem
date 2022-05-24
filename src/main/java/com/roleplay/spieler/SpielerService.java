@@ -332,6 +332,12 @@ public class SpielerService extends Objekt
                     }
             }
 
+            //  Refresh the players scoreboard...
+            if(main.SETTINGS.of_isUsingScoreboard())
+            {
+                main.SCOREBOARD.of_sendScoreboard2Player(ps);
+            }
+
             return lb_continue;
         }
 

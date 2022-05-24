@@ -2,7 +2,6 @@ package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
-import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.roleplay.spieler.Spieler;
@@ -15,8 +14,8 @@ import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.scores.ScoreboardTeam;
 import net.minecraft.world.scores.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R1.scoreboard.CraftScoreboard;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.scoreboard.CraftScoreboard;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import javax.net.ssl.HttpsURLConnection;
