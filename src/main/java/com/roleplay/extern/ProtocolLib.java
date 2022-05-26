@@ -75,7 +75,7 @@ public class ProtocolLib extends Objekt
                             if(npc != null)
                             {
                                 //  Only let the player interact when he is near the npc.
-                                if(npc.of_getLocation().distance(ps.of_getPlayer().getLocation()) <= 2)
+                                if(npc.of_getLocation().distance(ps.of_getPlayer().getLocation()) <= 3)
                                 {
                                     new BukkitRunnable()
                                     {

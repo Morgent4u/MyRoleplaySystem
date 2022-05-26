@@ -199,6 +199,46 @@ public class InventarService extends Objekt
     }
 
     /**
+     * This function is used to replace the display-name or lore-items
+     * of an item by searching for a specific pattern and replacing it.
+     * @param item The itemStack which should be updated.
+     * @param searchValue The searchValue.
+     * @param replaceValue The replaceValue.
+     * @return The itemStack with the updated display-name or lore-items.
+     */
+    public ItemStack of_replaceItemStackValues(ItemStack item, String searchValue, String replaceValue)
+    {
+        ItemMeta meta = item.getItemMeta();
+
+        if(meta != null)
+        {
+            if(meta.hasDisplayName())
+            {
+                meta.setDisplayName(meta.getDisplayName().replace(searchValue, replaceValue));
+            }
+
+            if(meta.hasLore())
+            {
+                List<String> lore = meta.getLore();
+
+                if(lore != null && lore.size() > 0)
+                {
+                    for(int i = 0; i < lore.size(); i++)
+                    {
+                        lore.set(i, lore.get(i).replace(searchValue, replaceValue));
+                    }
+                }
+
+                meta.setLore(lore);
+            }
+
+            item.setItemMeta(meta);
+        }
+
+        return item;
+    }
+
+    /**
      * This function converts a itemStack of the type PLAYER_HEAD to a playerHead-ItemStack
      * with the skin of the given playerName.
      * @param item The itemStack of the type PLAYER_HEAD.
@@ -251,7 +291,7 @@ public class InventarService extends Objekt
      * @param pattern The pattern which should be checked.
      * @return True if the ItemStack is containing the pattern, otherwise false.
      */
-    public boolean of_itemStacksContainsPattern(ItemStack item, String pattern)
+    public boolean of_check4ItemStackWithSpecificPattern(ItemStack item, String pattern)
     {
         if(item != null && item.hasItemMeta())
         {
@@ -287,11 +327,11 @@ public class InventarService extends Objekt
      * @param pattern The pattern which should be checked.
      * @return True if the ItemStacks is containing the pattern, otherwise false.
      */
-    public boolean of_itemStacksContainsPattern(ItemStack[] items, String pattern)
+    public boolean of_check4ItemStacksWithSpecificPattern(ItemStack[] items, String pattern)
     {
         for(ItemStack item : items)
         {
-            if(of_itemStacksContainsPattern(item, pattern))
+            if(of_check4ItemStackWithSpecificPattern(item, pattern))
             {
                 return true;
             }

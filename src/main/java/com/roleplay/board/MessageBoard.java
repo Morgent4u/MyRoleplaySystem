@@ -59,7 +59,8 @@ public class MessageBoard extends Objekt
         of_addMessageOrSound2Board("General.PlayerIsNotOnline", "&fThe player &c%otherPlayer%&f, you are looking for is not online!");
 
         // Roleplay:
-        // ....
+        of_addMessageOrSound2Board("Roleplay.Money.MoneyTransferCompleted", "&fYou have paid &a%money%€&f to your bank account!");
+        of_addMessageOrSound2Board("Roleplay.Money.MoneyTransferNotEnoughMoney", "&fYou do not have enough money for this interaction! &f(&e%money%€&f)");
 
         //  Add Sounds:
         of_addMessageOrSound2Board("Sound.NoPermissions", "block.sand.fall");
@@ -178,6 +179,7 @@ public class MessageBoard extends Objekt
         message = message.replace("%uuid%", ps.of_getUUID());
         message = message.replace("%moneyATM%", String.valueOf(ps.of_getMoneyATM()));
         message = message.replace("%moneyCash%", String.valueOf(ps.of_getMoneyCash()));
+        message = message.replace("%money%", String.valueOf(ps.of_getMoneyDiff()));
         message = message.replace("%jobId%", String.valueOf(ps.of_getJobId()));
         message = message.replace("%rangId%", String.valueOf(ps.of_getRangId()));
         message = message.replace("%id%", String.valueOf(ps.of_getObjectId()));
@@ -310,5 +312,10 @@ public class MessageBoard extends Objekt
     public boolean of_isUsingAlwaysPrefix()
     {
         return ib_usePrefix;
+    }
+
+    public boolean of_check4MessageId(String msgId)
+    {
+        return messages.containsKey(msgId);
     }
 }

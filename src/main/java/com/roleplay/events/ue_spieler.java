@@ -46,7 +46,13 @@ public class ue_spieler implements Listener
             else
             {
                 // Check if the player has already played before.
-                main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+                int rc = main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+
+                //  Stop, when the player has been kicked...
+                if(rc == -1)
+                {
+                    return;
+                }
             }
 
             //  Check for the NPCs...

@@ -18,8 +18,8 @@ import java.util.*;
  * @Created 22.05.2022
  * @Author Nihar
  * @Description
- * This command is used to interact with iFields.
- * It also allows creating or delete iFields.
+ * This command is used to interact with IFields.
+ * It also allows creating or delete IFields.
  */
 public class CMD_IField implements CommandExecutor, TabCompleter
 {
@@ -60,10 +60,10 @@ public class CMD_IField implements CommandExecutor, TabCompleter
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
                                 }
-                                //  If no iFields has been found.
+                                //  If no IFields has been found.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo iFields found.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IFields found.");
                                 }
 
                                 return true;
@@ -85,18 +85,35 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                                     if(rc == 1)
                                     {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aDeleted iField §f" + ifield.of_getInfo() + "§a.");
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aDeleted IField §f" + ifield.of_getInfo() + "§a.");
                                     }
                                     //  If an error occurred.
                                     else
                                     {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while deleting the iField.");
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while deleting the IField.");
                                     }
                                 }
                                 //  If not found.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo iField found with the name §e" + second + "§c.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IField found with the name §e" + second + "§c.");
+                                }
+
+                                return true;
+                            }
+                            else if(first.equalsIgnoreCase("tp"))
+                            {
+                                IField ifield = main.IFIELDSERVICE.of_getIFieldByName(second);
+
+                                if(ifield != null)
+                                {
+                                    p.teleport(ifield.of_getLocation());
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aTeleported to IField §f" + ifield.of_getInfo() + "§a.");
+                                }
+                                //  If not found.
+                                else
+                                {
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IField found with the name §e" + second + "§c.");
                                 }
 
                                 return true;
@@ -125,7 +142,7 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                                         if(range != -1)
                                         {
-                                            //  Create the iField...
+                                            //  Create the IField...
                                             ifield = new IField(material, new String[] { fifth }, p.getLocation(), range);
                                             ifield.of_setInfo(second);
 
@@ -133,12 +150,12 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                                             if(rc == 1)
                                             {
-                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aCreated iField §f" + ifield.of_getInfo() + "§a.");
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aCreated IField §f" + ifield.of_getInfo() + "§a.");
                                             }
                                             //  If an error occurs.
                                             else
                                             {
-                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the iField.");
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the IField.");
                                             }
                                         }
                                         //  If the number is not valid!
@@ -153,10 +170,10 @@ public class CMD_IField implements CommandExecutor, TabCompleter
                                         main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThe material §e" + third + "§c is not valid.");
                                     }
                                 }
-                                //  If the iField already exist.
+                                //  If the IField already exist.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn iField with the name §e" + second + "§c already exists.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn IField with the name §e" + second + "§c already exists.");
                                 }
 
                                 return true;
@@ -204,6 +221,8 @@ public class CMD_IField implements CommandExecutor, TabCompleter
         p.sendMessage("§c/IField");
         p.sendMessage("§7To get a list of all created IFields.");
         p.sendMessage("§c/IField list");
+        p.sendMessage("§7To teleport to an IField.");
+        p.sendMessage("§c/IField tp <name>");
         p.sendMessage("§7To create a new IField.");
         p.sendMessage("§c/IField create <name> <material> <range> <command-set>");
         p.sendMessage("§7To delete an IField.");
@@ -232,7 +251,7 @@ public class CMD_IField implements CommandExecutor, TabCompleter
         //  React to the different arguments.
         if(args.length == 1)
         {
-            completions = Arrays.asList("list", "create", "delete");
+            completions = Arrays.asList("list", "tp", "create", "delete");
         }
         else if(args.length == 2)
         {

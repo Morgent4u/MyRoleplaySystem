@@ -4,6 +4,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.extended.InventarDatei;
+import com.roleplay.inventar.normal.inv_atm;
 import com.roleplay.inventar.normal.inv_menu;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
@@ -42,6 +43,11 @@ public class InventarContext extends Objekt
         //  This inventory is the default menu for every player.
         of_loadInventoryByFile(new inv_menu(), null);
 
+        //	InventoryId: 2
+        //	Description:
+        //  This inventory is the atm-inventory for every player.
+        of_loadInventoryByFile(new inv_atm(), null);
+
         //  Load own inventories if its enabled.
         if(of_isUsingOwnInventoriesAllowed())
         {
@@ -74,6 +80,9 @@ public class InventarContext extends Objekt
 
     /**
      * This function loads an inventory from a file.
+     * If the given file does not exist this method will call the
+     * inventar.of_load() function to load all predefined settings
+     * for the given inventory-instance.
      * @param inventar The inventory to load.
      */
     public void of_loadInventoryByFile(Inventar inventar, String fileName)
@@ -135,6 +144,9 @@ public class InventarContext extends Objekt
                 //  Create an array of ItemStacks.
                 ItemStack[] itemStacks = new ItemStack[invSize];
 
+                //  Check for the inventory classification.
+                boolean lb_moneyTransferInv = invClassification.equals("MONEY_TRANSFER");
+
                 //  Get the inventory-items.
                 for(int i = 0; i < invSize; i++)
                 {
@@ -142,12 +154,45 @@ public class InventarContext extends Objekt
 
                     if(item != null)
                     {
-                        itemStacks[i] = item;
-
                         //  Check if the item has a defined command-set.
                         String[] commandSet = invFile.of_getStringArrayByKey(section + ".Items." + i + ".CommandSet");
+                        boolean lb_hasCommandSet = commandSet != null && commandSet.length > 0;
 
-                        if(commandSet != null && commandSet.length > 0)
+                        //  Get the price of the item and replace every placeholder with the price value.
+                        if(lb_moneyTransferInv)
+                        {
+                            if(invFile.of_getConfig().isSet(section + ".Items." + i + ".Price"))
+                            {
+                                double price = invFile.of_getDoubleByKey(section + ".Items." + i + ".Price");
+
+                                if(price != -1)
+                                {
+                                    item = main.INVENTARSERVICE.of_replaceItemStackValues(item, "%price%", String.valueOf(price));
+
+                                    //  Iterate through the CommandSet and check if the placeholder is in the command.
+                                    if(lb_hasCommandSet)
+                                    {
+                                        for(int j = 0; j < commandSet.length; j++)
+                                        {
+                                            if(commandSet[j].contains("%price%"))
+                                            {
+                                                commandSet[j] = commandSet[j].replace("%price%", String.valueOf(price));
+                                            }
+                                        }
+                                    }
+                                }
+                                //  If the price is not valid.
+                                else
+                                {
+                                    Sys.of_debug("The price of the item is not valid. Config-key: " + section + ".Items." + i + ".Price");
+                                }
+                            }
+                        }
+
+                        //  Add the item to the array.
+                        itemStacks[i] = item;
+
+                        if(lb_hasCommandSet)
                         {
                             inventar.of_addCommands2ItemName(i, commandSet);
                         }
@@ -162,7 +207,7 @@ public class InventarContext extends Objekt
 
                     if(!lb_copyInv)
                     {
-                        lb_copyInv = main.INVENTARSERVICE.of_itemStacksContainsPattern(itemStacks, "%");
+                        lb_copyInv = main.INVENTARSERVICE.of_check4ItemStacksWithSpecificPattern(itemStacks, "%");
                     }
 
                     //  Set the copyInv state.
@@ -207,6 +252,10 @@ public class InventarContext extends Objekt
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The file-inventory could not be saved: " + invFile.of_getFileName());
                 return;
             }
+
+            //  We load the inventory again...
+            of_loadInventoryByFile(inventar, fileName);
+            return;
         }
 
         //  Add the inventory to the inventar-context (inventories).
@@ -230,12 +279,15 @@ public class InventarContext extends Objekt
             // Get the inventory contents and the inventory name from the inventory instance.
             ItemStack[] items = inventory.getStorageContents();
             String inventoryName = inventar.of_getInventarName();
+            String invClassification = inventar.of_getInvClassification();
+
+            boolean lb_moneyTransferInv = invClassification.equals("MONEY_TRANSFER");
             int invSize = inventory.getSize();
 
             String section = "Inventory";
             invFile.of_set(section + ".Name", inventoryName.replace("§", "&"));
             invFile.of_set(section + ".Size", invSize);
-            invFile.of_set(section + ".Classification", inventar.of_getInvClassification());
+            invFile.of_set(section + ".Classification", invClassification);
             invFile.of_set(section + ".Type", inventory.getType().toString().toUpperCase());
             invFile.of_set(section + ".CloseOnClick", inventar.of_isClickCloseInv());
 
@@ -252,6 +304,13 @@ public class InventarContext extends Objekt
 
                         if(item != null)
                         {
+                            //  If the inventory-classification is a MONEY_TRANSFER-Inv, we add the entry: Price.
+                            if(lb_moneyTransferInv)
+                            {
+                                invFile.of_set(section + ".Items." + i + ".UseDefinedList", false);
+                                invFile.of_getSetDouble(section + ".Items." + i + ".Price", 999999);
+                            }
+
                             //  Check if the item has a defined command-set.
                             String[] commandSet = inventar.of_getCommandsByInvSlot(i);
 

@@ -130,8 +130,22 @@ public class SpielerService extends Objekt
      */
     public void of_sendPluginMessage2Player(Spieler ps, String message)
     {
-        message = main.MESSAGEBOARD.of_translateMessage(message);
-        ps.of_getPlayer().sendMessage(message);
+        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_translateMessage(message));
+    }
+
+    /**
+     * This function is used to send a message to the player by the given messageId.
+     * If the messageId is not valid, the player does not receive a message.
+     * @param ps Player instance.
+     * @param messageId The messageId which will be displayed.
+     */
+    public void of_sendMessageByMessageId(Spieler ps, String messageId)
+    {
+        //  We only send the player a message, if the key/msgId exist.
+        if(main.MESSAGEBOARD.of_check4MessageId(messageId))
+        {
+            ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats(messageId, ps));
+        }
     }
 
     /* ************************************* */
@@ -189,8 +203,9 @@ public class SpielerService extends Objekt
      * This function is used to check if the player is using
      * a second account. If so, the player will be kicked.
      * @param ps Player instance.
+     * @return 1 If kicked (has double ip-address), -1 if not.
      */
-    public void of_playerHasDoubleIPAddress(Spieler ps)
+    public int of_playerHasDoubleIPAddress(Spieler ps)
     {
         // We can only check the IP if the DataProtection has been accepted.
         if(of_hasAlreadyAcceptedDataProtection(ps))
@@ -242,6 +257,7 @@ public class SpielerService extends Objekt
 
                     //  Kick the player...
                     ps.of_getPlayer().kickPlayer(kickMessage.toString());
+                    return 1;
                 }
                 //  An error occurred.
                 else
@@ -251,6 +267,7 @@ public class SpielerService extends Objekt
             }
         }
 
+        return  -1;
     }
 
     /**
@@ -309,6 +326,7 @@ public class SpielerService extends Objekt
                             ps.of_setMoneyATM(ps.of_getMoneyATM() + moneyAmount);
                         }
                     }
+                    break;
                 case "cash":
                     //  Money-type need to be set to send a message to the player with the money-type.
                     ps.of_setMoneyType(0);
@@ -330,6 +348,12 @@ public class SpielerService extends Objekt
                     {
                         ps.of_setMoneyCash(ps.of_getMoneyCash() + moneyAmount);
                     }
+            }
+
+            //  We need to store the money we have added into the moneyDiff-variable...
+            if(lb_continue)
+            {
+                ps.of_setMoneyDiff(moneyAmount);
             }
 
             //  Refresh the players scoreboard...

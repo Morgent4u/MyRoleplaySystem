@@ -43,7 +43,7 @@ public class PermissionBoard extends Objekt
         of_addPermissions2Board("General.Admin.Permission", "mrs.general.admin");
         of_addPermissions2Board("General.Default.Permission", "mrs.general.default");
 
-        //  Load specific Permissions (Role play):
+        //  Load specific Permissions (Commands):
         of_addPermissions2Board("Command.Permission.Test", "mrs.command.test");
         of_addPermissions2Board("Command.Permission.Interaction", "mrs.command.interaction");
         of_addPermissions2Board("Command.Permission.Dataprotection", "mrs.command.dataprotection");
@@ -51,6 +51,8 @@ public class PermissionBoard extends Objekt
         of_addPermissions2Board("Command.Permission.Textblock", "mrs.command.textblock");
         of_addPermissions2Board("Command.Permission.NPC", "mrs.command.npc");
         of_addPermissions2Board("Command.Permission.Hologram", "mrs.command.hologram");
+
+        //  Load specific Permissions (Role play):
 
         return datei.of_save("PermissionBoard.of_load();");
     }
@@ -96,5 +98,4 @@ public class PermissionBoard extends Objekt
     {
         return of_hasPermissions(ps, "General.Admin.Permission");
     }
-
 }
