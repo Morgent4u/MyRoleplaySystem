@@ -16,6 +16,7 @@ import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
 import com.roleplay.spieler.SpielerService;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @Created 22.03.2022
@@ -49,6 +50,7 @@ public class Settings extends Objekt
     boolean ib_useTablist;
     boolean ib_useJoinQuitMsg;
     boolean ib_useIField;
+    boolean ib_useDataProtection;
 
     //  Module-Attributes:
     boolean ib_moduleIDCard;
@@ -107,6 +109,7 @@ public class Settings extends Objekt
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
+            ib_useDataProtection = datei.of_getSetBoolean(rpSection + "Check4DataProtection", true);
 
             //  Load the Scoreboard-Settings:
             ib_useScoreboard = datei.of_getSetBoolean(rpSection + "Scoreboard.Use", true);
@@ -288,7 +291,6 @@ public class Settings extends Objekt
 
             //  Load the player service...
             main.SPIELERSERVICE = new SpielerService();
-            main.SPIELERSERVICE.of_load();
 
             //  Load own inventories or predefined ones.
             main.INVENTARSERVICE = new InventarService();
@@ -300,9 +302,6 @@ public class Settings extends Objekt
                 //  Create the NPCService if ProtoclLib has been loaded.
                 main.NPCSERVICE = new NPCService();
                 main.NPCSERVICE.of_load();
-
-                //  Load all NPCs for each player.
-                main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
 
                 //  Load the ProtocolLib-Specific Listeners.
                 main.PROTOCOLLIB.ue_addSpecificPacketListeners2ProtocolLibManager();
@@ -316,13 +315,6 @@ public class Settings extends Objekt
             if(of_isUsingScoreboard())
             {
                 main.SCOREBOARD = new ScoreBoard(scoreboardLines);
-                main.SCOREBOARD.of_loadScoreboard2AllPlayers();
-            }
-
-            //  We create for every player the tab-list.
-            if(of_isUsingTablist())
-            {
-                main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
             }
 
             if(of_isUsingIField())
@@ -331,10 +323,49 @@ public class Settings extends Objekt
                 main.IFIELDSERVICE.of_load();
             }
 
+            //  We need to invoke the postInitSystemServices...
+            of_postInitSystemServices();
+
             return 1;
         }
 
         return -1;
+    }
+
+    /**
+     * This post function needs to be called 1 second after the reload process.
+     */
+    private void of_postInitSystemServices()
+    {
+        //  We use a RunnableTask to run the following code after 1 second.
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                //  We load the player service...
+                main.SPIELERSERVICE.of_load();
+
+                //  Load all NPCs for each player.
+                if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null && main.NPCSERVICE != null)
+                {
+                    main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
+                }
+
+                //  Load the scoreboard to all players...
+                if(of_isUsingScoreboard())
+                {
+                    main.SCOREBOARD.of_loadScoreboard2AllPlayers();
+                }
+
+                //  We create for every player the tab-list.
+                if(of_isUsingTablist())
+                {
+                    main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
+                }
+            }
+
+        }.runTaskLater(main.PLUGIN, 20);
     }
 
     /**
@@ -492,6 +523,11 @@ public class Settings extends Objekt
         ib_useMySQL = bool;
     }
 
+    public void of_setUseProtocolLib(boolean bool)
+    {
+        ib_useProtocolLib = bool;
+    }
+
     /* ************************* */
     /* GETTER */
     /* ************************* */
@@ -601,5 +637,10 @@ public class Settings extends Objekt
     public boolean of_isUsingIField()
     {
         return ib_useIField;
+    }
+
+    public boolean of_isUsingDataProtection()
+    {
+        return ib_useDataProtection;
     }
 }

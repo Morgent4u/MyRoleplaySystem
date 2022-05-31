@@ -18,18 +18,30 @@ public class IField extends Objekt
     private String[] commandSet;
     private Material material;
     private Location loc;
-    private double range;
 
     /* ************************************* */
     /* CONSTRUCTOR */
     /* ************************************* */
 
-    public IField(Material material, String[] commandSet, Location loc, double range)
+    public IField(Material material, String[] commandSet, Location loc)
     {
         this.material = material;
         this.commandSet = commandSet;
         this.loc = loc;
-        this.range = range;
+    }
+
+    /* ************************************* */
+    /* SETTER */
+    /* ************************************* */
+
+    public void of_setMaterial(Material material)
+    {
+        this.material = material;
+    }
+
+    public void of_setLocation(Location loc)
+    {
+        this.loc = loc;
     }
 
     /* ************************************* */
@@ -49,10 +61,5 @@ public class IField extends Objekt
     public Location of_getLocation()
     {
         return loc;
-    }
-
-    public double of_getRange()
-    {
-        return range;
     }
 }

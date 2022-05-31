@@ -9,6 +9,7 @@ import com.roleplay.board.ScoreBoard;
 import com.roleplay.cmds.*;
 import com.roleplay.events.ue_ifields;
 import com.roleplay.events.ue_inventory;
+import com.roleplay.events.ue_npc;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
@@ -82,7 +83,7 @@ public class main extends JavaPlugin
         ib_reload = true;
 
         //  Check if the plugin is compatible with the version.
-        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.03", "plugins");
+        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.04", "plugins");
 
         if(lb_continue)
         {
@@ -101,6 +102,7 @@ public class main extends JavaPlugin
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_ifields(), this);
+                Bukkit.getPluginManager().registerEvents(new ue_npc(), this);
 
                 //  Register some commands:
                 getCommand("Test").setExecutor(new CMD_Test());
@@ -110,6 +112,7 @@ public class main extends JavaPlugin
                 getCommand("NPC").setExecutor(new CMD_NPC());
                 getCommand("Hologram").setExecutor(new CMD_Hologram());
                 getCommand("IField").setExecutor(new CMD_IField());
+                getCommand("MRS").setExecutor(new CMD_MRS());
 
                 // Initialize own services or dependencies.
                 rc = SETTINGS.of_initSystemServices();
@@ -146,6 +149,9 @@ public class main extends JavaPlugin
     @Override
     public void onDisable()
     {
+        //  If the plugin gets disabled we set the reload-flag.
+        ib_reload = true;
+
         //  If the object has been initialized lets unload it.
         if(SETTINGS != null)
         {
@@ -154,6 +160,9 @@ public class main extends JavaPlugin
 
         //  End.
         Sys.of_sendMessage("This plugin has been coded by Nihar! Thank you for using this plugin! :^)");
+
+        //  Reset the reload-flag.
+        ib_reload = false;
     }
 
     /* ************************* */

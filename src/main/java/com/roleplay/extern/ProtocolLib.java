@@ -77,17 +77,26 @@ public class ProtocolLib extends Objekt
                                 //  Only let the player interact when he is near the npc.
                                 if(npc.of_getLocation().distance(ps.of_getPlayer().getLocation()) <= 3)
                                 {
-                                    new BukkitRunnable()
+                                    //  We only want to react when the player is right-clicking the npc, so we use a NPC-interaction-counter.
+                                    ps.of_setNPCInteractionCounter(ps.of_getNPCInteractionCounter() + 1);
+
+                                    if(ps.of_getNPCInteractionCounter() == 4)
                                     {
+                                        //  Reset the counter.
+                                        ps.of_setNPCInteractionCounter(0);
 
-                                        @Override
-                                        public void run()
+                                        new BukkitRunnable()
                                         {
-                                            //  Execute all given Commands for this specific NPC.
-                                            new CommandSet(npc.of_getCommandSet(), ps).of_executeAllCommands();
-                                        }
 
-                                    }.runTask(main.PLUGIN);
+                                            @Override
+                                            public void run()
+                                            {
+                                                //  Execute all given Commands for this specific NPC.
+                                                new CommandSet(npc.of_getCommandSet(), ps).of_executeAllCommands();
+                                            }
+
+                                        }.runTask(main.PLUGIN);
+                                    }
                                 }
                             }
                         }

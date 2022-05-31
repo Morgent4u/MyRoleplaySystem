@@ -1,14 +1,16 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
-import com.roleplay.ifield.IField;
+import com.basis.sys.Sys;
+import com.basis.utils.Datei;
 import com.roleplay.spieler.Spieler;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Created 16.04.2022
@@ -35,6 +37,30 @@ public class CMD_Test implements CommandExecutor
                     {
                         if(args.length == 0)
                         {
+                            /*
+                            //create the book
+                            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+                            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+
+                            //create a page
+                            BaseComponent[] page = new ComponentBuilder("Click me")
+                                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/time set day"))
+                                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Go to the spigot website!").create()))
+                                    .create();
+
+                            //add the page to the meta
+                            assert bookMeta != null;
+                            bookMeta.spigot().addPage(page);
+
+                            //set the title and author of this book
+                            bookMeta.setTitle("Interactive Book");
+                            bookMeta.setAuthor("gigosaurus");
+
+                            //update the ItemStack with this new meta
+                            book.setItemMeta(bookMeta);
+                            p.openBook(book);
+                            */
+
                             // Do not change this!
                             p.sendMessage("§cCommand has been executed!");
                             return true;

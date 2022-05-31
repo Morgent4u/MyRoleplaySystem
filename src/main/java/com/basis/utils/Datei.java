@@ -1,12 +1,14 @@
 package com.basis.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import com.basis.sys.Sys;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @Created 11.10.2021
@@ -44,18 +46,47 @@ public class Datei
             absolutePath += ".yml";
         }
 
-        file = new File(absolutePath);
-        cfg = new YamlConfiguration().loadConfiguration(file);
+        this.file = new File(absolutePath);
+        this.cfg = new YamlConfiguration();
+
+        //  Initialize the configuration.
+        of_initializeData("constructor(File);");
     }
 
     /**
      * Constructor
      * @param file File object.
      */
-    public Datei(File file)
+    public Datei(@NotNull File file)
     {
         this.file = file;
-        this.cfg = new YamlConfiguration().loadConfiguration(file);
+        this.cfg = new YamlConfiguration();
+
+        //  Initialize the configuration.
+        of_initializeData("constructor(File);");
+    }
+
+    private void of_initializeData(String invokerName)
+    {
+        try
+        {
+            this.cfg.load(file);
+            return;
+        }
+        catch (Exception ignored) { }
+
+        if(of_fileExists())
+        {
+            //  Create the backup file...
+            if(of_createBackupFromCurrentFile() == 1)
+            {
+                Sys.of_sendErrorMessage(null, "Datei", invokerName, "Error while reading the following file: " + file.getAbsolutePath() + " - Backup file has been created. :)! We try to fix the current file...");
+            }
+            else
+            {
+                Sys.of_sendErrorMessage(null, "Datei", invokerName, "Error while creating the backup file for the following file: " + file.getAbsolutePath() + " - Backup file could not be created. :(");
+            }
+        }
     }
 
     /* ************************************* */
@@ -70,13 +101,12 @@ public class Datei
     {
         if(file != null)
         {
-            //	Beim Entladen, alle Dateien entfernen,
-            //	die keinen Inhalt haben. Wir wollen ja
-            //	keinen Datenmuell erzeugen :)!
-
+            //  Check the length of the file.
+            //  Delete the file if it's empty we don't want to save empty files.
             if(file.length() == 0)
             {
                 file.delete();
+                Sys.of_debug("File has been deleted because it was empty. File: " + file.getAbsolutePath());
             }
         }
     }
@@ -88,7 +118,7 @@ public class Datei
     /**
      * This function checks if the current configKey is already set.
      * If the configKey is not set the defaultValue will be set and also returned.
-     * If the the configKey is already set, the value will be returned.
+     * If the configKey is already set, the value will be returned.
      * @param configKey Section in the .YML-File.
      * @param defaultValue Default value which will be used as initialize value for the given section.
      * @return The value in the configKey or the defaultValue if the configKey is not given.
@@ -118,7 +148,7 @@ public class Datei
     /**
      * This function checks if the current configKey is already set.
      * If the configKey is not set the defaultValue will be set and also returned.
-     * If the the configKey is already set, the value will be returned.
+     * If the configKey is already set, the value will be returned.
      * @param configKey Section in the .YML-File.
      * @param defaultValue Default value which will be used as initialize value for the given section.
      * @return The value in the configKey or the defaultValue if the configKey is not given.
@@ -148,7 +178,7 @@ public class Datei
     /**
      * This function checks if the current configKey is already set.
      * If the configKey is not set the defaultValue will be set and also returned.
-     * If the the configKey is already set, the value will be returned.
+     * If the configKey is already set, the value will be returned.
      * @param configKey Section in the .YML-File.
      * @param defaultValue Default value which will be used as initialize value for the given section.
      * @return The value in the configKey or the defaultValue if the configKey is not given.
@@ -159,7 +189,11 @@ public class Datei
 
         if(cfg.isSet(configKey))
         {
-            tmpValue = Sys.of_getString2Int(cfg.getString(configKey));
+            try
+            {
+                tmpValue = cfg.getDouble(configKey);
+            }
+            catch (Exception ignored) { }
 
             if(tmpValue == -1)
             {
@@ -178,7 +212,7 @@ public class Datei
     /**
      * This function checks if the current configKey is already set.
      * If the configKey is not set the defaultValue will be set and also returned.
-     * If the the configKey is already set, the value will be returned.
+     * If the configKey is already set, the value will be returned.
      * @param configKey Section in the .YML-File.
      * @param defaultBool Default value which will be used as initialize value for the given section.
      * @return The value in the configKey or the defaultValue if the configKey is not given.
@@ -212,22 +246,22 @@ public class Datei
     {
         String[] tmp = null;
 
-        //	Existiert der Pfad bereits?
+        //  Does the path already exist?
         if(cfg.isSet(configKey))
         {
-            //	Laden...
+            //  Load existing one...
             tmp = of_getStringArrayByKey(configKey);
         }
-        //	Neu anlegen...
+        //  Create new...
         else
         {
             cfg.set(configKey, arrayList);
         }
 
-        //	Fehler beim Laden?
+        //  Error while getting the value? We ignore this...
         if(tmp == null)
         {
-            //	Default geht zur�ck :)
+            //  We send back the default....
             return arrayList.toArray(new String[0]);
         }
 
@@ -259,7 +293,7 @@ public class Datei
     }
 
     /* ************************************* */
-    /* OBJEKT-ANWEISUNGEN */
+    /* OBJECT-METHODS */
     /* ************************************* */
 
     /**
@@ -293,7 +327,7 @@ public class Datei
     }
 
     /* ************************************* */
-    /* SPEICHERUNG */
+    /* SAVE-STUFF */
     /* ************************************* */
 
     /**
@@ -311,6 +345,47 @@ public class Datei
         catch (Exception e)
         {
             Sys.of_sendErrorMessage(e, "Datei", "of_save(String)", "Error while saving the file!");
+        }
+
+        return -1;
+    }
+
+    /**
+     * This function is used to create a backup. It will be called if the load-process of
+     * the file failed. This has been coded in this constructor.
+     * @return 1 if the backup was created successfully, otherwise -1.
+     */
+    private int of_createBackupFromCurrentFile()
+    {
+        if(file != null)
+        {
+            if(file.length() > 0)
+            {
+                //  We want to create a folder with the current date, after this we create the file with the time-stamp.
+                String currentTimeStamp = Sys.of_getTimeStamp(true, "yyy_MM_dd", "hh_mm_ss").replace(" ",  "//");
+                File backupFile = new File(Sys.of_getMainFilePath() + "Backups//", currentTimeStamp + file.getName());
+
+                //  Delete the backup-file if it already exists.
+                if(backupFile.exists())
+                {
+                    backupFile.delete();
+                }
+
+                try
+                {
+                    FileUtils.copyFile(file, backupFile);
+                    return 1;
+                }
+                catch (IOException e)
+                {
+                    Sys.of_sendErrorMessage(e, "Datei", "of_createBackupFromCurrentFile()", "Error while creating the backup file!");
+                }
+            }
+            //  If the file is empty...
+            else
+            {
+                Sys.of_debug("The file is empty! No backup will be created!");
+            }
         }
 
         return -1;

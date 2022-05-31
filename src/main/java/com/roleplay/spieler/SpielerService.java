@@ -28,6 +28,14 @@ public class SpielerService extends Objekt
     //	Attribute
     public SpielerContext _CONTEXT;
 
+    /**
+     * Constructor we need to create the SpielerContext here.
+     */
+    public SpielerService()
+    {
+        _CONTEXT = new SpielerContext();
+    }
+
     /* ************************************* */
     /* LOADER // UNLOADER */
     /* ************************************* */
@@ -39,8 +47,6 @@ public class SpielerService extends Objekt
     @Override
     public int of_load()
     {
-        _CONTEXT = new SpielerContext();
-
         if(Bukkit.getOnlinePlayers().size() > 0)
         {
             for(Player p : Bukkit.getOnlinePlayers())

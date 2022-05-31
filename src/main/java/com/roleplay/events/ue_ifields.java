@@ -6,8 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Objects;
-
 /**
  * @Created 22.05.2022
  * @Author Nihar
@@ -28,9 +26,9 @@ public class ue_ifields implements Listener
 
         if(ps != null)
         {
-            if(e.getClickedBlock() != null)
+            if(e.getClickedBlock() != null && main.SETTINGS.of_isUsingIField())
             {
-                main.IFIELDSERVICE.of_check4IFields2Execute(ps, e.getClickedBlock().getType());
+                e.setCancelled(main.IFIELDSERVICE.of_check4IFields2Execute(ps, e.getClickedBlock()));
             }
         }
     }

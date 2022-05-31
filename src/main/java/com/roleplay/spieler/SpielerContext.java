@@ -89,7 +89,7 @@ public class SpielerContext extends Objekt
             ps.of_setJobId(jobId);
 
             // If the server is not using the vault-economy-system, set the money to the player instance.
-            //  We use our own system instead...
+            // We use our own system instead...
             if(!main.SETTINGS.of_isUsingVaultMoneySystem())
             {
                 ps.of_setMoneyATM(moneyATM);
@@ -159,7 +159,13 @@ public class SpielerContext extends Objekt
 
             //  Set last connection date and the money-attributes.
             user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
-            user.of_set(sectionKey + ".Money.ATM", ps.of_getMoneyATM());
+
+            //  If the server is not reloading and the vault-economy-system is enabled, we save the money.
+            if(!main.of_isReloading() && main.SETTINGS.of_isUsingVaultMoneySystem())
+            {
+                user.of_set(sectionKey + ".Money.ATM", ps.of_getMoneyATM());
+            }
+
             user.of_set(sectionKey + ".Money.Cash", ps.of_getMoneyCash());
 
             return user.of_save("SpielerContext.of_loadPlayer(Player);");

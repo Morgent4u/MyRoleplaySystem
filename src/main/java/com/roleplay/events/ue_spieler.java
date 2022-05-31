@@ -34,7 +34,7 @@ public class ue_spieler implements Listener
         {
             boolean lb_sendText4DataProtection = !( main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps) || main.SPIELERSERVICE.of_hasAlreadyIPLink(ps) );
 
-            if(lb_sendText4DataProtection)
+            if(lb_sendText4DataProtection && main.SETTINGS.of_isUsingDataProtection())
             {
                 //  Disallow the player to move.
                 ps.of_setBlockedMoving(true);
@@ -49,7 +49,7 @@ public class ue_spieler implements Listener
                 int rc = main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
 
                 //  Stop, when the player has been kicked...
-                if(rc == -1)
+                if(rc == 1)
                 {
                     return;
                 }
@@ -91,6 +91,12 @@ public class ue_spieler implements Listener
             if(main.SETTINGS.of_isUsingJoinAndQuitMessage())
             {
                 e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getQuitMessage(), ps));
+            }
+
+            //  Remove the player from the iField-Setup.
+            if(main.SETTINGS.of_isUsingIField())
+            {
+                main.IFIELDSERVICE.of_removePlayerFromSetup(ps);
             }
 
             main.SPIELERSERVICE._CONTEXT.of_unloadPlayer(ps);

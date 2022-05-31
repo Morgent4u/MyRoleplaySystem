@@ -1,10 +1,8 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
-import com.basis.sys.Sys;
 import com.roleplay.ifield.IField;
 import com.roleplay.spieler.Spieler;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,6 +35,20 @@ public class CMD_IField implements CommandExecutor, TabCompleter
                     if(main.PERMISSIONBOARD.of_isAdmin(ps))
                     {
                         Player p = ps.of_getPlayer();
+
+                        if(!main.SETTINGS.of_isUsingIField())
+                        {
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "The §aIField-system§7 is currently §cdisabled§7.");
+                            return true;
+                        }
+
+                        if(main.IFIELDSERVICE.of_isInSetup(ps))
+                        {
+                            //  Remove the player from the setup-mode.
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cYou have left the setup-mode.");
+                            main.IFIELDSERVICE.of_removePlayerFromSetup(ps);
+                            return true;
+                        }
 
                         if(args.length == 1)
                         {
@@ -120,13 +132,11 @@ public class CMD_IField implements CommandExecutor, TabCompleter
                             }
                         }
 
-                        if(args.length == 5)
+                        if(args.length == 3)
                         {
                             String first = args[0];
                             String second = args[1];
                             String third = args[2];
-                            String fourth = args[3];
-                            String fifth = args[4];
 
                             if(first.equalsIgnoreCase("create"))
                             {
@@ -134,41 +144,16 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                                 if(ifield == null)
                                 {
-                                    Material material = Material.getMaterial(third);
+                                    //  Create a new instance with the name...
+                                    ifield = new IField(null, new String[] {third}, null);
+                                    ifield.of_setInfo(second);
 
-                                    if(material != null)
-                                    {
-                                        int range = Sys.of_getString2Int(fourth);
+                                    //  Set the iField as powerObject to the player...
+                                    ps.of_setPowerObject(ifield);
 
-                                        if(range != -1)
-                                        {
-                                            //  Create the IField...
-                                            ifield = new IField(material, new String[] { fifth }, p.getLocation(), range);
-                                            ifield.of_setInfo(second);
-
-                                            int rc = main.IFIELDSERVICE._CONTEXT.of_saveIField2File(ifield);
-
-                                            if(rc == 1)
-                                            {
-                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aCreated IField §f" + ifield.of_getInfo() + "§a.");
-                                            }
-                                            //  If an error occurs.
-                                            else
-                                            {
-                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the IField.");
-                                            }
-                                        }
-                                        //  If the number is not valid!
-                                        else
-                                        {
-                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThe range §e" + fourth + "§c is not valid.");
-                                        }
-                                    }
-                                    //  If the material is not valid.
-                                    else
-                                    {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThe material §e" + third + "§c is not valid.");
-                                    }
+                                    main.IFIELDSERVICE.of_addPlayer2Setup(ps);
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fYou have defined your §acommand-set§f and §aIField-Name.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§eClick on a block to set your command-set to it!");
                                 }
                                 //  If the IField already exist.
                                 else
@@ -224,7 +209,7 @@ public class CMD_IField implements CommandExecutor, TabCompleter
         p.sendMessage("§7To teleport to an IField.");
         p.sendMessage("§c/IField tp <name>");
         p.sendMessage("§7To create a new IField.");
-        p.sendMessage("§c/IField create <name> <material> <range> <command-set>");
+        p.sendMessage("§c/IField create <name> <command-set>");
         p.sendMessage("§7To delete an IField.");
         p.sendMessage("§c/IField delete <name>");
         p.sendMessage("");
@@ -258,14 +243,6 @@ public class CMD_IField implements CommandExecutor, TabCompleter
             completions = Collections.singletonList("<name>");
         }
         else if(args.length == 3)
-        {
-            completions = Collections.singletonList("<material>");
-        }
-        else if(args.length == 4)
-        {
-            completions = Collections.singletonList("<range>");
-        }
-        else if(args.length == 5)
         {
             completions = Arrays.asList("OPEN=inv_name_example", "CMD=command_example", "TEXTBLOCK=example_text.yml", "DEBUG");
         }

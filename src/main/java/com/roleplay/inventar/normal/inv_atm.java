@@ -1,10 +1,10 @@
 package com.roleplay.inventar.normal;
 
 import com.basis.main.main;
-import com.basis.sys.Sys;
 import com.roleplay.inventar.Inventar;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @Created 25.05.2022
@@ -39,24 +39,27 @@ public class inv_atm extends Inventar
         String depositText = "&7Deposit selected amount.";
         String defaultDisplayName = "&a+%price%€";
 
-        inv.setItem(0,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(1,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(2,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(3,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(9,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(10, main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
-        inv.setItem(11, main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1));
+        ItemStack item = main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {depositText}, 1);
+        inv.setItem(0, item);
+        inv.setItem(1, item);
+        inv.setItem(2, item);
+        inv.setItem(3, item);
+        inv.setItem(9, item);
+        inv.setItem(10,item);
+        inv.setItem(11,item);
 
         //  Payout...
         String payOffText = "&7Pay out selected amount.";
         defaultDisplayName = "&c-%price%€";
-        inv.setItem(5,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(6,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(7,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(8,  main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(14, main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(15, main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
-        inv.setItem(16, main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1));
+
+        item = main.INVENTARSERVICE.of_createItemStack(Material.EMERALD, defaultDisplayName, new String[] {payOffText}, 1);
+        inv.setItem(5,  item);
+        inv.setItem(6,  item);
+        inv.setItem(7,  item);
+        inv.setItem(8,  item);
+        inv.setItem(14, item);
+        inv.setItem(15, item);
+        inv.setItem(16, item);
 
         //  Other Itemstacks...
         inv.setItem(27, main.INVENTARSERVICE.of_createItemStack(Material.LEAD, "&aDeposit your cash.", new String[] {"&7Deposit your whole cash amount.", "&e%moneyCash%€"}, 1));
@@ -92,8 +95,9 @@ public class inv_atm extends Inventar
         of_addCommands2ItemName(15, payOutCMDSet);
         of_addCommands2ItemName(16, payOutCMDSet);
 
-        //  Other...
-        of_addCommands2ItemName(27, Sys.of_getReplacedArrayString(payInCMDSet, "%price%", "%moneyCash%"));
+        //  Others...
+        String[] payAllInCMDSet = new String[] {"TAKE=MONEY_CASH=%moneyCash%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyTransferCompleted", "GIVE=MONEY_ATM=%moneyCash%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
+        of_addCommands2ItemName(27, payAllInCMDSet);
         of_addCommands2ItemName(35, new String[] {"CLOSE"});
     }
 }

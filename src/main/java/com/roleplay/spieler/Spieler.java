@@ -32,10 +32,12 @@ public class Spieler extends Objekt
     double moneyCash;
     double moneyATM;
     double moneyDiff;
+
     //  1 = ATM, 0 = CASH
     int moneyType;
     int dbIdOtherPlayer;
     int invId;
+    int npcInteractionCounter;
 
     boolean ib_playedBefore = true;
     boolean ib_newbie;
@@ -146,6 +148,11 @@ public class Spieler extends Objekt
         ib_wait4Input = bool;
     }
 
+    public void of_setNPCInteractionCounter(int value)
+    {
+        npcInteractionCounter = value;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -229,6 +236,12 @@ public class Spieler extends Objekt
     {
         return input4Commands;
     }
+
+    public int of_getNPCInteractionCounter()
+    {
+        return npcInteractionCounter;
+    }
+
 
     /* ************************************* */
     /* BOOLS */

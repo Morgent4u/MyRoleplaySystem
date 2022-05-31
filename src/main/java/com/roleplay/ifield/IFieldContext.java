@@ -82,12 +82,11 @@ public class IFieldContext extends Objekt
             Material material = Material.getMaterial(datei.of_getSetString("Material", "STONE").toUpperCase());
             String[] commandSet = datei.of_getStringArrayByKey("CommandSet");
             Location location = datei.of_getLocationByKey("Location");
-            double range = datei.of_getDoubleByKey("Range");
 
             //  Validate all data.
-            if(material != null && commandSet != null && location != null && range != -1)
+            if(material != null && commandSet != null && location != null)
             {
-                IField iField = new IField(material, commandSet, location, range);
+                IField iField = new IField(material, commandSet, location);
                 iField.of_setInfo(datei.of_getFileName().replace(".yml", ""));
                 iField.of_setObjectId(iFields.size() + 1);
                 iFields.put(iField.of_getObjectId(), iField);
@@ -117,7 +116,6 @@ public class IFieldContext extends Objekt
             {
                 datei.of_getSetStringArray("CommandSet", ifield.of_getCommandSet());
                 datei.of_set("Material", ifield.of_getMaterial().toString());
-                datei.of_set("Range", ifield.of_getRange());
                 datei.of_setLocation("Location", ifield.of_getLocation());
 
                 //  Add the current iField to the current memory...

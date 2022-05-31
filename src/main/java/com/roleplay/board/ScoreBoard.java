@@ -118,7 +118,7 @@ public class ScoreBoard extends Objekt
                     tmpValue = tmpValue.replace("&", "§");
 
                     //  If a placeholder has been found add a placement to avoid a problem by using same color codes.
-                    boolean lb_addPlacement = tmpValue.contains("%");
+                    boolean lb_addPlacement = tmpValue.contains("%") || tmpValue.equals("");
 
                     //  Replace current line with player stats...
                     tmpValue = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(tmpValue, ps);

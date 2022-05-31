@@ -6,6 +6,7 @@ import com.basis.sys.Sys;
 import com.roleplay.spieler.Spieler;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
+import java.util.HashMap;
 
 /**
  * @Created 15.04.2022
@@ -29,12 +30,13 @@ public class CommandSet extends Objekt
 
     /**
      * Constructor for the CommandSet
-     * @param commands The commands which should be executed by the given player.
+     * @param cmds The commands which should be executed by the given player.
      * @param ps The player which should execute the commands or interactions.
      */
-    public CommandSet(String[] commands, Spieler ps)
+    public CommandSet(String[] cmds, Spieler ps)
     {
-        this.commands = commands;
+        commands = new String[cmds.length];
+        System.arraycopy(cmds, 0, commands, 0, cmds.length);
         this.ps = ps;
     }
 
@@ -58,6 +60,12 @@ public class CommandSet extends Objekt
 
         //  Get the current-size stored in a variable, it will be used later...
         int size = commands.length;
+
+        //  Replace all commands with player stats...
+        for(int i = 0; i < size; i++)
+        {
+            commands[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(commands[i], ps);
+        }
 
         //  Iterate through all commands:
         for(int i = 0; i < size; i++)
@@ -136,12 +144,6 @@ public class CommandSet extends Objekt
      */
     private int of_executeCommand(String category, String command)
     {
-        //  Replace all player placeholder if command is given!
-        if(!command.isEmpty())
-        {
-            command = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(command, ps);
-        }
-
         switch (category)
         {
             case "CMD":
@@ -215,6 +217,7 @@ public class CommandSet extends Objekt
                 double money = Double.parseDouble(commandData[1]);
 
                 //  Check if the player has the needed money...
+                ps.of_setMoneyDiff(0);
                 rc = ( main.SPIELERSERVICE.of_editPlayerMoney(ps, moneyType, removeAdd, money) ) ? 1 : -1;
             }
             catch (Exception ignored) { /* If an error occurred the returnCode will be -2 */ }

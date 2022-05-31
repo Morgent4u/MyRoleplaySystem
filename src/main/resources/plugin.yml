@@ -19,6 +19,9 @@ commands:
   Hologram:
     usuage: /Hologram
     aliases: [holo, hd]
+  MRS:
+    usuage: /MRS
+    aliases: [MyRoleplaySystem]
   NPC:
     usuage: /NPC
   IField:

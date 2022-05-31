@@ -44,6 +44,7 @@ public class PermissionBoard extends Objekt
         of_addPermissions2Board("General.Default.Permission", "mrs.general.default");
 
         //  Load specific Permissions (Commands):
+        of_addPermissions2Board("Command.Permission.MRS", "mrs.command.mrs");
         of_addPermissions2Board("Command.Permission.Test", "mrs.command.test");
         of_addPermissions2Board("Command.Permission.Interaction", "mrs.command.interaction");
         of_addPermissions2Board("Command.Permission.Dataprotection", "mrs.command.dataprotection");
