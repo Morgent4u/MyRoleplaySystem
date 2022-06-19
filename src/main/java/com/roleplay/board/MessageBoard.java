@@ -8,7 +8,6 @@ import com.roleplay.objects.TextBlock;
 import com.roleplay.spieler.Spieler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +58,8 @@ public class MessageBoard extends Objekt
         of_addMessageOrSound2Board("General.PlayerIsNotOnline", "&fThe player &c%otherPlayer%&f, you are looking for is not online!");
 
         // Roleplay:
-        of_addMessageOrSound2Board("Roleplay.Money.MoneyTransferCompleted", "&fYou have paid &a%money%€&f to your bank account!");
+        of_addMessageOrSound2Board("Roleplay.Money.MoneyDepositFromBank", "&fYou have paid &a%money%€&f to your bank account!");
+        of_addMessageOrSound2Board("Roleplay.Money.MoneyWithdrawFromBank", "&fYou have taken &a%money%€&f from your bank account!");
         of_addMessageOrSound2Board("Roleplay.Money.MoneyTransferNotEnoughMoney", "&fYou do not have enough money for this interaction! &f(&e%money%€&f)");
 
         //  Add Sounds:

@@ -4,20 +4,21 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.roleplay.extended.LocationDatei;
 import com.roleplay.spieler.Spieler;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @Created 29.04.2022
@@ -88,8 +89,10 @@ public class NPCContext extends Objekt
             Location location = datei.of_getLocationByKey("Location");
             String[] commandSet = datei.of_getStringArrayByKey("CommandSet");
             String skinName = datei.of_getString("SkinName");
+            String skinTexture = datei.of_getString("SkinTexture");
+            String skinSignature = datei.of_getString("SkinSignature");
 
-            if(location != null && commandSet != null)
+            if(location != null && commandSet != null && skinTexture != null && skinSignature != null)
             {
                 //  Set the SkinName to NULL if it is set to 'None'.
                 skinName = skinName.equalsIgnoreCase("None") ? null : skinName;
@@ -105,7 +108,7 @@ public class NPCContext extends Objekt
                 // If no error occurred, add the NPC to the list.
                 if(errorMessage == null)
                 {
-                    EntityPlayer entityPlayer = of_createEntityPlayer2World(npc);
+                    EntityPlayer entityPlayer = of_createEntityPlayer2World(npc, skinTexture, skinSignature);
 
                     // This function also sets the ObjectId (EntityId)!
                     npc.of_setEntityNPC(entityPlayer);
@@ -136,14 +139,15 @@ public class NPCContext extends Objekt
      * This function is used to create a EntityPlayer from a NPC.
      * @return The EntityPlayer.
      */
-    private EntityPlayer of_createEntityPlayer2World(NPC npc)
+    private EntityPlayer of_createEntityPlayer2World(NPC npc, String skinTexture, String skinSignature)
     {
         //  Create an NPC.
-        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer world = ((CraftWorld) Objects.requireNonNull(npc.of_getLocation().getWorld())).getHandle();
 
         //  Set the GameProfile and the EntityPlayer.
-        GameProfile gameProfile = main.NPCSERVICE.of_createGameProfile(npc.of_getSkinName());
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
+        gameProfile.getProperties().put("textures", new Property("textures", skinTexture, skinSignature));
 
         return new EntityPlayer(server, world, gameProfile);
     }
@@ -174,7 +178,19 @@ public class NPCContext extends Objekt
                 npc.of_setSkinName("None");
             }
 
+            //  Store the NPC data into the npc-file.
             datei.of_set("SkinName", npc.of_getSkinName());
+
+            //  Save the Texture and Signature of the skin, this is used to create the GameProfile.
+            String[] textureSignature = main.NPCSERVICE.of_getTextureAndSignatureBySkinName(npc.of_getSkinName());
+
+            if(textureSignature != null && textureSignature.length > 0)
+            {
+                datei.of_set("SkinTexture", textureSignature[0]);
+                datei.of_set("SkinSignature", textureSignature[1]);
+            }
+
+            //  Store the given CommandSet and the location into the file.
             datei.of_getSetStringArray("CommandSet", npc.of_getCommandSet());
             datei.of_setLocation("Location", loc);
 
@@ -188,10 +204,6 @@ public class NPCContext extends Objekt
 
                 if(rc == 1)
                 {
-                    //  Show the NPC for all online players.
-                    // Send the remove packets...
-                    main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
-
                     //  Send the create packets...
                     main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
 

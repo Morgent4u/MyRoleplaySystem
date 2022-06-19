@@ -349,6 +349,7 @@ public class Settings extends Objekt
                 //  Load all NPCs for each player.
                 if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null && main.NPCSERVICE != null)
                 {
+                    main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
                     main.NPCSERVICE.of_showAllNPCs2AllOnlinePlayers();
                 }
 

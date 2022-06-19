@@ -13,7 +13,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,9 +61,9 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                                     p.sendMessage("§8[§4§lHologram - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9TeleportId - DisplayName");
-                                    for(int i = 0; i < size; i++)
+                                    for(Hologram holo : holos)
                                     {
-                                        p.sendMessage("§f" + (i + 1) + " §8- §7" + holos[i].of_getHologramTitles().get(0).replace("&", "§"));
+                                        p.sendMessage("§f" + holo.of_getObjectId() + " §8- §7" + holo.of_getHologramTitles().get(0).replace("&", "§"));
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");

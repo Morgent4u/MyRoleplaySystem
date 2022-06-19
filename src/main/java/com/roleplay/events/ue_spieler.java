@@ -99,6 +99,14 @@ public class ue_spieler implements Listener
                 main.IFIELDSERVICE.of_removePlayerFromSetup(ps);
             }
 
+            //  Check for the NPCs...
+            /*
+            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            {
+                main.NPCSERVICE.of_removeAllNPCsFromPlayer(ps);
+            }
+            */
+
             main.SPIELERSERVICE._CONTEXT.of_unloadPlayer(ps);
         }
     }

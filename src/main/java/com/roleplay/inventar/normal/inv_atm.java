@@ -74,8 +74,8 @@ public class inv_atm extends Inventar
     @Override
     public void of_defineCommands4Inventory()
     {
-        String[] payInCMDSet = new String[] {"TAKE=MONEY_CASH=%price%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyTransferCompleted", "GIVE=MONEY_ATM=%price%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
-        String[] payOutCMDSet = new String[] {"TAKE=MONEY_ATM=%price%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyTransferCompleted", "GIVE=MONEY_CASH=%price%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
+        String[] payInCMDSet = new String[] {"TAKE=MONEY_CASH=%price%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyDepositFromBank", "GIVE=MONEY_ATM=%price%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
+        String[] payOutCMDSet = new String[] {"TAKE=MONEY_ATM=%price%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyWithdrawFromBank", "GIVE=MONEY_CASH=%price%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
 
         //  PayIn...
         of_addCommands2ItemName(0,  payInCMDSet);
@@ -96,7 +96,7 @@ public class inv_atm extends Inventar
         of_addCommands2ItemName(16, payOutCMDSet);
 
         //  Others...
-        String[] payAllInCMDSet = new String[] {"TAKE=MONEY_CASH=%moneyCash%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyTransferCompleted", "GIVE=MONEY_ATM=%moneyCash%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
+        String[] payAllInCMDSet = new String[] {"TAKE=MONEY_CASH=%moneyCash%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyDepositFromBank", "GIVE=MONEY_ATM=%moneyCash%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
         of_addCommands2ItemName(27, payAllInCMDSet);
         of_addCommands2ItemName(35, new String[] {"CLOSE"});
     }

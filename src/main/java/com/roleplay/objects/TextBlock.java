@@ -107,7 +107,7 @@ public class TextBlock extends Objekt
                     p.sendMessage(chatMessage);
                 }
             }
-            //  An error occured.
+            //  An error occurred.
             else
             {
                 main.SPIELERSERVICE.of_sendErrorMessage(ps, "There was an error while loading the text-block file. File: " + datei.of_getFileName());

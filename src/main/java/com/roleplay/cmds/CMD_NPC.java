@@ -58,6 +58,8 @@ public class CMD_NPC implements CommandExecutor
                                     p.sendMessage("§8[§4§lNPC - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9TeleportId - DisplayName");
+                                    //  We do not work the object-id here because the object-id is the entity-player-id!
+                                    //  So we use the array-index instead.
                                     for(int i = 0; i < size; i++)
                                     {
                                         p.sendMessage("§f" + (i + 1) + " §8- §7" + npcs[i].of_getInfo());

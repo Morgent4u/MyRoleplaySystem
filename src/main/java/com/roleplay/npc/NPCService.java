@@ -2,6 +2,8 @@ package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.roleplay.spieler.Spieler;
@@ -11,6 +13,7 @@ import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.network.syncher.DataWatcherRegistry;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.scores.ScoreboardTeam;
 import net.minecraft.world.scores.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
@@ -69,11 +72,12 @@ public class NPCService extends Objekt
         {
             Player p = ps.of_getPlayer();
 
-            //  Create the connection to the player-client to send the packets.
+            //  Create the connection and the packet.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
             for(NPC npc : _CONTEXT.of_getLoadedNPCs())
             {
+                //  Create the connection to the player-client to send the packets.
                 EntityPlayer entityPlayer = npc.of_getEntityNPC();
 
                 //  Create the Team which is used to hide the NameTag and the DataWatcher to build the full skin of the NPC.
@@ -82,17 +86,16 @@ public class NPCService extends Objekt
 
                 //  Disallow the NameTagVisibility of the team.
                 team.a(ScoreboardTeamBase.EnumNameTagVisibility.b);
-
                 //  DataWatcher is needed to build the full skin of the NPC.
                 watcher.a(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
 
-                // This packet adds the NPC to the player.
+                //  This packet adds the NPC to the player.
                 connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer));
                 //  This packet shows the NPC to the player.
-                connection.a(new PacketPlayOutNamedEntitySpawn(entityPlayer));
+                connection.a(new PacketPlayOutNamedEntitySpawn((EntityHuman) entityPlayer));
                 //  This packet corrects the NPC-head rotation.
                 connection.a(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (npc.of_getLocation().getYaw() * 256 / 360)));
-                // This packet is used to build the full skin of the NPC.
+                //  This packet is used to build the full skin of the NPC.
                 connection.a(new PacketPlayOutEntityMetadata(entityPlayer.ae(), watcher, false));
 
                 //  Remove the NameTag of the NPC.
@@ -112,7 +115,7 @@ public class NPCService extends Objekt
                     @Override
                     public void run()
                     {
-                        //  This packet must be sent a little later.
+                        //  This packet must be sent a little later is used to remove then npc-name from the tab-list.
                         connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer));
                     }
 
@@ -171,44 +174,35 @@ public class NPCService extends Objekt
     }
 
     /**
-     * This function is used to create a GameProfile by using the SkinName.
-     * If no SkinName is given it only creates the GameProfile.
-     * @param skinName The SkinName of the GameProfile. This can be null.
-     * @return The GameProfile.
+     * This function is used to get the texture and signature for the
+     * GameProfile.
+     * @param skinName SkinName of the player to get the texture and signature for.
+     * @return Returns an Array, [0] => Texture and [1] => Signature.
      */
-    public GameProfile of_createGameProfile(String skinName)
+    public String[] of_getTextureAndSignatureBySkinName(String skinName)
     {
-        // We need a blank GameProfile.
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "");
+        //  Create new GameProfile.
+        String texture = "";
+        String signature = "";
 
-        if(skinName != null)
+        try
         {
-            try
-            {
-                //  Get information via. API for the GameProfile.
-                HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://api.ashcon.app/mojang/v2/user/%s", skinName)).openConnection();
+            //  Get the UUID by using the SkinName aka. PlayerName.
+            URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + skinName);
+            InputStreamReader reader = new InputStreamReader(url.openStream());
+            String uuid = (new JsonParser()).parse(reader).getAsJsonObject().get("id").getAsString();
 
-                //  Check if the connection is open.
-                if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK)
-                {
-                    ArrayList<String> lines = new ArrayList<>();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    reader.lines().forEach(lines::add);
+            //  Open second url for the properties
+            URL url2 = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false");
+            InputStreamReader reader2 = new InputStreamReader(url2.openStream());
+            JsonObject property = (new JsonParser()).parse(reader2).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
 
-                    //  Extract the properties.
-                    String reply = String.join(" ",lines);
-                    int indexOfValue = reply.indexOf("\"value\": \"");
-                    int indexOfSignature = reply.indexOf("\"signature\": \"");
-                    String skin = reply.substring(indexOfValue + 10, reply.indexOf("\"", indexOfValue + 10));
-                    String signature = reply.substring(indexOfSignature + 14, reply.indexOf("\"", indexOfSignature + 14));
-
-                    //  Set the skin.
-                    gameProfile.getProperties().put("textures", new Property("textures", skin, signature));
-                }
-
-            } catch (IOException ignored) { }
+            //  Get the properties...
+            texture = property.get("value").getAsString();
+            signature = property.get("signature").getAsString();
         }
+        catch (Exception ignored) { }
 
-        return gameProfile;
+        return new String[] {texture, signature};
     }
 }
