@@ -177,7 +177,7 @@ public class Inventar extends Objekt
      * @param invSlot The ItemName to interact with.
      * @param cmds The commands to execute.
      */
-    public void of_addCommands2ItemName(int invSlot, String[] cmds)
+    public void of_addCommands2ItemSlot(int invSlot, String[] cmds)
     {
         if(!commands.containsKey(invSlot))
         {

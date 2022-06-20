@@ -6,7 +6,6 @@ import com.basis.sys.Sys;
 import com.roleplay.spieler.Spieler;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
-import java.util.HashMap;
 
 /**
  * @Created 15.04.2022
@@ -36,6 +35,8 @@ public class CommandSet extends Objekt
     public CommandSet(String[] cmds, Spieler ps)
     {
         commands = new String[cmds.length];
+
+        //  Need to be copied to avoid problems with the java-pointer.
         System.arraycopy(cmds, 0, commands, 0, cmds.length);
         this.ps = ps;
     }
@@ -170,6 +171,11 @@ public class CommandSet extends Objekt
             case "MSGID":
                 main.SPIELERSERVICE.of_sendMessageByMessageId(ps, command);
                 return 1;
+            case "POS":
+            case "POSITION":
+                return main.SPIELERSERVICE.of_sendPlayer2PositionByNameOrId(ps, command);
+            case "NOTHING":
+                return 1;
             case "GIVE":
                 return of_executeCommand4MoneySystem(command, "add");
             case "TAKE":
@@ -220,7 +226,7 @@ public class CommandSet extends Objekt
                 ps.of_setMoneyDiff(0);
                 rc = ( main.SPIELERSERVICE.of_editPlayerMoney(ps, moneyType, removeAdd, money) ) ? 1 : -1;
             }
-            catch (Exception ignored) { /* If an error occurred the returnCode will be -2 */ }
+            catch (Exception ignored) { /* If an error occurs the returnCode will be -2 */ }
         }
 
         if(rc == -2)

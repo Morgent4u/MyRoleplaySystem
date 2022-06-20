@@ -78,26 +78,26 @@ public class inv_atm extends Inventar
         String[] payOutCMDSet = new String[] {"TAKE=MONEY_ATM=%price%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyWithdrawFromBank", "GIVE=MONEY_CASH=%price%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
 
         //  PayIn...
-        of_addCommands2ItemName(0,  payInCMDSet);
-        of_addCommands2ItemName(1,  payInCMDSet);
-        of_addCommands2ItemName(2,  payInCMDSet);
-        of_addCommands2ItemName(3,  payInCMDSet);
-        of_addCommands2ItemName(9,  payInCMDSet);
-        of_addCommands2ItemName(10, payInCMDSet);
-        of_addCommands2ItemName(11, payInCMDSet);
+        of_addCommands2ItemSlot(0,  payInCMDSet);
+        of_addCommands2ItemSlot(1,  payInCMDSet);
+        of_addCommands2ItemSlot(2,  payInCMDSet);
+        of_addCommands2ItemSlot(3,  payInCMDSet);
+        of_addCommands2ItemSlot(9,  payInCMDSet);
+        of_addCommands2ItemSlot(10, payInCMDSet);
+        of_addCommands2ItemSlot(11, payInCMDSet);
 
         //  PayOut...
-        of_addCommands2ItemName(5,  payOutCMDSet);
-        of_addCommands2ItemName(6,  payOutCMDSet);
-        of_addCommands2ItemName(7,  payOutCMDSet);
-        of_addCommands2ItemName(8,  payOutCMDSet);
-        of_addCommands2ItemName(14, payOutCMDSet);
-        of_addCommands2ItemName(15, payOutCMDSet);
-        of_addCommands2ItemName(16, payOutCMDSet);
+        of_addCommands2ItemSlot(5,  payOutCMDSet);
+        of_addCommands2ItemSlot(6,  payOutCMDSet);
+        of_addCommands2ItemSlot(7,  payOutCMDSet);
+        of_addCommands2ItemSlot(8,  payOutCMDSet);
+        of_addCommands2ItemSlot(14, payOutCMDSet);
+        of_addCommands2ItemSlot(15, payOutCMDSet);
+        of_addCommands2ItemSlot(16, payOutCMDSet);
 
         //  Others...
         String[] payAllInCMDSet = new String[] {"TAKE=MONEY_CASH=%moneyCash%", "=IF EXECUTED THEN=", "MSGID=Roleplay.Money.MoneyDepositFromBank", "GIVE=MONEY_ATM=%moneyCash%", "=ELSE=", "MSGID=Roleplay.Money.MoneyTransferNotEnoughMoney"};
-        of_addCommands2ItemName(27, payAllInCMDSet);
-        of_addCommands2ItemName(35, new String[] {"CLOSE"});
+        of_addCommands2ItemSlot(27, payAllInCMDSet);
+        of_addCommands2ItemSlot(35, new String[] {"CLOSE"});
     }
 }

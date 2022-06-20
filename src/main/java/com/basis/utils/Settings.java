@@ -15,6 +15,7 @@ import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
+import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -51,6 +52,7 @@ public class Settings extends Objekt
     boolean ib_useJoinQuitMsg;
     boolean ib_useIField;
     boolean ib_useDataProtection;
+    boolean ib_usePosition;
 
     //  Module-Attributes:
     boolean ib_moduleIDCard;
@@ -146,6 +148,14 @@ public class Settings extends Objekt
 
             //  Enable or disable iField-System:
             ib_useIField = datei.of_getSetBoolean(rpSection + "IField.Use", true);
+
+            //  Enable or disable the Position-System:
+            ib_usePosition = datei.of_getSetBoolean(rpSection + "Position.Use", true);
+            if(of_isUsingPosition())
+            {
+                main.POSITIONSERVICE = new PositionService();
+                main.POSITIONSERVICE.of_load();
+            }
 
             //	MySQL-Attribute einlesen:
             String externalSection = sectionKey + ".External.";
@@ -503,6 +513,11 @@ public class Settings extends Objekt
             Sys.of_sendMessage(blue+"[*] IFields:"+white);
             main.IFIELDSERVICE.of_sendDebugDetailInformation();
         }
+        if(of_isUsingPosition())
+        {
+            Sys.of_sendMessage(blue+"[*] Position:"+white);
+            main.POSITIONSERVICE.of_sendDebugDetailInformation();
+        }
         Sys.of_sendMessage("========================================================");
     }
 
@@ -643,5 +658,10 @@ public class Settings extends Objekt
     public boolean of_isUsingDataProtection()
     {
         return ib_useDataProtection;
+    }
+
+    public boolean of_isUsingPosition()
+    {
+        return ib_usePosition;
     }
 }

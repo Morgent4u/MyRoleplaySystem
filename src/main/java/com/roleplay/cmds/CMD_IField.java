@@ -38,7 +38,7 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                         if(!main.SETTINGS.of_isUsingIField())
                         {
-                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "The §aIField-system§7 is currently §cdisabled§7.");
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe §aIField-system§f is currently §cdisabled§f.");
                             return true;
                         }
 

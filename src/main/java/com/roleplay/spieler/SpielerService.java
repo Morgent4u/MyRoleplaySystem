@@ -6,6 +6,7 @@ import com.basis.sys.Sys;
 import com.basis.utils.Datei;
 import com.roleplay.inventar.Inventar;
 import com.roleplay.objects.TextBlock;
+import com.roleplay.position.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -152,6 +153,28 @@ public class SpielerService extends Objekt
         {
             ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats(messageId, ps));
         }
+    }
+
+    /**
+     * This method is used to send the player to the given position-name or position-id.
+     * @param ps Player instance.
+     * @param posNameOrId The position-name or position-id which will be used to get the position.
+     * @return 1 if successful, -1 if not.
+     */
+    public int of_sendPlayer2PositionByNameOrId(Spieler ps, String posNameOrId)
+    {
+        if(main.SETTINGS.of_isUsingPosition())
+        {
+            Position pos = main.POSITIONSERVICE.of_getPositionByAnything(posNameOrId);
+
+            if(pos != null)
+            {
+                ps.of_getPlayer().teleport(pos.of_getLocation());
+                return 1;
+            }
+        }
+
+        return -1;
     }
 
     /* ************************************* */

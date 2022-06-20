@@ -18,6 +18,7 @@ import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.npc.NPCService;
+import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -57,6 +58,7 @@ public class main extends JavaPlugin
     public static HologramService HOLOGRAMSERVICE;
     public static NPCService NPCSERVICE;
     public static IFieldService IFIELDSERVICE;
+    public static PositionService POSITIONSERVICE;
 
     public static MessageBoard MESSAGEBOARD;
     public static PermissionBoard PERMISSIONBOARD;
@@ -113,6 +115,7 @@ public class main extends JavaPlugin
                 getCommand("Hologram").setExecutor(new CMD_Hologram());
                 getCommand("IField").setExecutor(new CMD_IField());
                 getCommand("MRS").setExecutor(new CMD_MRS());
+                getCommand("Position").setExecutor(new CMD_Position());
 
                 // Initialize own services or dependencies.
                 rc = SETTINGS.of_initSystemServices();

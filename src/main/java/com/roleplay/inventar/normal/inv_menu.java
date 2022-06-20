@@ -36,6 +36,6 @@ public class inv_menu extends Inventar
     @Override
     public void of_defineCommands4Inventory()
     {
-        of_addCommands2ItemName(3, new String[] {"DEBUG"});
+        of_addCommands2ItemSlot(3, new String[] {"DEBUG"});
     }
 }

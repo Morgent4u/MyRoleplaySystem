@@ -13,6 +13,7 @@ commands:
     usuage: /Interaction
   Dataprotection:
     usuage: /Dataprotection
+    aliases: [Datenschutzerklärung,Datenschutz]
   Textblock:
     usuage: /Textblock
     aliases: [text]
@@ -26,3 +27,7 @@ commands:
     usuage: /NPC
   IField:
     usuage: /IField
+    aliases: [iFeld,iBlock]
+  Position:
+    usuage: /Position
+    aliases: [pos]

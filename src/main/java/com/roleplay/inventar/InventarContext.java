@@ -194,7 +194,7 @@ public class InventarContext extends Objekt
 
                         if(lb_hasCommandSet)
                         {
-                            inventar.of_addCommands2ItemName(i, commandSet);
+                            inventar.of_addCommands2ItemSlot(i, commandSet);
                         }
                     }
                 }
