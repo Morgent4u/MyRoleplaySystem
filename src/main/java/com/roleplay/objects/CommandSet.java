@@ -266,6 +266,13 @@ public class CommandSet extends Objekt
     /* BOOLS */
     /* ************************************* */
 
+    /**
+     * This function is used to iterate through all defined Commands and
+     * find the CommandSet with the given CommandSet-Start-parameter.
+     * For example: CMD or SCMD.
+     * @param command The command which should be searched.
+     * @return True if the command was found, false if not.
+     */
     public boolean of_commandExists(String command)
     {
         command = command.toUpperCase();

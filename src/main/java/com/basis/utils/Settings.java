@@ -14,6 +14,7 @@ import com.roleplay.hologram.HologramService;
 import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
+import com.roleplay.module.deathcmds.DeathCmdSet;
 import com.roleplay.npc.NPCService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
@@ -56,6 +57,7 @@ public class Settings extends Objekt
 
     //  Module-Attributes:
     boolean ib_moduleIDCard;
+    boolean ib_moduleDeathCommandSet;
 
     //  Money-Attributes:
     boolean ib_useVaultMoney;
@@ -454,6 +456,16 @@ public class Settings extends Objekt
                 module.of_save("Settings.of_check4Modules(); IDCard.yml");
             }
         }
+
+        //  Check for the death-CommandSet-Module:
+        ib_moduleDeathCommandSet = datei.of_getSetBoolean(configSection + ".DeathCommandSet.Use", true);
+        if(of_isUsingModuleDeathCommandSet())
+        {
+            main.MODULE_DEATHCMDSET = new DeathCmdSet();
+
+            //  Enable or disable this module if the load-process was successfully.
+            ib_moduleDeathCommandSet = main.MODULE_DEATHCMDSET.of_load(new Datei(moduleFolder + "//DeathCommandSet//DeathCommandSet.yml")) == 1;
+        }
     }
 
     /**
@@ -663,5 +675,10 @@ public class Settings extends Objekt
     public boolean of_isUsingPosition()
     {
         return ib_usePosition;
+    }
+
+    public boolean of_isUsingModuleDeathCommandSet()
+    {
+        return ib_moduleDeathCommandSet;
     }
 }

@@ -17,6 +17,7 @@ import com.roleplay.hologram.HologramService;
 import com.roleplay.ifield.IFieldService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
+import com.roleplay.module.deathcmds.DeathCmdSet;
 import com.roleplay.npc.NPCService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
@@ -53,6 +54,7 @@ public class main extends JavaPlugin
     //  Own services/objects:
     public static Settings SETTINGS;
 
+    //  Services:
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
     public static HologramService HOLOGRAMSERVICE;
@@ -60,11 +62,16 @@ public class main extends JavaPlugin
     public static IFieldService IFIELDSERVICE;
     public static PositionService POSITIONSERVICE;
 
+    //  Boards:
     public static MessageBoard MESSAGEBOARD;
     public static PermissionBoard PERMISSIONBOARD;
     public static ScoreBoard SCOREBOARD;
 
+    //  Managers:
     public static TablistManager TABLISTMANAGER;
+
+    //  Modules:
+    public static DeathCmdSet MODULE_DEATHCMDSET;
 
 
     /* ************************* */

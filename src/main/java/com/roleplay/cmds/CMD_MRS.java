@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,6 +54,18 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
                                 main.SETTINGS.of_setUseProtocolLib(true);
 
                                 sender.sendMessage("§8[§cReload-Service§8]§a Plugin has been reloaded.");
+                                return true;
+                            }
+                            else if(first.equalsIgnoreCase("modules"))
+                            {
+                                p.sendMessage("§7═════════════════════════");
+                                p.sendMessage("");
+                                p.sendMessage("§8[§4§l"+Sys.of_getProgramVersion()+" - Modules§8]");
+                                p.sendMessage("");
+                                p.sendMessage("§5Current modules:");
+                                p.sendMessage("§b[*]§f DeathCommandSet: "+( main.SETTINGS.of_isUsingModuleDeathCommandSet() ? "§aEnabled" : "§cDisabled" ));
+                                p.sendMessage("");
+                                p.sendMessage("§7═════════════════════════");
                                 return true;
                             }
                         }
@@ -99,6 +111,8 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
         p.sendMessage("");
         p.sendMessage("§7To show the help-text:");
         p.sendMessage("§c/MRS");
+        p.sendMessage("§fCheck the current enabled modules:");
+        p.sendMessage("§c/MRS modules");
         p.sendMessage("§7To reload the whole MRS:");
         p.sendMessage("§c/MRS reload");
         p.sendMessage("");
@@ -125,7 +139,7 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
         //  React to the different arguments.
         if(args.length == 1)
         {
-            completions = Collections.singletonList("reload");
+            completions = Arrays.asList("reload", "modules");
         }
 
         // Suggest the player the completions.

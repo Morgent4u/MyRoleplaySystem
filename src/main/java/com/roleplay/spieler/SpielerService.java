@@ -169,6 +169,7 @@ public class SpielerService extends Objekt
 
             if(pos != null)
             {
+                ps.of_setPositionId(pos.of_getObjectId());
                 ps.of_getPlayer().teleport(pos.of_getLocation());
                 return 1;
             }

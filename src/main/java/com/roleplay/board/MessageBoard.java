@@ -5,6 +5,7 @@ import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
 import com.roleplay.objects.TextBlock;
+import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
@@ -135,6 +136,24 @@ public class MessageBoard extends Objekt
         textBlock.of_addMessage2Block("§7═════════════════════════");
         textBlock.of_addCommandSet2Block(new String[] {"KICK=txt_double_ipaddress"});
         textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        //  Death-Message:
+        textBlock = new TextBlock("txt_death_message");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lYou died!§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§d%p%§f, you have died!");
+        textBlock.of_addMessage2Block("§fYou have been teleported to:");
+        textBlock.of_addMessage2Block("§c%pos%");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§eEnjoy your life! :)");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fIf your death was caused by a");
+        textBlock.of_addMessage2Block("§fbug, please report it to us.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
     }
 
     /* ************************* */
@@ -203,6 +222,18 @@ public class MessageBoard extends Objekt
             if(ds != null)
             {
                 message = message.replace("%otherPlayer%", ds.of_getPlayer().getName());
+            }
+        }
+
+        //  Check for the last Position-Object:
+        if(ps.of_getPositionId() > 0)
+        {
+            Position position = main.POSITIONSERVICE._CONTEXT.of_getPositionByObjectId(ps.of_getObjectId());
+
+            if(position != null)
+            {
+                message = message.replace("%pos%", position.of_getPositionName());
+                message = message.replace("%position%", position.of_getPositionName());
             }
         }
 

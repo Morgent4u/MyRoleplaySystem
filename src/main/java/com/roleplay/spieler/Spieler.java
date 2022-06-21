@@ -38,6 +38,7 @@ public class Spieler extends Objekt
     int dbIdOtherPlayer;
     int invId;
     int npcInteractionCounter;
+    int positionId;
 
     boolean ib_playedBefore = true;
     boolean ib_newbie;
@@ -153,6 +154,11 @@ public class Spieler extends Objekt
         npcInteractionCounter = value;
     }
 
+    public void of_setPositionId(int positionId)
+    {
+        this.positionId = positionId;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -242,6 +248,10 @@ public class Spieler extends Objekt
         return npcInteractionCounter;
     }
 
+    public int of_getPositionId()
+    {
+        return positionId;
+    }
 
     /* ************************************* */
     /* BOOLS */
