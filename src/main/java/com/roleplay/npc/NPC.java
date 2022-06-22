@@ -71,7 +71,7 @@ public class NPC extends Objekt
 
         if(cmds != null && cmds.length > 0)
         {
-            Sys.of_sendMessage("Commands: ");
+            Sys.of_sendMessage("Commands:");
 
             for(String cmd : cmds)
             {

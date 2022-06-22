@@ -171,6 +171,9 @@ public class CommandSet extends Objekt
             case "MSGID":
                 main.SPIELERSERVICE.of_sendMessageByMessageId(ps, command);
                 return 1;
+            case "PLAYSOUND":
+                main.MESSAGEBOARD.of_playSoundByKey(command, ps);
+                return 1;
             case "POS":
             case "POSITION":
                 return main.SPIELERSERVICE.of_sendPlayer2PositionByNameOrId(ps, command);

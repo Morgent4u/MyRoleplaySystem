@@ -253,14 +253,22 @@ public class MessageBoard extends Objekt
      */
     public void of_playSoundByKey(String soundKey, Spieler ps)
     {
+        Player p = ps.of_getPlayer();
         String sound = messages.get(soundKey);
 
-        if(sound != null && !sound.isEmpty())
+        //  If the sound could be found in the messagesSounds.yml use the defined minecraft-sound.
+        if(sound != null)
         {
-            Player p = ps.of_getPlayer();
-
-            //  Play the sound...
             sound = sound.toLowerCase();
+        }
+        //  Otherwise, the sound could be from an CommandSet, so we handle it as a minecraft-sound.
+        else
+        {
+            sound = soundKey.toLowerCase();
+        }
+
+        if(!sound.isEmpty())
+        {
             p.playSound(p.getLocation(), sound, 1, 1);
         }
     }
