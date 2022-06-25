@@ -1,7 +1,7 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
-import com.roleplay.ifield.IField;
+import com.roleplay.iblock.IBlock;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,15 +16,15 @@ import java.util.*;
  * @Created 22.05.2022
  * @Author Nihar
  * @Description
- * This command is used to interact with IFields.
- * It also allows creating or delete IFields.
+ * This command is used to interact with IBlocks.
+ * It also allows creating or delete IBlocks.
  */
-public class CMD_IField implements CommandExecutor, TabCompleter
+public class CMD_IBlock implements CommandExecutor, TabCompleter
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
     {
-        if(cmd.getName().equalsIgnoreCase("IField"))
+        if(cmd.getName().equalsIgnoreCase("IBlock"))
         {
             if(sender instanceof Player)
             {
@@ -36,17 +36,17 @@ public class CMD_IField implements CommandExecutor, TabCompleter
                     {
                         Player p = ps.of_getPlayer();
 
-                        if(!main.SETTINGS.of_isUsingIField())
+                        if(!main.SETTINGS.of_isUsingIBlock())
                         {
-                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe §aIField-system§f is currently §cdisabled§f.");
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe §aIBlock-system§f is currently §cdisabled§f.");
                             return true;
                         }
 
-                        if(main.IFIELDSERVICE.of_isInSetup(ps))
+                        if(main.IBLOCKSERVICE.of_isInSetup(ps))
                         {
                             //  Remove the player from the setup-mode.
                             main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cYou have left the setup-mode.");
-                            main.IFIELDSERVICE.of_removePlayerFromSetup(ps);
+                            main.IBLOCKSERVICE.of_removePlayerFromSetup(ps);
                             return true;
                         }
 
@@ -56,26 +56,26 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                             if(first.equalsIgnoreCase("list"))
                             {
-                                IField[] ifields = main.IFIELDSERVICE._CONTEXT.of_getAllIFields();
+                                IBlock[] iblocks = main.IBLOCKSERVICE._CONTEXT.of_getAllIBlocks();
 
-                                if(ifields != null && ifields.length > 0)
+                                if(iblocks != null && iblocks.length > 0)
                                 {
                                     p.sendMessage("§7═════════════════════════");
                                     p.sendMessage("");
-                                    p.sendMessage("§8[§4§lIField - List§8]");
+                                    p.sendMessage("§8[§4§lIBlock - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9Id §f-§9 Name");
-                                    for (IField ifield : ifields)
+                                    for (IBlock iblock : iblocks)
                                     {
-                                        p.sendMessage("§a" + (ifield.of_getObjectId()) + " §f- §a" + ifield.of_getInfo());
+                                        p.sendMessage("§a" + iblock.of_getObjectId() + " §f- §a" + iblock.of_getInfo());
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
                                 }
-                                //  If no IFields has been found.
+                                //  If no iBlocks has been found.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IFields found.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IBlocks found.");
                                 }
 
                                 return true;
@@ -89,43 +89,43 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                             if(first.equalsIgnoreCase("delete"))
                             {
-                                IField ifield = main.IFIELDSERVICE.of_getIFieldByName(second);
+                                IBlock iblock = main.IBLOCKSERVICE.of_getIBlockByName(second);
 
-                                if(ifield != null)
+                                if(iblock != null)
                                 {
-                                    int rc = main.IFIELDSERVICE._CONTEXT.of_deleteIField(ifield);
+                                    int rc = main.IBLOCKSERVICE._CONTEXT.of_deleteIBlock(iblock);
 
                                     if(rc == 1)
                                     {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aDeleted IField §f" + ifield.of_getInfo() + "§a.");
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aDeleted IBlock §f" + iblock.of_getInfo() + "§a.");
                                     }
                                     //  If an error occurred.
                                     else
                                     {
-                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while deleting the IField.");
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while deleting the IBlock.");
                                     }
                                 }
                                 //  If not found.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IField found with the name §e" + second + "§c.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IBlock found with the name §e" + second + "§c.");
                                 }
 
                                 return true;
                             }
                             else if(first.equalsIgnoreCase("tp"))
                             {
-                                IField ifield = main.IFIELDSERVICE.of_getIFieldByName(second);
+                                IBlock iblock = main.IBLOCKSERVICE.of_getIBlockByName(second);
 
-                                if(ifield != null)
+                                if(iblock != null)
                                 {
-                                    p.teleport(ifield.of_getLocation());
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aTeleported to IField §f" + ifield.of_getInfo() + "§a.");
+                                    p.teleport(iblock.of_getLocation());
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aTeleported to IBlock §f" + iblock.of_getInfo() + "§a.");
                                 }
                                 //  If not found.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IField found with the name §e" + second + "§c.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cNo IBlock found with the name §e" + second + "§c.");
                                 }
 
                                 return true;
@@ -140,25 +140,25 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
                             if(first.equalsIgnoreCase("create"))
                             {
-                                IField ifield = main.IFIELDSERVICE.of_getIFieldByName(second);
+                                IBlock iblock = main.IBLOCKSERVICE.of_getIBlockByName(second);
 
-                                if(ifield == null)
+                                if(iblock == null)
                                 {
                                     //  Create a new instance with the name...
-                                    ifield = new IField(null, new String[] {third}, null);
-                                    ifield.of_setInfo(second);
+                                    iblock = new IBlock(null, new String[] {third}, null);
+                                    iblock.of_setInfo(second);
 
-                                    //  Set the iField as powerObject to the player...
-                                    ps.of_setPowerObject(ifield);
+                                    //  Set the IBlock as powerObject to the player...
+                                    ps.of_setPowerObject(iblock);
 
-                                    main.IFIELDSERVICE.of_addPlayer2Setup(ps);
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fYou have defined your §acommand-set§f and §aIField-Name.");
+                                    main.IBLOCKSERVICE.of_addPlayer2Setup(ps);
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fYou have defined your §acommand-set§f and §aIBlock-Name.");
                                     main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§eClick on a block to set your command-set to it!");
                                 }
-                                //  If the IField already exist.
+                                //  If the IBlock already exist.
                                 else
                                 {
-                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn IField with the name §e" + second + "§c already exists.");
+                                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn IBlock with the name §e" + second + "§c already exists.");
                                 }
 
                                 return true;
@@ -197,21 +197,21 @@ public class CMD_IField implements CommandExecutor, TabCompleter
 
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");
-        p.sendMessage("§8[§4§lIField - Help§8]");
+        p.sendMessage("§8[§4§lIBlock - Help§8]");
         p.sendMessage("");
         p.sendMessage("§fHello §d"+p.getName() + "§f,");
         p.sendMessage("§fyou can use the following commands:");
         p.sendMessage("");
         p.sendMessage("§7To show the help-text:");
-        p.sendMessage("§c/IField");
-        p.sendMessage("§7To get a list of all created IFields.");
-        p.sendMessage("§c/IField list");
-        p.sendMessage("§7To teleport to an IField.");
-        p.sendMessage("§c/IField tp <name>");
-        p.sendMessage("§7To create a new IField.");
-        p.sendMessage("§c/IField create <name> <command-set>");
-        p.sendMessage("§7To delete an IField.");
-        p.sendMessage("§c/IField delete <name>");
+        p.sendMessage("§c/IBlock");
+        p.sendMessage("§7To get a list of all created IBlocks.");
+        p.sendMessage("§c/IBlock list");
+        p.sendMessage("§7To teleport to an IBlock.");
+        p.sendMessage("§c/IBlock tp <name>");
+        p.sendMessage("§7To create a new IBlock.");
+        p.sendMessage("§c/IBlock create <name> <command-set>");
+        p.sendMessage("§7To delete an IBlock.");
+        p.sendMessage("§c/IBlock delete <name>");
         p.sendMessage("");
         p.sendMessage("§7═════════════════════════");
     }

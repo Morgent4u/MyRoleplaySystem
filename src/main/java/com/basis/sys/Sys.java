@@ -242,7 +242,6 @@ public class Sys
 
             //	ArrayCopy :)
             System.arraycopy(myArray, 0, tmpArray, 0, size);
-
             tmpArray[size] = addValue;
 
             return tmpArray;

@@ -1,4 +1,4 @@
-package com.roleplay.ifield;
+package com.roleplay.iblock;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * @Created 22.05.2022
  * @Author Nihar
  * @Description
- * This service-class is used to interact with the IField-object
+ * This service-class is used to interact with the IBlock-object
  * or -context.
  */
-public class IFieldService extends Objekt
+public class IBlockService extends Objekt
 {
     //  Attributes:
-    public IFieldContext _CONTEXT;
+    public IBlockContext _CONTEXT;
     private ArrayList<String> setupPlayers = new ArrayList<>();
 
     /* ************************************* */
@@ -29,7 +29,7 @@ public class IFieldService extends Objekt
     @Override
     public int of_load()
     {
-        _CONTEXT = new IFieldContext(Sys.of_getMainFilePath() + "IFields//");
+        _CONTEXT = new IBlockContext(Sys.of_getMainFilePath() + "IBlocks//");
         _CONTEXT.of_load();
         return 1;
     }
@@ -52,7 +52,7 @@ public class IFieldService extends Objekt
 
     /**
      * This method is used to remove the player from the
-     * setup-mode of an iField.
+     * setup-mode of an IBlock.
      * @param ps Player instance.
      */
     public void of_removePlayerFromSetup(Spieler ps)
@@ -68,7 +68,7 @@ public class IFieldService extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
-        Sys.of_sendMessage("Loaded IFields: " + _CONTEXT.of_getLoadedIFields());
+        Sys.of_sendMessage("Loaded IBlocks: " + _CONTEXT.of_getLoadedIBlocks());
     }
 
     /* ************************************* */
@@ -76,21 +76,21 @@ public class IFieldService extends Objekt
     /* ************************************* */
 
     /**
-     * This function is used to identify a iField by its name.
-     * @param name The name of the iField.
-     * @return The iField-object or null if not found.
+     * This function is used to identify an IBlock by its name.
+     * @param name The name of the IBlock.
+     * @return The IBlock-object or null if not found.
      */
-    public IField of_getIFieldByName(String name)
+    public IBlock of_getIBlockByName(String name)
     {
-        IField[] ifields = _CONTEXT.of_getAllIFields();
+        IBlock[] iblocks = _CONTEXT.of_getAllIBlocks();
 
-        if(ifields != null && ifields.length > 0)
+        if(iblocks != null && iblocks.length > 0)
         {
-            for(IField ifield : ifields)
+            for(IBlock iblock : iblocks)
             {
-                if(ifield.of_getInfo().equalsIgnoreCase(name))
+                if(iblock.of_getInfo().equalsIgnoreCase(name))
                 {
-                    return ifield;
+                    return iblock;
                 }
             }
         }
@@ -107,53 +107,53 @@ public class IFieldService extends Objekt
      * is interaction with the needed material and is in the given range.
      * @param ps The player which is interacting with the material.
      * @param block The block which has been clicked.
-     * @return TRUE = iField has been found. FALSE = No iField has been found.
+     * @return TRUE = IBlock has been found. FALSE = No IBlock has been found.
      */
-    public boolean of_check4IFields2Execute(Spieler ps, Block block)
+    public boolean of_check4IBlocks2Execute(Spieler ps, Block block)
     {
         if(of_isInSetup(ps))
         {
             //  Get the powerObject...
-            IField ifield = null;
+            IBlock iblock = null;
 
             try
             {
-                ifield = (IField) ps.of_getPowerObject();
+                iblock = (IBlock) ps.of_getPowerObject();
             }
             catch (Exception ignored) { }
 
-            if(ifield != null)
+            if(iblock != null)
             {
-                //  Create the IField...
-                ifield.of_setMaterial(block.getType());
-                ifield.of_setLocation(block.getLocation());
+                //  Create the IBlock...
+                iblock.of_setMaterial(block.getType());
+                iblock.of_setLocation(block.getLocation());
 
-                int rc = main.IFIELDSERVICE._CONTEXT.of_saveIField2File(ifield);
+                int rc = main.IBLOCKSERVICE._CONTEXT.of_saveIBlock2File(iblock);
 
                 if(rc == 1)
                 {
                     // Remove the player from the setup-list.
                     of_removePlayerFromSetup(ps);
-                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aCreated IField §f" + ifield.of_getInfo() + "§a.");
+                    main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aCreated IBlock §f" + iblock.of_getInfo() + "§a.");
                     return true;
                 }
             }
 
-            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the IField.");
+            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cAn error occurred while creating the IBlock.");
             of_removePlayerFromSetup(ps);
             return true;
         }
 
         Location loc = block.getLocation();
 
-        //  Iterate through all defined iFields...
-        for(IField iField : _CONTEXT.of_getAllIFields())
+        //  Iterate through all defined IBlocks...
+        for(IBlock iblock : _CONTEXT.of_getAllIBlocks())
         {
-            if(iField.of_getMaterial() == block.getType())
+            if(iblock.of_getMaterial() == block.getType())
             {
-                if(iField.of_getLocation().equals(loc))
+                if(iblock.of_getLocation().equals(loc))
                 {
-                    new CommandSet(iField.of_getCommandSet(), ps).of_executeAllCommands();
+                    new CommandSet(iblock.of_getCommandSet(), ps).of_executeAllCommands();
                     return true;
                 }
             }

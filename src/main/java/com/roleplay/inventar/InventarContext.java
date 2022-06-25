@@ -6,6 +6,7 @@ import com.basis.sys.Sys;
 import com.roleplay.extended.InventarDatei;
 import com.roleplay.inventar.normal.inv_atm;
 import com.roleplay.inventar.normal.inv_menu;
+import com.roleplay.objects.CommandSet;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -84,8 +85,9 @@ public class InventarContext extends Objekt
      * inventar.of_load() function to load all predefined settings
      * for the given inventory-instance.
      * @param inventar The inventory to load.
+     * @return 1 = OK, -1 = An error occurred.
      */
-    public void of_loadInventoryByFile(Inventar inventar, String fileName)
+    public int of_loadInventoryByFile(Inventar inventar, String fileName)
     {
         //  Set the fileName, if it's not set use the inventar-instance name instead.
         if(fileName == null)
@@ -132,7 +134,7 @@ public class InventarContext extends Objekt
                     catch(Exception e)
                     {
                         inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The inventory type '" + invType + "' is not defined.");
-                        return;
+                        return -1;
                     }
                 }
                 //  Default inventory-type (chest)
@@ -143,9 +145,6 @@ public class InventarContext extends Objekt
 
                 //  Create an array of ItemStacks.
                 ItemStack[] itemStacks = new ItemStack[invSize];
-
-                //  Check for the inventory classification.
-                boolean lb_moneyTransferInv = invClassification.equals("MONEY_TRANSFER");
 
                 //  Get the inventory-items.
                 for(int i = 0; i < invSize; i++)
@@ -158,34 +157,93 @@ public class InventarContext extends Objekt
                         String[] commandSet = invFile.of_getStringArrayByKey(section + ".Items." + i + ".CommandSet");
                         boolean lb_hasCommandSet = commandSet != null && commandSet.length > 0;
 
-                        //  Get the price of the item and replace every placeholder with the price value.
-                        if(lb_moneyTransferInv)
+                        //  We need to handle the inventory-classification. The return is an object-array,
+                        //  Array-Index:
+                        //  0 => integer => 1 = OK, -1 Error, -2 Break here
+                        //  1 => item => modified-item-stack (for example replace some placeholder in the item-stack).
+                        //  2 => CommandSet => modified-command-set (for example replace some placeholder).
+                        //  3 => ItemStacks[] => If we break here, the itemStacks-Array has been filled in the Inventory-Class-Handle.
+                        //  4 => CommandSets[] => Is used to set to the defined ItemStacks which has been set by the handle-function, the right commandSet.
+                        Object[] objects = main.INVENTARSERVICE.of_handleInventoryClassification4ItemStack(inventory, invFile, section, item, i, invClassification, commandSet);
+
+                        if(objects != null && objects.length == 5)
                         {
-                            if(invFile.of_getConfig().isSet(section + ".Items." + i + ".Price"))
+                            ItemStack[] subItemStacks = null;
+                            CommandSet[] subCommandSets = null;
+                            int returnCode = -1;
+
+                            try
                             {
-                                double price = invFile.of_getDoubleByKey(section + ".Items." + i + ".Price");
+                                //  Get the important objects in the given order.
+                                returnCode = (Integer) objects[0];
+                                item = (ItemStack) objects[1];
+                                commandSet = (String[]) objects[2];
+                                subItemStacks = (ItemStack[]) objects[3];
+                                subCommandSets = (CommandSet[]) objects[4];
+                            }
+                            catch (Exception e)
+                            {
+                                inventar.of_sendErrorMessage(e, "InventarContext.of_loadInventoryByFile();", "There was an error while receiving data from the function: of_handleInventoryClassification4ItemStack(;");
+                                return -1;
+                            }
 
-                                if(price != -1)
+                            //  If the handleInventoryFunction could not handle the given Inventory-Classification.
+                            if(returnCode == -1)
+                            {
+                                return -1;
+                            }
+                            //  We don't have to iterate through the item-stacks any longer.
+                            else if(returnCode == -2)
+                            {
+                                if(subItemStacks != null && subItemStacks.length > 0)
                                 {
-                                    item = main.INVENTARSERVICE.of_replaceItemStackValues(item, "%price%", String.valueOf(price));
-
-                                    //  Iterate through the CommandSet and check if the placeholder is in the command.
-                                    if(lb_hasCommandSet)
+                                    //  Check if some CommandSets has been defined.
+                                    if(subCommandSets != null && subCommandSets.length > 0)
                                     {
-                                        for(int j = 0; j < commandSet.length; j++)
+                                        int cmdSetIndex = 0;
+
+                                        for(int j = 0; j < subItemStacks.length; j++)
                                         {
-                                            if(commandSet[j].contains("%price%"))
+                                            if(subItemStacks[j] != null)
                                             {
-                                                commandSet[j] = commandSet[j].replace("%price%", String.valueOf(price));
+                                                //  Add for each item-stack the commandSet by the order.
+                                                String[] subCommandSet = commandSet;
+                                                if(cmdSetIndex <= subCommandSets.length - 1)
+                                                {
+                                                    CommandSet cmdSet = subCommandSets[cmdSetIndex];
+
+                                                    if(cmdSet != null )
+                                                    {
+                                                        subCommandSet = cmdSet.of_getCommandSets();
+                                                    }
+                                                }
+
+                                                //  Use the parent-commandSet
+                                                inventar.of_addCommands2ItemSlot(j, subCommandSet);
                                             }
                                         }
                                     }
+                                    else
+                                    {
+                                        //  If no command-sets has been loaded for each added item-stack by the handle-function.
+                                        //  We use the parent-command-set for ALL defined ItemStacks by the handle-function.
+                                        if(lb_hasCommandSet)
+                                        {
+                                            for(int j = 0; j < subItemStacks.length; j++)
+                                            {
+                                                if(subItemStacks[j] != null)
+                                                {
+                                                    inventar.of_addCommands2ItemSlot(j, commandSet);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    //  Update the current ItemStacks with the one from the handle-function.
+                                    itemStacks = subItemStacks;
                                 }
-                                //  If the price is not valid.
-                                else
-                                {
-                                    Sys.of_debug("The price of the item is not valid. Config-key: " + section + ".Items." + i + ".Price");
-                                }
+
+                                break;
                             }
                         }
 
@@ -224,7 +282,7 @@ public class InventarContext extends Objekt
             else
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the file-inventory: " + invFile.of_getFileName());
-                return;
+                return -1;
             }
         }
         // When the file does not exist, let the inventar-instance create a predefined inventory which
@@ -241,7 +299,7 @@ public class InventarContext extends Objekt
             if(errorMessage != null)
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", errorMessage);
-                return;
+                return -1;
             }
 
             //  After the inventory is created, save it to the file.
@@ -250,18 +308,19 @@ public class InventarContext extends Objekt
             if(rc != 1)
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The file-inventory could not be saved: " + invFile.of_getFileName());
-                return;
+                return -1;
             }
 
             //  We load the inventory again...
             of_loadInventoryByFile(inventar, fileName);
-            return;
+            return -1;
         }
 
         //  Add the inventory to the inventar-context (inventories).
         inventar.of_setInfo(fileName.toLowerCase().replace(".yml", ""));
         inventar.of_setObjectId(inventories.size() + 1);
         inventories.put(inventar.of_getObjectId(), inventar);
+        return 1;
     }
 
     /**

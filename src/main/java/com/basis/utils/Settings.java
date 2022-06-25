@@ -11,7 +11,7 @@ import com.roleplay.board.ScoreBoard;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
-import com.roleplay.ifield.IFieldService;
+import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.module.deathcmds.DeathCmdSet;
@@ -51,7 +51,7 @@ public class Settings extends Objekt
     boolean ib_useScoreboard;
     boolean ib_useTablist;
     boolean ib_useJoinQuitMsg;
-    boolean ib_useIField;
+    boolean ib_useIBlock;
     boolean ib_useDataProtection;
     boolean ib_usePosition;
 
@@ -148,8 +148,8 @@ public class Settings extends Objekt
                 joinQuitMessage[1] = datei.of_getSetString(rpSection + "JoinQuitMsg.Quit", "&cGoodbye &e%p%&c!");
             }
 
-            //  Enable or disable iField-System:
-            ib_useIField = datei.of_getSetBoolean(rpSection + "IField.Use", true);
+            //  Enable or disable iBlock-System:
+            ib_useIBlock = datei.of_getSetBoolean(rpSection + "IBlock.Use", true);
 
             //  Enable or disable the Position-System:
             ib_usePosition = datei.of_getSetBoolean(rpSection + "Position.Use", true);
@@ -329,10 +329,10 @@ public class Settings extends Objekt
                 main.SCOREBOARD = new ScoreBoard(scoreboardLines);
             }
 
-            if(of_isUsingIField())
+            if(of_isUsingIBlock())
             {
-                main.IFIELDSERVICE = new IFieldService();
-                main.IFIELDSERVICE.of_load();
+                main.IBLOCKSERVICE = new IBlockService();
+                main.IBLOCKSERVICE.of_load();
             }
 
             //  We need to invoke the postInitSystemServices...
@@ -520,10 +520,10 @@ public class Settings extends Objekt
         }
         Sys.of_sendMessage(blue+"[*] Holograms:"+white);
         main.HOLOGRAMSERVICE._CONTEXT.of_sendDebugDetailInformation();
-        if(of_isUsingIField())
+        if(of_isUsingIBlock())
         {
-            Sys.of_sendMessage(blue+"[*] IFields:"+white);
-            main.IFIELDSERVICE.of_sendDebugDetailInformation();
+            Sys.of_sendMessage(blue+"[*] IBlock:"+white);
+            main.IBLOCKSERVICE.of_sendDebugDetailInformation();
         }
         if(of_isUsingPosition())
         {
@@ -662,9 +662,9 @@ public class Settings extends Objekt
         return ib_moduleIDCard;
     }
 
-    public boolean of_isUsingIField()
+    public boolean of_isUsingIBlock()
     {
-        return ib_useIField;
+        return ib_useIBlock;
     }
 
     public boolean of_isUsingDataProtection()

@@ -2,6 +2,8 @@ package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.sys.Sys;
+import com.roleplay.extended.InventarDatei;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -49,6 +51,79 @@ public class InventarService extends Objekt
     /* ************************************* */
     /* OBJEKT - ANWEISUNGEN */
     /* ************************************* */
+
+    /**
+     * This function has been implemented to structure the sourcecode from the InventarContext
+     * to the InventarService.
+     *
+     * @param invFile The given inventory-file.
+     * @param section The given inventory--file-section.
+     * @param item The current itemStack.
+     * @param arrayIndex The current arrayIndex of the item which has been loaded.
+     * @param invClassification The inv-classification.
+     * @param commandSet Defined CommandSets.
+     * @return 1 = OK, -1 = ERROR, -2 = NO Error but the ItemStacks[]-Array has been filled by this function.
+     */
+    public Object[] of_handleInventoryClassification4ItemStack(Inventory inv, InventarDatei invFile, String section, ItemStack item, int arrayIndex, String invClassification, String[] commandSet)
+    {
+        //  We need to handle the inventory-classification. The return is an object-array,
+        //  Array-Index:
+        //  0 => integer => 1 = OK, -1 Error, -2 Break here
+        //  1 => item => modified-item-stack (for example replace some placeholder in the item-stack).
+        //  2 => CommandSet => modified-command-set (for example replace some placeholder).
+        //  3 => ItemStacks[] => If we break here, the itemStacks-Array has been filled in the Inventory-Class-Handle.
+        //  4 => CommandSets[] => Is used to set to the defined ItemStacks which has been set by the handle-function, the right commandSet.
+
+        Object[] errorObject = new Object[] {-1, null, null, null, null};
+
+        //  Check for the inventory classification.
+        if(invClassification.equals("MONEY_TRANSFER"))
+        {
+            if(invFile.of_getConfig().isSet(section + ".Items." + arrayIndex + ".Price"))
+            {
+                double price = invFile.of_getDoubleByKey(section + ".Items." + arrayIndex + ".Price");
+
+                if(price != -1)
+                {
+                    item = of_replaceItemStackValues(item, "%price%", String.valueOf(price));
+
+                    //  Iterate through the CommandSet and check if the placeholder is in the command.
+                    if(commandSet != null)
+                    {
+                        for(int j = 0; j < commandSet.length; j++)
+                        {
+                            if(commandSet[j].contains("%price%"))
+                            {
+                                commandSet[j] = commandSet[j].replace("%price%", String.valueOf(price));
+                            }
+                        }
+                    }
+
+                    //  Return the needed objects in the correct order.
+                    return new Object[] {1, item, commandSet, null, null};
+                }
+                //  If the price is not valid.
+                else
+                {
+                    Sys.of_debug("InventarService.of_handleInventoryClassification4ItemStack();  - The price of the item is not valid. Config-key: " + section + ".Items." + arrayIndex + ".Price");
+                }
+            }
+        }
+        else if(invClassification.equals("TEMPLATE_ITEM"))
+        {
+            String dataSource = invClassification.replace("TEMPLATE_ITEM", "");
+
+            //  TODO: Allgemeinesn Dienst erstellten, welcher jede Datensource annehmen kann.
+            //  Hier soll folgende Funktion hilfreich sein.
+            //  Sys.of_getStringWithoutPlaceholder()
+
+            return new Object[] {-2, item, commandSet, null, null};
+        }
+
+        //  Send the default...
+        return new Object[] {1, null, null, null, null};
+    }
+
 
     /**
      * This function is used to create an itemStack by the given attributes.

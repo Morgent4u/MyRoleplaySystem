@@ -16,6 +16,12 @@ import java.util.HashMap;
  * @Description
  * This class is used to represent a GU-Interface as an inventory for
  * the player.
+ *
+ * Current Classifactions:
+ * - DEFAULT
+ * - MONEY_TRANSFER
+ * - TEMPLATE_ITEM
+ *
  */
 public class Inventar extends Objekt
 {
@@ -100,7 +106,8 @@ public class Inventar extends Objekt
 
     /**
      * This function needs to be overridden in the child class so the
-     * inventory has a predefined gui.
+     * inventory has a predefined gui. This function will be called
+     * if no inventory-file exist!
      * @return 1 if the inventory is created, -1 if not.
      */
     @Override
@@ -174,6 +181,7 @@ public class Inventar extends Objekt
 
     /**
      * This function is used to add dynamically a command to the inventory.
+     * It will be called it the inventory-file has not been created yet.
      * @param invSlot The ItemName to interact with.
      * @param cmds The commands to execute.
      */

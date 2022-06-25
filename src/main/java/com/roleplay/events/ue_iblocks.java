@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * @Description
  * This event-class is used to listen to the player-interact-events.
  */
-public class ue_ifields implements Listener
+public class ue_iblocks implements Listener
 {
     /**
      * This event is used to interact with the player when he interacts with the
@@ -26,9 +26,9 @@ public class ue_ifields implements Listener
 
         if(ps != null)
         {
-            if(e.getClickedBlock() != null && main.SETTINGS.of_isUsingIField())
+            if(e.getClickedBlock() != null && main.SETTINGS.of_isUsingIBlock())
             {
-                e.setCancelled(main.IFIELDSERVICE.of_check4IFields2Execute(ps, e.getClickedBlock()));
+                e.setCancelled(main.IBLOCKSERVICE.of_check4IBlocks2Execute(ps, e.getClickedBlock()));
             }
         }
     }

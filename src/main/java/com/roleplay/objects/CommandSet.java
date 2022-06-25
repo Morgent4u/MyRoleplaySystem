@@ -19,6 +19,7 @@ public class CommandSet extends Objekt
 {
     //  Attributes:
     String[] commands;
+    String[] replacements;
     Spieler ps;
 
     int executed = 0;
@@ -179,6 +180,8 @@ public class CommandSet extends Objekt
                 return main.SPIELERSERVICE.of_sendPlayer2PositionByNameOrId(ps, command);
             case "NOTHING":
                 return 1;
+            case "INPUT":
+                return of_executeCommand4PlayerInput(command);
             case "GIVE":
                 return of_executeCommand4MoneySystem(command, "add");
             case "TAKE":
@@ -204,6 +207,36 @@ public class CommandSet extends Objekt
 
         return null;
     }
+
+    /**
+     * This Method is used to replace all commands in an CommandSet
+     * when some replacements have been defined.
+     */
+    public void of_replaceAllCommandsWithDefinedReplacements()
+    {
+        if(of_hasReplacementValues())
+        {
+            //  Iterate through all replacements...
+            for(String replacement : replacements)
+            {
+                String[] replaceParameters = replacement.split("=");
+
+                //  Iterate trough all commands...
+                if(replaceParameters != null && replaceParameters.length == 2)
+                {
+                    for(int i = 0; i < commands.length; i++)
+                    {
+                        //  Replace the commands with the replacement-values.
+                        commands[i] = commands[i].replace(replaceParameters[0], replaceParameters[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    /* ************************************* */
+    /* COMMAND-SET METHODS */
+    /* ************************************* */
 
     /**
      * This function is used to handle the money-give and money-take commands.
@@ -240,6 +273,62 @@ public class CommandSet extends Objekt
         return rc;
     }
 
+    /**
+     * This method is used to get the player-input.
+     * We store the player-input in the given placeholder.
+     * For example: 'INPUT=%value1%'
+     * So we store the player-chat-message into the variable %value1%
+     * @param command The current command.
+     * @return 1 = OK, -1 = An error occurs.
+     */
+    private int of_executeCommand4PlayerInput(String command)
+    {
+        //  Example:
+        //  0       1       2       3       4
+        //  test    test2   test3   INPUT   test5
+
+        //  First we need to identify the placeholder.
+        if(command.contains("%"))
+        {
+            int arrayIndex = 0;
+
+            //  We need to identify the INPUT-Statement.
+            for(String cmd : commands)
+            {
+                if(cmd.startsWith("INPUT="))
+                {
+                    //  We set the placeholder here, %PLACEHOLDER% for example.
+                    commands[arrayIndex] = command;
+                    break;
+                }
+
+                arrayIndex++;
+            }
+
+            //  Create an array with the rest of the commandSet-Statements.
+            String[] commandSet = new String[0];
+            int arraySize = commands.length - arrayIndex;
+
+            //	ArrayCopy :)
+            System.arraycopy(commands, arrayIndex, commandSet, 0, arraySize);
+
+            //  Print some debug stuff...
+            for(int i = 0; i < commandSet.length; i++)
+            {
+                Sys.of_debug("CMD-SET-DEBUG: " + i + " - " + commandSet[i]);
+            }
+
+            ps.of_setPowerObject(commandSet);
+            ps.of_setWaiting4Input(true);
+        }
+        else
+        {
+            Sys.of_debug("There was an error while executing the following INPUT-Statement: " + command + "'. No placeholder found!");
+        }
+
+        return -1;
+    }
+
     /* ************************************* */
     /* DEBUG CENTER */
     /* ************************************* */
@@ -263,6 +352,34 @@ public class CommandSet extends Objekt
                 Sys.of_sendMessage(i+": "+commands[i]);
             }
         }
+    }
+
+    /* ************************************* */
+    /* ADDER */
+    /* ************************************* */
+
+    /**
+     * This method is used to add to the current CommandSet
+     * defined placeholder and replace values.
+     * @param placeholder The placeholder.
+     * @param replacement The replace-value for the placeholder.
+     */
+    public void of_addReplaceValue2CommandSet(String placeholder, String replacement)
+    {
+        if(placeholder != null && replacement != null)
+        {
+            replacements = Sys.of_addArrayValue(replacements, placeholder + "=" + replacement);
+        }
+    }
+
+
+    /* ************************************* */
+    /* GETTER */
+    /* ************************************* */
+
+    public String[] of_getCommandSets()
+    {
+        return commands;
     }
 
     /* ************************************* */
@@ -293,4 +410,10 @@ public class CommandSet extends Objekt
 
         return false;
     }
+
+    private boolean of_hasReplacementValues()
+    {
+        return ( replacements != null && replacements.length > 0);
+    }
+
 }

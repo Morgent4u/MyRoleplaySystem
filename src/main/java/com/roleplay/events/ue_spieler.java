@@ -1,14 +1,12 @@
 package com.roleplay.events;
 
 import com.basis.main.main;
+import com.basis.sys.Sys;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 
 /**
  * @Created 04.04.2022
@@ -93,10 +91,10 @@ public class ue_spieler implements Listener
                 e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getQuitMessage(), ps));
             }
 
-            //  Remove the player from the iField-Setup.
-            if(main.SETTINGS.of_isUsingIField())
+            //  Remove the player from the IBlock-Setup.
+            if(main.SETTINGS.of_isUsingIBlock())
             {
-                main.IFIELDSERVICE.of_removePlayerFromSetup(ps);
+                main.IBLOCKSERVICE.of_removePlayerFromSetup(ps);
             }
 
             //  Check for the NPCs...
@@ -141,6 +139,52 @@ public class ue_spieler implements Listener
         if(ps != null)
         {
             e.setCancelled(ps.of_isBlockedMovingEnabled());
+        }
+    }
+
+    /**
+     * This event is used to interact with the player while
+     * he is chatting.
+     * @param e The event instance.
+     */
+    @EventHandler
+    public void ue_asyncPlayerChat4MRS(AsyncPlayerChatEvent e)
+    {
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
+
+        //  Check if the player is valid, and we need to get the player-input.
+        if(ps != null && ps.of_isWaiting4Input())
+        {
+            //  Get the player input and execute the rest of the defined Commands.
+            String[] cmds = null;
+            ps.of_setWaiting4Input(false);
+
+            try
+            {
+                cmds = (String[]) ps.of_getPowerObject();
+            }
+            catch(Exception ignored) { }
+
+            //  Validate the rest of the CommandSet.
+            if(cmds != null && cmds.length > 0)
+            {
+                //  In the first array-value should be the placeholder.
+                String placeholder = cmds[0];
+
+                if(placeholder.startsWith("%"))
+                {
+                    cmds = Sys.of_removeArrayValue(cmds, placeholder);
+
+                    if(cmds != null && cmds.length > 0)
+                    {
+                        //  Create the new command-set with the rest of the commands.
+                        CommandSet cmdSet = new CommandSet(cmds, ps);
+                        cmdSet.of_addReplaceValue2CommandSet(cmds[0], e.getMessage());
+                        cmdSet.of_replaceAllCommandsWithDefinedReplacements();
+                        cmdSet.of_executeAllCommands();
+                    }
+                }
+            }
         }
     }
 }

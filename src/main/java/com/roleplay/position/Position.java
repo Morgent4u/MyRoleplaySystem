@@ -7,9 +7,12 @@ import org.bukkit.Location;
  * @Created 19.05.2022
  * @Author Nihar
  * @Description
- * An IField-Object is used to create defined areas/fields
- * in which defined CommandSets will be executed.
- * The long-name for IField is "InteractionField".
+ * The Position-Object is used to represent
+ * locations/warp-points which can be
+ * used in an CommandSet.
+ *
+ * This is a model.
+ *
  */
 public class Position extends Objekt
 {

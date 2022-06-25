@@ -25,9 +25,9 @@ commands:
     aliases: [MyRoleplaySystem]
   NPC:
     usuage: /NPC
-  IField:
-    usuage: /IField
-    aliases: [iFeld,iBlock]
+  IBlock:
+    usuage: /IBlock
+    aliases: [ifield]
   Position:
     usuage: /Position
     aliases: [pos]

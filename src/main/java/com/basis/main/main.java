@@ -7,14 +7,14 @@ import com.roleplay.board.MessageBoard;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.board.ScoreBoard;
 import com.roleplay.cmds.*;
-import com.roleplay.events.ue_ifields;
+import com.roleplay.events.ue_iblocks;
 import com.roleplay.events.ue_inventory;
 import com.roleplay.events.ue_npc;
 import com.roleplay.events.ue_spieler;
 import com.roleplay.extern.ProtocolLib;
 import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
-import com.roleplay.ifield.IFieldService;
+import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.module.deathcmds.DeathCmdSet;
@@ -59,7 +59,7 @@ public class main extends JavaPlugin
     public static InventarService INVENTARSERVICE;
     public static HologramService HOLOGRAMSERVICE;
     public static NPCService NPCSERVICE;
-    public static IFieldService IFIELDSERVICE;
+    public static IBlockService IBLOCKSERVICE;
     public static PositionService POSITIONSERVICE;
 
     //  Boards:
@@ -110,7 +110,7 @@ public class main extends JavaPlugin
                 //  Register some events :)
                 Bukkit.getPluginManager().registerEvents(new ue_spieler(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_inventory(), this);
-                Bukkit.getPluginManager().registerEvents(new ue_ifields(), this);
+                Bukkit.getPluginManager().registerEvents(new ue_iblocks(), this);
                 Bukkit.getPluginManager().registerEvents(new ue_npc(), this);
 
                 //  Register some commands:
@@ -120,7 +120,7 @@ public class main extends JavaPlugin
                 getCommand("Textblock").setExecutor(new CMD_Textblock());
                 getCommand("NPC").setExecutor(new CMD_NPC());
                 getCommand("Hologram").setExecutor(new CMD_Hologram());
-                getCommand("IField").setExecutor(new CMD_IField());
+                getCommand("IBlock").setExecutor(new CMD_IBlock());
                 getCommand("MRS").setExecutor(new CMD_MRS());
                 getCommand("Position").setExecutor(new CMD_Position());
 

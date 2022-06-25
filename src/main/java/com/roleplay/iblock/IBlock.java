@@ -1,4 +1,4 @@
-package com.roleplay.ifield;
+package com.roleplay.iblock;
 
 import com.basis.ancestor.Objekt;
 import org.bukkit.Location;
@@ -8,11 +8,11 @@ import org.bukkit.Material;
  * @Created 22.05.2022
  * @Author Nihar
  * @Description
- * An IField-Object is used to create defined areas/fields
- * in which defined CommandSets will be executed.
- * The long-name for IField is "InteractionField".
+ * An IBlock-Object is used to define for a specific block
+ * an CommandSet which should be executed when the player clicks
+ * on the given block.
  */
-public class IField extends Objekt
+public class IBlock extends Objekt
 {
     //  Attributes:
     private String[] commandSet;
@@ -23,7 +23,7 @@ public class IField extends Objekt
     /* CONSTRUCTOR */
     /* ************************************* */
 
-    public IField(Material material, String[] commandSet, Location loc)
+    public IBlock(Material material, String[] commandSet, Location loc)
     {
         this.material = material;
         this.commandSet = commandSet;
