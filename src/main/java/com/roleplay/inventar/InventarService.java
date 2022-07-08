@@ -109,7 +109,7 @@ public class InventarService extends Objekt
                 }
             }
         }
-        else if(invClassification.equals("TEMPLATE_ITEM"))
+        else if(invClassification.startsWith("TEMPLATE_ITEM"))
         {
             String dataSource = invClassification.replace("TEMPLATE_ITEM", "");
 

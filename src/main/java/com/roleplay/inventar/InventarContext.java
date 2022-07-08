@@ -164,12 +164,13 @@ public class InventarContext extends Objekt
                         //  2 => CommandSet => modified-command-set (for example replace some placeholder).
                         //  3 => ItemStacks[] => If we break here, the itemStacks-Array has been filled in the Inventory-Class-Handle.
                         //  4 => CommandSets[] => Is used to set to the defined ItemStacks which has been set by the handle-function, the right commandSet.
+
                         Object[] objects = main.INVENTARSERVICE.of_handleInventoryClassification4ItemStack(inventory, invFile, section, item, i, invClassification, commandSet);
 
                         if(objects != null && objects.length == 5)
                         {
-                            ItemStack[] subItemStacks = null;
-                            CommandSet[] subCommandSets = null;
+                            ItemStack[] returnedItemStacks = null;
+                            CommandSet[] returnedCommandSets = null;
                             int returnCode = -1;
 
                             try
@@ -178,8 +179,8 @@ public class InventarContext extends Objekt
                                 returnCode = (Integer) objects[0];
                                 item = (ItemStack) objects[1];
                                 commandSet = (String[]) objects[2];
-                                subItemStacks = (ItemStack[]) objects[3];
-                                subCommandSets = (CommandSet[]) objects[4];
+                                returnedItemStacks = (ItemStack[]) objects[3];
+                                returnedCommandSets = (CommandSet[]) objects[4];
                             }
                             catch (Exception e)
                             {
@@ -195,52 +196,63 @@ public class InventarContext extends Objekt
                             //  We don't have to iterate through the item-stacks any longer.
                             else if(returnCode == -2)
                             {
-                                if(subItemStacks != null && subItemStacks.length > 0)
+                                if(returnedItemStacks != null && returnedItemStacks.length > 0)
                                 {
                                     //  Check if some CommandSets has been defined.
-                                    if(subCommandSets != null && subCommandSets.length > 0)
+                                    if(returnedCommandSets != null && returnedCommandSets.length > 0)
                                     {
-                                        int cmdSetIndex = 0;
+                                        //  We iterate through the ItemStacks and check if we can find
+                                        //  a defined CommandSet for the given ItemStack.
+                                        int commandSetIndex = 0;
 
-                                        for(int j = 0; j < subItemStacks.length; j++)
+                                        for(int itemStackIndex = 0; itemStackIndex < returnedItemStacks.length; itemStackIndex++)
                                         {
-                                            if(subItemStacks[j] != null)
+                                            //  Check if the current ItemStack is not NULL.
+                                            if(returnedItemStacks[itemStackIndex] != null)
                                             {
-                                                //  Add for each item-stack the commandSet by the order.
-                                                String[] subCommandSet = commandSet;
-                                                if(cmdSetIndex <= subCommandSets.length - 1)
+                                                if(commandSetIndex <= returnedCommandSets.length -1)
                                                 {
-                                                    CommandSet cmdSet = subCommandSets[cmdSetIndex];
+                                                    CommandSet currentCommandSet = returnedCommandSets[commandSetIndex];
 
-                                                    if(cmdSet != null )
+                                                    //  If a CommandSet has been defined.
+                                                    if(currentCommandSet != null)
                                                     {
-                                                        subCommandSet = cmdSet.of_getCommandSets();
+                                                        //  We need the Slot-Id (ItemStack-Index) and add the given String-Commands by of_getCommandSet().
+                                                        inventar.of_addCommands2ItemSlot(itemStackIndex, currentCommandSet.of_getCommandSets());
                                                     }
-                                                }
 
-                                                //  Use the parent-commandSet
-                                                inventar.of_addCommands2ItemSlot(j, subCommandSet);
+                                                    commandSetIndex++;
+                                                }
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        //  If no command-sets has been loaded for each added item-stack by the handle-function.
-                                        //  We use the parent-command-set for ALL defined ItemStacks by the handle-function.
+                                        //  If no CommandSet has been defined for the given ItemStack-Array we use
+                                        //  the default (parent) CommandSet for every ItemStack.
+
+                                        //  Check if parent CommandSet exist.
                                         if(lb_hasCommandSet)
                                         {
-                                            for(int j = 0; j < subItemStacks.length; j++)
+                                            //  Iterate through the ItemStacks and add it with
+                                            //  the parent CommandSet to the inventory.
+                                            for(int slot = 0; slot < returnedItemStacks.length; slot++)
                                             {
-                                                if(subItemStacks[j] != null)
+                                                //  Check if the ItemStack (Slot) is not NULL.
+                                                if(returnedItemStacks[slot] != null)
                                                 {
-                                                    inventar.of_addCommands2ItemSlot(j, commandSet);
+                                                    inventar.of_addCommands2ItemSlot(slot, commandSet);
                                                 }
                                             }
                                         }
                                     }
 
                                     //  Update the current ItemStacks with the one from the handle-function.
-                                    itemStacks = subItemStacks;
+                                    itemStacks = returnedItemStacks;
+                                }
+                                else
+                                {
+                                    Sys.of_debug("InventarContext.of_loadByInv() - Failed to handle the inventory-classification. The InventarContext has got an ItemStacks[] with NULL or no entries.");
                                 }
 
                                 break;
