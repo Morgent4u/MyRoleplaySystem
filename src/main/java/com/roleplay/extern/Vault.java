@@ -2,6 +2,7 @@ package com.roleplay.extern;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.utils.Settings;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -39,7 +40,7 @@ public class Vault extends Objekt
             PERMISSIONS = registerClassPermission.getProvider();
 
             //  Register the vault-economy class to this plugin.
-            if(main.SETTINGS.of_isUsingVaultMoneySystem())
+            if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
             {
                 RegisteredServiceProvider<Economy> registerClassEconomy = main.PLUGIN.getServer().getServicesManager().getRegistration(Economy.class);
                 assert registerClassEconomy != null;
@@ -54,7 +55,7 @@ public class Vault extends Objekt
 
             //  If the economy system is used this can cause the error. So we add an extended message to the default message
             //  to make sure that the server owner is using an economy system.
-            if(main.SETTINGS.of_isUsingVaultMoneySystem())
+            if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
             {
                 extendedMessage = "Please check if your server is using an economy plugin.";
             }

@@ -2,6 +2,7 @@ package com.roleplay.events;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.basis.utils.Settings;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
@@ -32,7 +33,7 @@ public class ue_spieler implements Listener
         {
             boolean lb_sendText4DataProtection = !( main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps) || main.SPIELERSERVICE.of_hasAlreadyIPLink(ps) );
 
-            if(lb_sendText4DataProtection && main.SETTINGS.of_isUsingDataProtection())
+            if(lb_sendText4DataProtection && Settings.of_getInstance().of_isUsingDataProtection())
             {
                 //  Disallow the player to move.
                 ps.of_setBlockedMoving(true);
@@ -60,15 +61,15 @@ public class ue_spieler implements Listener
             }
 
             //  When we are using the tab-list manager we need to update/create the tab-list for the player :)!
-            if(main.SETTINGS.of_isUsingTablist())
+            if(Settings.of_getInstance().of_isUsingTablist())
             {
                 main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
             }
 
             //  If we use the joinQuitMessage, we send them into the chat.
-            if(main.SETTINGS.of_isUsingJoinAndQuitMessage())
+            if(Settings.of_getInstance().of_isUsingJoinAndQuitMessage())
             {
-                e.setJoinMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getJoinMessage(), ps));
+                e.setJoinMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getJoinMessage(), ps));
             }
         }
     }
@@ -86,13 +87,13 @@ public class ue_spieler implements Listener
         if(ps != null)
         {
             //  If we use the joinQuitMessage, we send them into the chat.
-            if(main.SETTINGS.of_isUsingJoinAndQuitMessage())
+            if(Settings.of_getInstance().of_isUsingJoinAndQuitMessage())
             {
-                e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(main.SETTINGS.of_getQuitMessage(), ps));
+                e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getQuitMessage(), ps));
             }
 
             //  Remove the player from the IBlock-Setup.
-            if(main.SETTINGS.of_isUsingIBlock())
+            if(Settings.of_getInstance().of_isUsingIBlock())
             {
                 main.IBLOCKSERVICE.of_removePlayerFromSetup(ps);
             }
@@ -116,7 +117,7 @@ public class ue_spieler implements Listener
     @EventHandler
     public void ue_playerSwapHandItem4MRS(PlayerSwapHandItemsEvent e)
     {
-        if(main.SETTINGS.of_isUsingMenuOnSwap())
+        if(Settings.of_getInstance().of_isUsingMenuOnSwap())
         {
             Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
 

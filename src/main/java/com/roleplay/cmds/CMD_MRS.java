@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.basis.utils.Settings;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -48,10 +49,10 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
                                 sender.sendMessage("§8[§cReload-Service§8]§6 Warning: §c!§fThe plugin will be reloaded, but some-functions could be lost§c!");
 
                                 //  We disable and enable the plugin...
-                                main.SETTINGS.of_setUseProtocolLib(false);
+                                Settings.of_getInstance().of_setUseProtocolLib(false);
                                 main.PLUGIN.onDisable();
-                                main.SETTINGS.of_initSystemServices();
-                                main.SETTINGS.of_setUseProtocolLib(true);
+                                Settings.of_getInstance().of_initSystemServices();
+                                Settings.of_getInstance().of_setUseProtocolLib(true);
 
                                 sender.sendMessage("§8[§cReload-Service§8]§a Plugin has been reloaded.");
                                 return true;
@@ -63,7 +64,7 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
                                 p.sendMessage("§8[§4§l"+Sys.of_getProgramVersion()+" - Modules§8]");
                                 p.sendMessage("");
                                 p.sendMessage("§5Current modules:");
-                                p.sendMessage("§b[*]§f DeathCommandSet: "+( main.SETTINGS.of_isUsingModuleDeathCommandSet() ? "§aEnabled" : "§cDisabled" ));
+                                p.sendMessage("§b[*]§f DeathCommandSet: "+( Settings.of_getInstance().of_isUsingModuleDeathCommandSet() ? "§aEnabled" : "§cDisabled" ));
                                 p.sendMessage("");
                                 p.sendMessage("§7═════════════════════════");
                                 return true;

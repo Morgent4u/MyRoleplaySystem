@@ -6,6 +6,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
+import com.basis.utils.Settings;
 import org.bukkit.entity.Player;
 
 /**
@@ -65,8 +66,8 @@ public class SpielerContext extends Objekt
             user.of_set(sectionKey + ".Name", p.getName());
             user.of_set(sectionKey + ".FirstConnection", Sys.of_getTimeStamp(true));
             user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
-            moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", main.SETTINGS.of_getDefaultMoneyATM());
-            moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", main.SETTINGS.of_getDefaultMoneyCash());
+            moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", Settings.of_getInstance().of_getDefaultMoneyATM());
+            moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", Settings.of_getInstance().of_getDefaultMoneyCash());
 
             int rc = user.of_save("SpielerContext.of_loadPlayer(Player);");
 
@@ -77,7 +78,7 @@ public class SpielerContext extends Objekt
             }
 
             // Check if the player is new and the vault-economy-system is enabled.
-            if(!ps.of_hasPlayedBefore() && main.SETTINGS.of_isUsingVaultMoneySystem())
+            if(!ps.of_hasPlayedBefore() && Settings.of_getInstance().of_isUsingVaultMoneySystem())
             {
                 //  Set the money to the player instance.
                 main.SPIELERSERVICE.of_editPlayerMoney(ps, "atm", "add", moneyATM);
@@ -90,7 +91,7 @@ public class SpielerContext extends Objekt
 
             // If the server is not using the vault-economy-system, set the money to the player instance.
             // We use our own system instead...
-            if(!main.SETTINGS.of_isUsingVaultMoneySystem())
+            if(!Settings.of_getInstance().of_isUsingVaultMoneySystem())
             {
                 ps.of_setMoneyATM(moneyATM);
             }
@@ -103,7 +104,7 @@ public class SpielerContext extends Objekt
 
             //  After this is done, we load the scoreBoard to the player.
             //  Check if scoreBoard is null because in the reload-process it's null!
-            if(main.SETTINGS.of_isUsingScoreboard() && main.SCOREBOARD != null)
+            if(Settings.of_getInstance().of_isUsingScoreboard() && main.SCOREBOARD != null)
             {
                 main.SCOREBOARD.of_sendScoreboard2Player(ps);
             }
@@ -161,7 +162,7 @@ public class SpielerContext extends Objekt
             user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
 
             //  If the server is not reloading and the vault-economy-system is enabled, we save the money.
-            if(!main.of_isReloading() && main.SETTINGS.of_isUsingVaultMoneySystem())
+            if(!main.of_isReloading() && Settings.of_getInstance().of_isUsingVaultMoneySystem())
             {
                 user.of_set(sectionKey + ".Money.ATM", ps.of_getMoneyATM());
             }

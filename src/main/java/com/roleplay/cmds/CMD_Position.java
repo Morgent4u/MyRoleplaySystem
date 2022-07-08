@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.basis.utils.Settings;
 import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -38,7 +39,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
                     {
                         Player p = ps.of_getPlayer();
 
-                        if(!main.SETTINGS.of_isUsingPosition())
+                        if(!Settings.of_getInstance().of_isUsingPosition())
                         {
                             main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe §aPosition-system§7 is currently §cdisabled§f.");
                             return true;

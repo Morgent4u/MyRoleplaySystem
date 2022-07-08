@@ -4,6 +4,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
+import com.basis.utils.Settings;
 import com.roleplay.inventar.Inventar;
 import com.roleplay.objects.TextBlock;
 import com.roleplay.position.Position;
@@ -56,7 +57,7 @@ public class SpielerService extends Objekt
             }
         }
         //  Close database connection.
-        else if(main.SETTINGS.of_isUsingMySQL() && main.SQL != null && main.SQL.of_isConnected())
+        else if(Settings.of_getInstance().of_isUsingMySQL() && main.SQL != null && main.SQL.of_isConnected())
         {
             //  The database connection will be established when the player connects to the server!
             main.SQL.of_closeConnection();
@@ -163,7 +164,7 @@ public class SpielerService extends Objekt
      */
     public int of_sendPlayer2PositionByNameOrId(Spieler ps, String posNameOrId)
     {
-        if(main.SETTINGS.of_isUsingPosition())
+        if(Settings.of_getInstance().of_isUsingPosition())
         {
             Position pos = main.POSITIONSERVICE.of_getPositionByAnything(posNameOrId);
 
@@ -329,7 +330,7 @@ public class SpielerService extends Objekt
                     {
                         if(ps.of_getMoneyATM() >= moneyAmount)
                         {
-                            if(main.SETTINGS.of_isUsingVaultMoneySystem())
+                            if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
                             {
                                 main.VAULT.ECONOMY.withdrawPlayer(ps.of_getPlayer(), moneyAmount);
                             }
@@ -347,7 +348,7 @@ public class SpielerService extends Objekt
                     }
                     else if(removeAdd.equals("add"))
                     {
-                        if(main.SETTINGS.of_isUsingVaultMoneySystem())
+                        if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
                         {
                             main.VAULT.ECONOMY.depositPlayer(ps.of_getPlayer(), moneyAmount);
                         }
@@ -387,7 +388,7 @@ public class SpielerService extends Objekt
             }
 
             //  Refresh the players scoreboard...
-            if(main.SETTINGS.of_isUsingScoreboard())
+            if(Settings.of_getInstance().of_isUsingScoreboard())
             {
                 main.SCOREBOARD.of_sendScoreboard2Player(ps);
             }

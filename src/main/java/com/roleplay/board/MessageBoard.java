@@ -4,6 +4,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Datei;
+import com.basis.utils.Settings;
 import com.roleplay.objects.TextBlock;
 import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
@@ -238,7 +239,7 @@ public class MessageBoard extends Objekt
         }
 
         //  Use the PlaceholderAPI if it's enabled...
-        if(main.SETTINGS.of_isUsingPlaceholderAPI())
+        if(Settings.of_getInstance().of_isUsingPlaceholderAPI())
         {
             message = PlaceholderAPI.setPlaceholders(ps.of_getPlayer(), message);
         }

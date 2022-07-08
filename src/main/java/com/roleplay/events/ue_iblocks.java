@@ -1,6 +1,7 @@
 package com.roleplay.events;
 
 import com.basis.main.main;
+import com.basis.utils.Settings;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +27,7 @@ public class ue_iblocks implements Listener
 
         if(ps != null)
         {
-            if(e.getClickedBlock() != null && main.SETTINGS.of_isUsingIBlock())
+            if(e.getClickedBlock() != null && Settings.of_getInstance().of_isUsingIBlock())
             {
                 e.setCancelled(main.IBLOCKSERVICE.of_check4IBlocks2Execute(ps, e.getClickedBlock()));
             }

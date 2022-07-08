@@ -2,6 +2,7 @@ package com.roleplay.spieler;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.utils.Settings;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -190,7 +191,7 @@ public class Spieler extends Objekt
 
     public double of_getMoneyATM()
     {
-        if(main.SETTINGS.of_isUsingVaultMoneySystem())
+        if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
         {
             return main.VAULT.ECONOMY.getBalance(p);
         }

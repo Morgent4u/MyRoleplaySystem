@@ -32,6 +32,9 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class Settings extends Objekt
 {
+    //  We use singleton-pattern to get the instance of the settings-object.
+    private static Settings instance;
+
     //	Attribute:
     Datei datei;
 
@@ -70,11 +73,10 @@ public class Settings extends Objekt
 
     /**
      * Constructor
-     * @param directoryPath This is the path where the settings.yml is stored.
      */
-    public Settings(String directoryPath)
+    private Settings()
     {
-        datei = new Datei(directoryPath+"settings.yml");
+        datei = new Datei(Sys.of_getMainFilePath()+"settings.yml");
         sectionKey = Sys.of_getPaket();
     }
 
@@ -559,6 +561,11 @@ public class Settings extends Objekt
     /* ************************* */
     /* GETTER */
     /* ************************* */
+
+    public static Settings of_getInstance()
+    {
+        return instance;
+    }
 
     public Datei of_getSettingsFile()
     {

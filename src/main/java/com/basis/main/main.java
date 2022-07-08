@@ -51,9 +51,6 @@ public class main extends JavaPlugin
     public static Vault VAULT;
     public static ProtocolLib PROTOCOLLIB;
 
-    //  Own services/objects:
-    public static Settings SETTINGS;
-
     //  Services:
     public static SpielerService SPIELERSERVICE;
     public static InventarService INVENTARSERVICE;
@@ -72,7 +69,6 @@ public class main extends JavaPlugin
 
     //  Modules:
     public static DeathCmdSet MODULE_DEATHCMDSET;
-
 
     /* ************************* */
     /* ENABLE */
@@ -102,8 +98,7 @@ public class main extends JavaPlugin
             Sys.of_setDebugMode(false);
 
             //  Load the default settings.
-            SETTINGS = new Settings(Sys.of_getMainFilePath());
-            int rc = SETTINGS.of_load();
+            int rc = Settings.of_getInstance().of_load();
 
             if(rc == 1)
             {
@@ -125,12 +120,12 @@ public class main extends JavaPlugin
                 getCommand("Position").setExecutor(new CMD_Position());
 
                 // Initialize own services or dependencies.
-                rc = SETTINGS.of_initSystemServices();
+                rc = Settings.of_getInstance().of_initSystemServices();
 
                 if(rc == 1)
                 {
                     //  Loading was successful, so we can send a report to the console.
-                    SETTINGS.of_printStatusReport2Console();
+                    Settings.of_getInstance().of_printStatusReport2Console();
                 }
                 //  If an error occured, we send a hint to the console and disable the plugin.
                 else
@@ -163,9 +158,9 @@ public class main extends JavaPlugin
         ib_reload = true;
 
         //  If the object has been initialized lets unload it.
-        if(SETTINGS != null)
+        if(Settings.of_getInstance() != null)
         {
-            SETTINGS.of_unload();
+            Settings.of_getInstance().of_unload();
         }
 
         //  End.

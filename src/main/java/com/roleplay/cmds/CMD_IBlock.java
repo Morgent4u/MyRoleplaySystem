@@ -1,6 +1,7 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
+import com.basis.utils.Settings;
 import com.roleplay.iblock.IBlock;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -36,7 +37,7 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
                     {
                         Player p = ps.of_getPlayer();
 
-                        if(!main.SETTINGS.of_isUsingIBlock())
+                        if(!Settings.of_getInstance().of_isUsingIBlock())
                         {
                             main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe §aIBlock-system§f is currently §cdisabled§f.");
                             return true;
