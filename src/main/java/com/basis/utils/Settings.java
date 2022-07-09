@@ -33,10 +33,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Settings extends Objekt
 {
     //  We use singleton-pattern to get the instance of the settings-object.
-    private static Settings instance;
+    private static final Settings instance = new Settings();
 
     //	Attribute:
-    Datei datei;
+    SimpleFile datei;
 
     String[] scoreboardLines;
     String[] joinQuitMessage;
@@ -76,7 +76,7 @@ public class Settings extends Objekt
      */
     private Settings()
     {
-        datei = new Datei(Sys.of_getMainFilePath()+"settings.yml");
+        datei = new SimpleFile(Sys.of_getMainFilePath()+"settings.yml");
         sectionKey = Sys.of_getPaket();
     }
 
@@ -137,8 +137,8 @@ public class Settings extends Objekt
             if(of_isUsingTablist())
             {
                 //  Load the tab-list.
-                main.TABLISTMANAGER = new TablistManager();
-                main.TABLISTMANAGER.of_loadPredefinedTeams(datei, rpSection + "Tablist");
+                TablistManager.of_getInstance().of_loadPredefinedTeams(datei, rpSection + "Tablist");
+                TablistManager.of_getInstance().of_loadPredefinedTeams(datei, rpSection + "Tablist");
             }
 
             //  Enable or disable the join- and quit-message.
@@ -255,7 +255,7 @@ public class Settings extends Objekt
     public void of_unload()
     {
         //  If ProtocolLib and NPCs are loaded/enabled then remove the NPCs from the player.
-        if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null && main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+        if(of_isUsingProtocolLib() && main.PROTOCOLLIB != null && main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
         {
             main.NPCSERVICE.of_removeAllNPCsFromAllOnlinePlayers();
         }
@@ -296,12 +296,10 @@ public class Settings extends Objekt
         {
             //  First step, load the PermissionsBoard to make sure that
             //  we have permissions for player-stuff.
-            main.PERMISSIONBOARD = new PermissionBoard();
-            main.PERMISSIONBOARD.of_load();
+            PermissionBoard.of_getInstance().of_load();
 
             //  Load all predefined messages...
-            main.MESSAGEBOARD = new MessageBoard();
-            main.MESSAGEBOARD.of_load();
+            MessageBoard.of_getInstance().of_load();
 
             //  Load the player service...
             main.SPIELERSERVICE = new SpielerService();
@@ -328,7 +326,7 @@ public class Settings extends Objekt
             //  Create the scoreBoard for each online-player if it's enabled!
             if(of_isUsingScoreboard())
             {
-                main.SCOREBOARD = new ScoreBoard(scoreboardLines);
+                ScoreBoard.of_getInstance().of_load(scoreboardLines);
             }
 
             if(of_isUsingIBlock())
@@ -370,13 +368,13 @@ public class Settings extends Objekt
                 //  Load the scoreboard to all players...
                 if(of_isUsingScoreboard())
                 {
-                    main.SCOREBOARD.of_loadScoreboard2AllPlayers();
+                    ScoreBoard.of_getInstance().of_loadScoreboard2AllPlayers();
                 }
 
                 //  We create for every player the tab-list.
                 if(of_isUsingTablist())
                 {
-                    main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
+                    TablistManager.of_getInstance().of_createOrUpdateTablist4AllPlayers();
                 }
             }
 
@@ -450,7 +448,7 @@ public class Settings extends Objekt
         if(of_isUsingModuleIDCard())
         {
             //  Create the idCard-Module-Folder.
-            Datei module = new Datei(moduleFolder + "//IDCard//IDCard.yml");
+            SimpleFile module = new SimpleFile(moduleFolder + "//IDCard//IDCard.yml");
 
             if(!module.of_fileExists())
             {
@@ -466,7 +464,7 @@ public class Settings extends Objekt
             main.MODULE_DEATHCMDSET = new DeathCmdSet();
 
             //  Enable or disable this module if the load-process was successfully.
-            ib_moduleDeathCommandSet = main.MODULE_DEATHCMDSET.of_load(new Datei(moduleFolder + "//DeathCommandSet//DeathCommandSet.yml")) == 1;
+            ib_moduleDeathCommandSet = main.MODULE_DEATHCMDSET.of_load(new SimpleFile(moduleFolder + "//DeathCommandSet//DeathCommandSet.yml")) == 1;
         }
     }
 
@@ -509,9 +507,9 @@ public class Settings extends Objekt
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage("ProtocolLib-Enabled: "+of_isUsingProtocolLib());
         Sys.of_sendMessage(blue+"[*] Permissions-board:"+white);
-        main.PERMISSIONBOARD.of_sendDebugDetailInformation();
+        PermissionBoard.of_getInstance().of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"[*] Message-/Sound-board:"+white);
-        main.MESSAGEBOARD.of_sendDebugDetailInformation();
+        MessageBoard.of_getInstance().of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"[*] Inventories:"+white);
         main.INVENTARSERVICE._CONTEXT.of_sendDebugDetailInformation();
         //  The NPCService can be null if ProtocolLib has been disabled.
@@ -543,7 +541,7 @@ public class Settings extends Objekt
     {
         ib_usePlugin = bool;
 
-        //	Speicherung in der Datei...
+        //	Speicherung in der SimpleFile...
         datei.of_set(sectionKey + ".Enabled", ib_usePlugin);
         datei.of_save("Settings.of_setPlugin(boolean)");
     }
@@ -567,7 +565,7 @@ public class Settings extends Objekt
         return instance;
     }
 
-    public Datei of_getSettingsFile()
+    public SimpleFile of_getSettingsFile()
     {
         return datei;
     }

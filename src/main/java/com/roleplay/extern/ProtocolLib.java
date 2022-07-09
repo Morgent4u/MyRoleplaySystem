@@ -52,7 +52,7 @@ public class ProtocolLib extends Objekt
         if(PROTOCOLMANAGER != null)
         {
             // Only enable this packet listener if NPCs has been created.
-            if(main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            if(main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
             {
                 //  @PacketListener | This PacketListener is used to listen between Packets of the player and the NPC.
                 PROTOCOLMANAGER.addPacketListener(new PacketAdapter(main.PLUGIN, ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY)
@@ -70,7 +70,7 @@ public class ProtocolLib extends Objekt
                             int entityId = packet.getIntegers().read(0);
 
                             // Get the NPC by using the EntityId.
-                            NPC npc = main.NPCSERVICE._CONTEXT.of_getNPCByEntityId(entityId);
+                            NPC npc = (NPC) main.NPCSERVICE._CONTEXT.of_getObjectById(entityId);
 
                             if(npc != null)
                             {

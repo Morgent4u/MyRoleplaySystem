@@ -1,9 +1,7 @@
 package com.roleplay.position;
 
 import com.basis.ancestor.Objekt;
-import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.spieler.Spieler;
 
 /**
  * @Created 19.06.2022
@@ -24,7 +22,7 @@ public class PositionService  extends Objekt
     @Override
     public int of_load()
     {
-        _CONTEXT = new PositionContext(Sys.of_getMainFilePath() + "Positions//");
+        _CONTEXT = new PositionContext("PositionContext", Sys.of_getMainFilePath() + "Positions//");
         return _CONTEXT.of_load();
     }
 
@@ -35,7 +33,7 @@ public class PositionService  extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
-        Sys.of_sendMessage("Loaded Positions: " + _CONTEXT.of_getLoadedPositions());
+        Sys.of_sendMessage("Loaded Positions: " + _CONTEXT.of_getLoadedObjects());
     }
 
     /* ************************************* */
@@ -55,7 +53,7 @@ public class PositionService  extends Objekt
         if(posId != -1)
         {
             //  Get the position by the position-id.
-            pos = _CONTEXT.of_getPositionByObjectId(posId);
+            pos = (Position) _CONTEXT.of_getObjectById(posId);
         }
         else
         {
@@ -73,7 +71,7 @@ public class PositionService  extends Objekt
 
     public Position of_getPositionByPositionName(String positionName)
     {
-        Position[] positions = _CONTEXT.of_getAllPositions();
+        Position[] positions = (Position[]) _CONTEXT.of_getAllObjects();
 
         for(Position pos : positions)
         {
@@ -88,7 +86,7 @@ public class PositionService  extends Objekt
 
     public Position of_getPositionByFileName(String fileName)
     {
-        Position[] positions = _CONTEXT.of_getAllPositions();
+        Position[] positions = (Position[]) _CONTEXT.of_getAllObjects();
         fileName = fileName.toLowerCase().replace(".yml", "");
 
         for(Position pos : positions)

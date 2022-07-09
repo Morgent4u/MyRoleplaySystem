@@ -29,7 +29,7 @@ public class IBlockService extends Objekt
     @Override
     public int of_load()
     {
-        _CONTEXT = new IBlockContext(Sys.of_getMainFilePath() + "IBlocks//");
+        _CONTEXT = new IBlockContext("IBlockContext", Sys.of_getMainFilePath() + "IBlocks//");
         _CONTEXT.of_load();
         return 1;
     }
@@ -68,7 +68,7 @@ public class IBlockService extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
-        Sys.of_sendMessage("Loaded IBlocks: " + _CONTEXT.of_getLoadedIBlocks());
+        Sys.of_sendMessage("Loaded IBlocks: " + _CONTEXT.of_getLoadedObjects());
     }
 
     /* ************************************* */
@@ -82,7 +82,7 @@ public class IBlockService extends Objekt
      */
     public IBlock of_getIBlockByName(String name)
     {
-        IBlock[] iblocks = _CONTEXT.of_getAllIBlocks();
+        IBlock[] iblocks = (IBlock[]) _CONTEXT.of_getAllObjects();
 
         if(iblocks != null && iblocks.length > 0)
         {
@@ -128,7 +128,7 @@ public class IBlockService extends Objekt
                 iblock.of_setMaterial(block.getType());
                 iblock.of_setLocation(block.getLocation());
 
-                int rc = main.IBLOCKSERVICE._CONTEXT.of_saveIBlock2File(iblock);
+                int rc = main.IBLOCKSERVICE._CONTEXT.of_saveObject2File(iblock);
 
                 if(rc == 1)
                 {
@@ -147,7 +147,7 @@ public class IBlockService extends Objekt
         Location loc = block.getLocation();
 
         //  Iterate through all defined IBlocks...
-        for(IBlock iblock : _CONTEXT.of_getAllIBlocks())
+        for(IBlock iblock : (IBlock[]) _CONTEXT.of_getAllObjects())
         {
             if(iblock.of_getMaterial() == block.getType())
             {

@@ -3,6 +3,7 @@ package com.roleplay.cmds;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -35,7 +36,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
 
                 if(ps != null)
                 {
-                    if(main.PERMISSIONBOARD.of_isAdmin(ps))
+                    if(PermissionBoard.of_getInstance().of_isAdmin(ps))
                     {
                         Player p = ps.of_getPlayer();
 
@@ -52,7 +53,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  TODO: Need to be an GUI-System.
-                                Position[] positions = main.POSITIONSERVICE._CONTEXT.of_getAllPositions();
+                                Position[] positions = (Position[]) main.POSITIONSERVICE._CONTEXT.of_getAllObjects();
 
                                 //  Validate the positions
                                 if(positions != null && positions.length > 0)
@@ -90,7 +91,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
 
                                 if(pos != null)
                                 {
-                                    int rc = main.POSITIONSERVICE._CONTEXT.of_deletePosition(pos);
+                                    int rc = main.POSITIONSERVICE._CONTEXT.of_deleteObjectFromFile(pos);
 
                                     //  Handle the return code.
                                     switch (rc)
@@ -144,7 +145,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
                                     //  Create the position-object which will be stored into the file.
                                     Position pos = new Position(new String[]{fourth}, second, p.getLocation(), range);
 
-                                    int rc = main.POSITIONSERVICE._CONTEXT.of_savePosition2File(pos);
+                                    int rc = main.POSITIONSERVICE._CONTEXT.of_saveObject2File(pos);
 
                                     //  Handle the return code.
                                     switch (rc)

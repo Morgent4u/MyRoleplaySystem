@@ -2,7 +2,7 @@ package com.roleplay.board;
 
 import com.basis.ancestor.Objekt;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import com.roleplay.spieler.Spieler;
 
 import java.util.HashMap;
@@ -18,17 +18,19 @@ import java.util.Map;
 public class PermissionBoard extends Objekt
 {
     //  Attributes:
+    private static final PermissionBoard instance = new PermissionBoard();
+
     //  PermissionsKey - Permissions
     Map<String, String> permissions = new HashMap<>();
-    Datei datei;
+    SimpleFile datei;
 
     /* ************************* */
     /* CONSTRUCTOR // LOADER */
     /* ************************* */
 
-    public PermissionBoard()
+    private PermissionBoard()
     {
-        datei = new Datei(Sys.of_getMainFilePath() + "//Others//permissions.yml");
+        datei = new SimpleFile(Sys.of_getMainFilePath() + "//Others//permissions.yml");
     }
 
     /**
@@ -76,6 +78,15 @@ public class PermissionBoard extends Objekt
     public void of_sendDebugDetailInformation()
     {
         Sys.of_sendMessage("Loaded permissions: " + permissions.size());
+    }
+
+    /* **************************** */
+    /* GETTER */
+    /* *************************** */
+
+    public static PermissionBoard of_getInstance()
+    {
+        return instance;
     }
 
     /* **************************** */

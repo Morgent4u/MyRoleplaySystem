@@ -33,12 +33,12 @@ public class ue_npc implements Listener
         if(ps != null)
         {
             //  Check if the NPCService is valid and some NPCs are registered.
-            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
             {
                 Location pLoc = ps.of_getPlayer().getLocation();
 
                 //  Iterate through all NPCs...
-                for(NPC npc : main.NPCSERVICE._CONTEXT.of_getLoadedNPCs())
+                for(NPC npc : (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects())
                 {
                     Location npcLoc = npc.of_getLocation();
 

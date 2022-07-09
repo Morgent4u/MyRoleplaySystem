@@ -3,6 +3,7 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Material;
@@ -254,7 +255,7 @@ public class Inventar extends Objekt
         //  If the inventory need to be copied...
         if(of_isCopyInv())
         {
-            localInv = main.INVENTARSERVICE.of_copyInv(inv, main.MESSAGEBOARD.of_translateMessageWithPlayerStats(of_getInventarName(), ps));
+            localInv = main.INVENTARSERVICE.of_copyInv(inv, MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(of_getInventarName(), ps));
         }
 
         return localInv;

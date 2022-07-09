@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import com.basis.main.main;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import org.bukkit.Bukkit;
 import com.google.common.base.Splitter;
 
@@ -58,7 +58,7 @@ public class Sys
         mainRootPath = fileRootPath + "//"+paketName+"//";
 
         //  Create or load the version.yml to check the compatibility.
-        Datei datei = new Datei(mainRootPath + "version.yml");
+        SimpleFile datei = new SimpleFile(mainRootPath + "version.yml");
 
         //  Get the information about the version.
         String oldVersion = datei.of_getSetString("Version", of_getProgramVersion());

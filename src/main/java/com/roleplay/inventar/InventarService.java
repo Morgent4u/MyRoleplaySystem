@@ -1,9 +1,9 @@
 package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
-import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.extended.InventarDatei;
+import com.roleplay.board.MessageBoard;
+import com.roleplay.extended.ExtendedFile;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -64,7 +64,7 @@ public class InventarService extends Objekt
      * @param commandSet Defined CommandSets.
      * @return 1 = OK, -1 = ERROR, -2 = NO Error but the ItemStacks[]-Array has been filled by this function.
      */
-    public Object[] of_handleInventoryClassification4ItemStack(Inventory inv, InventarDatei invFile, String section, ItemStack item, int arrayIndex, String invClassification, String[] commandSet)
+    public Object[] of_handleInventoryClassification4ItemStack(Inventory inv, ExtendedFile invFile, String section, ItemStack item, int arrayIndex, String invClassification, String[] commandSet)
     {
         //  We need to handle the inventory-classification. The return is an object-array,
         //  Array-Index:
@@ -249,7 +249,7 @@ public class InventarService extends Objekt
         {
             if(meta.hasDisplayName())
             {
-                meta.setDisplayName(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(meta.getDisplayName(), ps));
+                meta.setDisplayName(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(meta.getDisplayName(), ps));
             }
 
             if(meta.hasLore())
@@ -260,7 +260,7 @@ public class InventarService extends Objekt
                 {
                     for(int i = 0; i < lore.size(); i++)
                     {
-                        lore.set(i, main.MESSAGEBOARD.of_translateMessageWithPlayerStats(lore.get(i), ps));
+                        lore.set(i, MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(lore.get(i), ps));
                     }
                 }
 

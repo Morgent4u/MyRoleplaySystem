@@ -5,8 +5,9 @@ import java.util.HashMap;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import com.basis.utils.Settings;
+import com.roleplay.board.ScoreBoard;
 import org.bukkit.entity.Player;
 
 /**
@@ -48,7 +49,7 @@ public class SpielerContext extends Objekt
             double moneyCash = -1;
 
             //  File-System...
-            Datei user = of_getPlayerFile(ps);
+            SimpleFile user = of_getPlayerFile(ps);
 
             //  Set playerHasPlayedBefore state.
             if(!user.of_fileExists())
@@ -104,9 +105,9 @@ public class SpielerContext extends Objekt
 
             //  After this is done, we load the scoreBoard to the player.
             //  Check if scoreBoard is null because in the reload-process it's null!
-            if(Settings.of_getInstance().of_isUsingScoreboard() && main.SCOREBOARD != null)
+            if(Settings.of_getInstance().of_isUsingScoreboard() && ScoreBoard.of_getInstance() != null)
             {
-                main.SCOREBOARD.of_sendScoreboard2Player(ps);
+                ScoreBoard.of_getInstance().of_sendScoreboard2Player(ps);
             }
         }
     }
@@ -145,7 +146,7 @@ public class SpielerContext extends Objekt
         if(ps != null)
         {
             //  File-System...
-            Datei user = of_getPlayerFile(ps);
+            SimpleFile user = of_getPlayerFile(ps);
 
             //  System-Stuff
             String sectionKey = "System";
@@ -212,18 +213,18 @@ public class SpielerContext extends Objekt
         return null;
     }
 
-    public Datei of_getPlayerFile(Spieler ps)
+    public SimpleFile of_getPlayerFile(Spieler ps)
     {
-        return new Datei(userdataPath + ps.of_getUUID() + ".yml");
+        return new SimpleFile(userdataPath + ps.of_getUUID() + ".yml");
     }
 
-    public Datei of_getPlayerFileByUUID(String uuid)
+    public SimpleFile of_getPlayerFileByUUID(String uuid)
     {
-        return new Datei(userdataPath + uuid + ".yml");
+        return new SimpleFile(userdataPath + uuid + ".yml");
     }
 
-    public Datei of_getPlayerIPFile(Spieler ps)
+    public SimpleFile of_getPlayerIPFile(Spieler ps)
     {
-        return new Datei(userdataPath + "IpAddresses//" + ps.of_getPlayerIPAsString() + ".yml");
+        return new SimpleFile(userdataPath + "IpAddresses//" + ps.of_getPlayerIPAsString() + ".yml");
     }
 }

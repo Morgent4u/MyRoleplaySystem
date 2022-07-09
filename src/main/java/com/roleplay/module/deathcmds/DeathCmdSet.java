@@ -2,7 +2,7 @@ package com.roleplay.module.deathcmds;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
@@ -34,18 +34,18 @@ public class DeathCmdSet extends Objekt implements Listener
 
     /**
      * This function is used to load module specified parameters to this object.
-     * @param datei The file-object where the module-settings will be saved/loaded to/from.
+     * @param simpleFile The file-object where the module-settings will be saved/loaded to/from.
      * @return 1 = OK, -1 = Error
      */
-    public int of_load(Datei datei)
+    public int of_load(SimpleFile simpleFile)
     {
         //  Load module specified data.
-        ib_cmdSetOnRespawn = datei.of_getSetBoolean("OnlyOnRespawn", false);
-        commandSet = datei.of_getSetStringArray("CommandSet", new String[] {"CHATCLEAR","POS=respawn_location.yml", "TEXTBLOCK=txt_death_message.yml"});
+        ib_cmdSetOnRespawn = simpleFile.of_getSetBoolean("OnlyOnRespawn", false);
+        commandSet = simpleFile.of_getSetStringArray("CommandSet", new String[] {"CHATCLEAR","POS=respawn_location.yml", "TEXTBLOCK=txt_death_message.yml"});
 
-        if(!datei.of_fileExists())
+        if(!simpleFile.of_fileExists())
         {
-            datei.of_save("DeathCmdSet.of_load();");
+            simpleFile.of_save("DeathCmdSet.of_load();");
         }
 
         //  Register this object-class as additional event-listeners.

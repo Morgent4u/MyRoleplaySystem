@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.utils.Settings;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.iblock.IBlock;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -33,7 +34,7 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
 
                 if(ps != null)
                 {
-                    if(main.PERMISSIONBOARD.of_isAdmin(ps))
+                    if(PermissionBoard.of_getInstance().of_isAdmin(ps))
                     {
                         Player p = ps.of_getPlayer();
 
@@ -57,7 +58,7 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
 
                             if(first.equalsIgnoreCase("list"))
                             {
-                                IBlock[] iblocks = main.IBLOCKSERVICE._CONTEXT.of_getAllIBlocks();
+                                IBlock[] iblocks = (IBlock[]) main.IBLOCKSERVICE._CONTEXT.of_getAllObjects();
 
                                 if(iblocks != null && iblocks.length > 0)
                                 {
@@ -94,7 +95,7 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
 
                                 if(iblock != null)
                                 {
-                                    int rc = main.IBLOCKSERVICE._CONTEXT.of_deleteIBlock(iblock);
+                                    int rc = main.IBLOCKSERVICE._CONTEXT.of_deleteObjectFromFile(iblock);
 
                                     if(rc == 1)
                                     {

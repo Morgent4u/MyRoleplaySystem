@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.npc.NPC;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -31,7 +32,7 @@ public class CMD_NPC implements CommandExecutor
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.NPC"))
+                    if(PermissionBoard.of_getInstance().of_hasPermissions(ps, "Command.Permission.NPC"))
                     {
                         //  Check if the NPCService is valid!
                         if(main.NPCSERVICE == null)
@@ -47,7 +48,7 @@ public class CMD_NPC implements CommandExecutor
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  Get all current loaded NPCs and send a list into the players chat.
-                                NPC[] npcs = main.NPCSERVICE._CONTEXT.of_getLoadedNPCs();
+                                NPC[] npcs = (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects();
                                 int size = npcs.length;
 
                                 if(size > 0)
@@ -127,7 +128,7 @@ public class CMD_NPC implements CommandExecutor
                                 if(objectId != -1)
                                 {
                                     // Get all loaded NPCs.
-                                    NPC[] npcs = main.NPCSERVICE._CONTEXT.of_getLoadedNPCs();
+                                    NPC[] npcs = (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects();
                                     int size = npcs.length;
 
                                     if(size > 0)

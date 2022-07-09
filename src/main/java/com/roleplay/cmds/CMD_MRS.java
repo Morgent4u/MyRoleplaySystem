@@ -3,6 +3,7 @@ package com.roleplay.cmds;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,7 +37,7 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.MRS"))
+                    if(PermissionBoard.of_getInstance().of_hasPermissions(ps, "Command.Permission.MRS"))
                     {
                         if(args.length == 1)
                         {

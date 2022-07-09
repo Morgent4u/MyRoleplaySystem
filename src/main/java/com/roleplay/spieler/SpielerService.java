@@ -3,8 +3,10 @@ package com.roleplay.spieler;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import com.basis.utils.Settings;
+import com.roleplay.board.MessageBoard;
+import com.roleplay.board.ScoreBoard;
 import com.roleplay.inventar.Inventar;
 import com.roleplay.objects.TextBlock;
 import com.roleplay.position.Position;
@@ -114,7 +116,7 @@ public class SpielerService extends Objekt
     public void of_sendErrorMessage(Spieler ps, String errorMessage)
     {
         //  Send the error message to the player.
-        String message = main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.ErrorMessage", ps);
+        String message = MessageBoard.of_getInstance().of_getMessageWithPlayerStats("General.ErrorMessage", ps);
         message = message.replace("%errorMessage%", errorMessage);
         message = message.replace("%errormessage%", errorMessage);
 
@@ -127,7 +129,7 @@ public class SpielerService extends Objekt
      */
     public void of_sendNoPermissionsMessage(Spieler ps)
     {
-        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats("General.NoPermissions", ps));
+        ps.of_getPlayer().sendMessage(MessageBoard.of_getInstance().of_getMessageWithPlayerStats("General.NoPermissions", ps));
     }
 
     /**
@@ -138,7 +140,7 @@ public class SpielerService extends Objekt
      */
     public void of_sendPluginMessage2Player(Spieler ps, String message)
     {
-        ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_translateMessage(message));
+        ps.of_getPlayer().sendMessage(MessageBoard.of_getInstance().of_translateMessage(message));
     }
 
     /**
@@ -150,9 +152,9 @@ public class SpielerService extends Objekt
     public void of_sendMessageByMessageId(Spieler ps, String messageId)
     {
         //  We only send the player a message, if the key/msgId exist.
-        if(main.MESSAGEBOARD.of_check4MessageId(messageId))
+        if(MessageBoard.of_getInstance().of_check4MessageId(messageId))
         {
-            ps.of_getPlayer().sendMessage(main.MESSAGEBOARD.of_getMessageWithPlayerStats(messageId, ps));
+            ps.of_getPlayer().sendMessage(MessageBoard.of_getInstance().of_getMessageWithPlayerStats(messageId, ps));
         }
     }
 
@@ -243,7 +245,7 @@ public class SpielerService extends Objekt
         {
             // Get the IP of the player.
             String ipAddress = ps.of_getPlayerIPAsString();
-            Datei ipFile = _CONTEXT.of_getPlayerIPFile(ps);
+            SimpleFile ipFile = _CONTEXT.of_getPlayerIPFile(ps);
 
             if(!ipFile.of_fileExists())
             {
@@ -261,7 +263,7 @@ public class SpielerService extends Objekt
             if(!of_getPlayerInternListData(ps, "DataProtection").equals(ipFile.of_getString("InsertTime")) || !ps.of_getUUID().equals(realUUID))
             {
                 // Get the File of the player which is stored as the "real"-player.
-                Datei realUser = _CONTEXT.of_getPlayerFileByUUID(realUUID);
+                SimpleFile realUser = _CONTEXT.of_getPlayerFileByUUID(realUUID);
 
                 if(realUser.of_fileExists())
                 {
@@ -390,7 +392,7 @@ public class SpielerService extends Objekt
             //  Refresh the players scoreboard...
             if(Settings.of_getInstance().of_isUsingScoreboard())
             {
-                main.SCOREBOARD.of_sendScoreboard2Player(ps);
+                ScoreBoard.of_getInstance().of_sendScoreboard2Player(ps);
             }
 
             return lb_continue;
@@ -424,7 +426,7 @@ public class SpielerService extends Objekt
     public void of_addDataEntry4PlayerInternList(Spieler ps, String entryKey, String entryValue)
     {
         // Get the user file.
-        Datei user = _CONTEXT.of_getPlayerFile(ps);
+        SimpleFile user = _CONTEXT.of_getPlayerFile(ps);
         user.of_getSetString("System.InternList." + entryKey, entryValue);
 
         //  Save the changes.

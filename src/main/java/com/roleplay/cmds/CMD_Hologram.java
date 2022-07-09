@@ -2,7 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.extended.LocationDatei;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.hologram.Hologram;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Location;
@@ -41,7 +41,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.Hologram"))
+                    if(PermissionBoard.of_getInstance().of_hasPermissions(ps, "Command.Permission.Hologram"))
                     {
                         if(args.length == 1)
                         {
@@ -50,7 +50,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  Get all current loaded holograms and send a list into the players chat.
-                                Hologram[] holos = main.HOLOGRAMSERVICE._CONTEXT.of_getAllHolograms();
+                                Hologram[] holos = (Hologram[]) main.HOLOGRAMSERVICE._CONTEXT.of_getAllObjects();
                                 int size = holos.length;
 
                                 if(size > 0)
@@ -109,7 +109,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                                 if(holo != null)
                                 {
                                     //  Delete the hologram.
-                                    int rc = main.HOLOGRAMSERVICE._CONTEXT.of_deleteHologram(holo);
+                                    int rc = main.HOLOGRAMSERVICE._CONTEXT.of_deleteObjectFromFile(holo);
 
                                     if(rc == 1)
                                     {
@@ -179,7 +179,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                                     if(rc == 1)
                                     {
                                         //  Load the hologram by using the load system on the context.
-                                        main.HOLOGRAMSERVICE._CONTEXT.of_loadHologramFromFile(new LocationDatei(new File(holo.of_getFilePath())));
+                                        main.HOLOGRAMSERVICE._CONTEXT.of_loadObjectByFile(new File(holo.of_getFilePath()));
                                     }
                                 }
                                 // If the hologram could not be created.
@@ -408,7 +408,7 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
 
         if(id != -1)
         {
-            Hologram holo = main.HOLOGRAMSERVICE._CONTEXT.of_getHologramById(id);
+            Hologram holo = (Hologram) main.HOLOGRAMSERVICE._CONTEXT.of_getObjectById(id);
 
             if(holo != null)
             {
@@ -433,33 +433,38 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
     /* TAB COMPLETE */
     /* ************************* */
 
-    // Attributes:
-    private static final Iterable<String> firstCompleteAttributes = Arrays.asList("delete", "create", "add", "remove", "list", "tp");
-    private static final Iterable<String> secondCompleteAttributes = Arrays.asList("<id>", "<fileName>");
-    private static final Iterable<String> thirdCompleteAttributes = Collections.singletonList("&aYour text here");
-
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args)
     {
+        // List in with the completions will be stored.
         List<String> list = new ArrayList<>();
+        Iterable<String> completions = null;
 
-        //  We react when the second-arguments are needed!
+        //  All array arguments to lowercase
+        for(int i = 0; i < args.length; i++)
+        {
+            args[i] = args[i].toLowerCase();
+        }
+
         if(args.length == 1)
         {
-            // Check for the start letter of the arguments.
-            StringUtil.copyPartialMatches(args[0], firstCompleteAttributes, list);
+            completions = Arrays.asList("delete", "create", "add", "remove", "list", "tp");
         }
         else if(args.length == 2)
         {
-            StringUtil.copyPartialMatches(args[1], secondCompleteAttributes, list);
+            completions = Arrays.asList("<id>", "<fileName>");
         }
         else if(args.length == 3)
         {
-            StringUtil.copyPartialMatches(args[2], thirdCompleteAttributes, list);
+            completions = Collections.singletonList("&aYour text here");
         }
 
-        // Sort the elements in the list.
-        Collections.sort(list);
+        // Suggest the player the completions.
+        if(completions != null)
+        {
+            //  Copy the completions to the list.
+            StringUtil.copyPartialMatches(args[args.length - 1], completions, list);
+        }
 
         return list;
     }

@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class CMD_DataProtection implements CommandExecutor, TabCompleter
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.Dataprotection"))
+                    if(PermissionBoard.of_getInstance().of_hasPermissions(ps, "Command.Permission.Dataprotection"))
                     {
                         //   If the player has already accepted the data protection.
                         if(main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps))
@@ -96,23 +98,31 @@ public class CMD_DataProtection implements CommandExecutor, TabCompleter
     /* TAB COMPLETE */
     /* ************************* */
 
-    // Attributes:
-    private static final Iterable<String> firstCompleteAttributes = Collections.singletonList("accept");
-
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args)
     {
+        // List in with the completions will be stored.
         List<String> list = new ArrayList<>();
+        Iterable<String> completions = null;
 
-        //  We react when the second-arguments are needed!
-        if(args.length == 1)
+        //  All array arguments to lowercase
+        for(int i = 0; i < args.length; i++)
         {
-            // Check for the start letter of the arguments.
-            StringUtil.copyPartialMatches(args[0], firstCompleteAttributes, list);
+            args[i] = args[i].toLowerCase();
         }
 
-        // Sort the elements in the list.
-        Collections.sort(list);
+        //  React to the different arguments.
+        if(args.length == 1)
+        {
+            completions = Collections.singletonList("accept");
+        }
+
+        // Suggest the player the completions.
+        if(completions != null)
+        {
+            //  Copy the completions to the list.
+            StringUtil.copyPartialMatches(args[args.length - 1], completions, list);
+        }
 
         return list;
     }

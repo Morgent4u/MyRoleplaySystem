@@ -1,11 +1,12 @@
 package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
+import com.basis.ancestor.ObjektContext;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.roleplay.extended.LocationDatei;
+import com.roleplay.extended.ExtendedFile;
 import com.roleplay.spieler.Spieler;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.EntityPlayer;
@@ -15,8 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,57 +30,26 @@ import java.util.UUID;
  * GitHub CoPilot.
  *
  */
-public class NPCContext extends Objekt
+public class NPCContext extends ObjektContext
 {
-    //  Attributes:
-    Map<Integer, NPC> npcs = new HashMap<>();
-
     /* ************************************* */
-    /* LOADER */
-    /* ************************************* */
-
-    @Override
-    public int of_load()
-    {
-        // Load the NPCs.
-        File directory = new File(Sys.of_getMainFilePath() + "//NPCs//");
-        File[] files = directory.listFiles();
-
-        if(files != null && files.length > 0)
-        {
-            for(File file : files)
-            {
-                if(file != null)
-                {
-                    int rc = of_loadNPCByFile(file);
-
-                    //  If an error occurred, stop the loading process.
-                    if(rc != 1)
-                    {
-                        of_sendErrorMessage(null, "NPCContext.of_load();", "There was an error while loading the NPC from the following file: " + file.getName());
-                        return -1;
-                    }
-                }
-            }
-
-            return 1;
-        }
-
-        return -1;
-    }
-
-    /* ************************************* */
-    /* OBJECT METHODS */
+    /* CONSTRUCTOR // LOADER */
     /* ************************************* */
 
     /**
-     * This function is used to load a NPC from a file.
-     * @param file The file to load the NPC from.
-     * @return 1 = Ok, -1 = Error. -2 = Some data in the given file is missing. -3 = The EntityPlayer could not be created with the given information.
+     * Is used to initialize the object.
+     * @param instanceName The name of the instance.
+     * @param mainFolder   The main-folder which contains all Object files.
      */
-    private int of_loadNPCByFile(File file)
+    public NPCContext(String instanceName, String mainFolder)
     {
-        LocationDatei datei = new LocationDatei(file);
+        super(instanceName, mainFolder);
+    }
+
+    @Override
+    public int of_loadObjectByFile(File file)
+    {
+        ExtendedFile datei = new ExtendedFile(file);
 
         if(datei.of_fileExists())
         {
@@ -118,8 +86,7 @@ public class NPCContext extends Objekt
                     entityPlayer.b(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 
                     //  Add the NPC to the list.
-                    npcs.put(npc.of_getObjectId(), npc);
-                    return 1;
+                    return of_addObject2ContextList(npc);
                 }
                 // If an error occurred, stop the loading.
                 else
@@ -133,7 +100,12 @@ public class NPCContext extends Objekt
         }
 
         return -1;
+
     }
+
+    /* ************************************* */
+    /* OBJECT METHODS */
+    /* ************************************* */
 
     /**
      * This function is used to create a EntityPlayer from a NPC.
@@ -166,7 +138,7 @@ public class NPCContext extends Objekt
         fileName = "npc_" + fileName + ".yml";
 
         // Create the file.
-        LocationDatei datei = new LocationDatei(new File(Sys.of_getMainFilePath() + "//NPCs//" + fileName));
+        ExtendedFile datei = new ExtendedFile(new File(Sys.of_getMainFilePath() + "//NPCs//" + fileName));
 
         if(!datei.of_fileExists())
         {
@@ -200,7 +172,7 @@ public class NPCContext extends Objekt
             if(rc == 1)
             {
                 // After saving the NPC successfully, we load it from the file and show the created NPC, to all online players.
-                rc = of_loadNPCByFile(datei.of_getFile().getAbsoluteFile());
+                rc = of_loadObjectByFile(datei.of_getFile().getAbsoluteFile());
 
                 if(rc == 1)
                 {
@@ -241,25 +213,24 @@ public class NPCContext extends Objekt
     public void of_sendDebugDetailInformation()
     {
         // Send the debug information.
-        Sys.of_sendMessage("Loaded NPCs: " + of_getLoadedNPCsSize());
+        Sys.of_sendMessage("Loaded NPCs: " + of_getLoadedObjects());
     }
 
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
 
-    public NPC of_getNPCByEntityId(int entityId)
+    @Override
+    public Objekt of_getObjectById(int objectId)
     {
-        return npcs.get(entityId);
-    }
+        for(NPC npc : (NPC[]) of_getAllObjects())
+        {
+            if(npc.of_getEntityId() == objectId)
+            {
+                return npc;
+            }
+        }
 
-    public int of_getLoadedNPCsSize()
-    {
-        return npcs.size();
-    }
-
-    public NPC[] of_getLoadedNPCs()
-    {
-        return npcs.values().toArray(new NPC[0]);
+        return null;
     }
 }

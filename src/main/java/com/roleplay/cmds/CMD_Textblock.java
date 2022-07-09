@@ -2,6 +2,7 @@ package com.roleplay.cmds;
 
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
@@ -33,7 +34,7 @@ public class CMD_Textblock implements CommandExecutor
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_hasPermissions(ps, "Command.Permission.Textblock"))
+                    if(PermissionBoard.of_getInstance().of_hasPermissions(ps, "Command.Permission.Textblock"))
                     {
                         if(args.length == 0)
                         {

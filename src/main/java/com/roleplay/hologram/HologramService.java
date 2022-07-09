@@ -1,6 +1,7 @@
 package com.roleplay.hologram;
 
 import com.basis.ancestor.Objekt;
+import com.basis.sys.Sys;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import java.util.Objects;
@@ -27,7 +28,7 @@ public class HologramService extends Objekt
     {
         //  initialize the hologram context which is used to load
         //  all defined holograms from a file.
-        _CONTEXT = new HologramContext();
+        _CONTEXT = new HologramContext("HologramContext", Sys.of_getMainFilePath() + "//Holograms//");
 
         return _CONTEXT.of_load();
     }
@@ -163,7 +164,7 @@ public class HologramService extends Objekt
             // If only one armorStand is left, we delete the whole hologram.
             if(holo.of_getArmorStandSize() == 1)
             {
-                int rc = _CONTEXT.of_deleteHologram(holo);
+                int rc = _CONTEXT.of_deleteObjectFromFile(holo);
 
                 if(rc == 1)
                 {

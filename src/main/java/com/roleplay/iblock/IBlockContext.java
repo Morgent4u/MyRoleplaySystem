@@ -1,7 +1,8 @@
 package com.roleplay.iblock;
 
 import com.basis.ancestor.Objekt;
-import com.roleplay.extended.LocationDatei;
+import com.basis.ancestor.ObjektContext;
+import com.roleplay.extended.ExtendedFile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import java.io.File;
@@ -15,67 +16,26 @@ import java.util.Map;
  * This class-object is used to load/save/delete an IBlock object
  * into a file.
  */
-public class IBlockContext extends Objekt
+public class IBlockContext extends ObjektContext
 {
-    //  Attributes:
-    private Map<Integer, IBlock> iblocks = new HashMap<>();
-    private String mainFolder;
-
     /* ************************************* */
     /* CONSTRUCTOR // LOADER */
     /* ************************************* */
 
     /**
      * Is used to initialize the object.
-     * @param mainFolder The main-folder which contains all IBlock files.
+     * @param instanceName The name of the instance.
+     * @param mainFolder   The main-folder which contains all Object files.
      */
-    public IBlockContext(String mainFolder)
+    public IBlockContext(String instanceName, String mainFolder)
     {
-        this.mainFolder = mainFolder;
+        super(instanceName, mainFolder);
     }
 
-    /**
-     * This function is used to load all IBlocks from the main-folder.
-     * @return 1 = OK, -1 = ERROR
-     */
     @Override
-    public int of_load()
+    public int of_loadObjectByFile(File file)
     {
-        // Load the IBlocks.
-        File directory = new File(of_getMainFolder());
-        File[] files = directory.listFiles();
-
-        if(files != null && files.length > 0)
-        {
-            for(File file : files)
-            {
-                if(file != null)
-                {
-                    int rc = of_loadIBlockByFile(file);
-
-                    //  If an error occurred, stop the loading process.
-                    if(rc != 1)
-                    {
-                        of_sendErrorMessage(null, "IBlockContext.of_load();", "There was an error while loading the IBlock from the following file: " + file.getName());
-                        return -1;
-                    }
-                }
-            }
-
-            return 1;
-        }
-
-        return -1;
-    }
-
-    /**
-     * This function is used to load an IBlock from a file.
-     * @param file The file to load the IBlock from.
-     * @return 1 if the IBlock was loaded successfully, -1 if an error occurred.
-     */
-    public int of_loadIBlockByFile(File file)
-    {
-        LocationDatei datei = new LocationDatei(file);
+        ExtendedFile datei = new ExtendedFile(file);
 
         if(datei.of_fileExists())
         {
@@ -88,9 +48,7 @@ public class IBlockContext extends Objekt
             {
                 IBlock iblock = new IBlock(material, commandSet, location);
                 iblock.of_setInfo(datei.of_getFileName().replace(".yml", ""));
-                iblock.of_setObjectId(iblocks.size() + 1);
-                iblocks.put(iblock.of_getObjectId(), iblock);
-                return 1;
+                return of_addObject2ContextList(iblock);
             }
         }
 
@@ -101,16 +59,14 @@ public class IBlockContext extends Objekt
     /* OBJECT-METHODS */
     /* ************************************* */
 
-    /**
-     * This method is used to store the given IBlock into a file.
-     * @param iblock The IBlock to store.
-     * @return 1 = OK, -1 = Error. -2 = The given IBlock (file-name) already exist.
-     */
-    public int of_saveIBlock2File(IBlock iblock)
+    @Override
+    public int of_saveObject2File(Objekt object)
     {
+        IBlock iblock = (IBlock) object;
+
         if(iblock != null)
         {
-            LocationDatei datei = new LocationDatei(new File(of_getMainFolder() + iblock.of_getInfo() + ".yml"));
+            ExtendedFile datei = new ExtendedFile(new File(of_getMainFolder() + iblock.of_getInfo() + ".yml"));
 
             if(!datei.of_fileExists())
             {
@@ -119,10 +75,10 @@ public class IBlockContext extends Objekt
                 datei.of_setLocation("Location", iblock.of_getLocation());
 
                 //  Add the current IBlock to the current memory...
-                iblock.of_setObjectId(iblocks.size() + 1);
-                iblocks.put(iblock.of_getObjectId(), iblock);
-
-                return datei.of_save("IBlockContext.of_saveIBlock2File();");
+                if(of_addObject2ContextList(iblock) == 1)
+                {
+                    return datei.of_save("IBlockContext.of_saveIBlock2File();");
+                }
             }
             //  If the IBlock already exist.
             else
@@ -134,46 +90,23 @@ public class IBlockContext extends Objekt
         return -1;
     }
 
-    /**
-     * This method is used to delete the given IBlock.
-     * @param iblock The IBlock to delete.
-     * @return 1 = OK, -1 = Error.
-     */
-    public int of_deleteIBlock(IBlock iblock)
+    @Override
+    public int of_deleteObjectFromFile(Objekt object)
     {
+        IBlock iblock = (IBlock) object;
+
         if(iblock != null)
         {
-            LocationDatei datei = new LocationDatei(new File(of_getMainFolder() + iblock.of_getInfo() + ".yml"));
+            ExtendedFile datei = new ExtendedFile(new File(of_getMainFolder() + iblock.of_getInfo() + ".yml"));
 
             if(datei.of_fileExists())
             {
-                datei.of_delete();
-
                 //  Remove the IBlock from the list.
-                iblocks.remove(iblock.of_getObjectId());
-                return 1;
+                datei.of_delete();
+                return of_removeObjectFromContextList(iblock);
             }
         }
 
         return -1;
-    }
-
-    /* ************************************* */
-    /* GETTER */
-    /* ************************************* */
-
-    public IBlock[] of_getAllIBlocks()
-    {
-        return iblocks.values().toArray(new IBlock[0]);
-    }
-
-    public String of_getMainFolder()
-    {
-        return mainFolder;
-    }
-
-    public int of_getLoadedIBlocks()
-    {
-        return iblocks.size();
     }
 }

@@ -59,14 +59,6 @@ public class main extends JavaPlugin
     public static IBlockService IBLOCKSERVICE;
     public static PositionService POSITIONSERVICE;
 
-    //  Boards:
-    public static MessageBoard MESSAGEBOARD;
-    public static PermissionBoard PERMISSIONBOARD;
-    public static ScoreBoard SCOREBOARD;
-
-    //  Managers:
-    public static TablistManager TABLISTMANAGER;
-
     //  Modules:
     public static DeathCmdSet MODULE_DEATHCMDSET;
 

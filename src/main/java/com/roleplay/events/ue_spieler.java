@@ -3,6 +3,8 @@ package com.roleplay.events;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
+import com.roleplay.board.MessageBoard;
+import com.roleplay.manager.TablistManager;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
@@ -55,7 +57,7 @@ public class ue_spieler implements Listener
             }
 
             //  Check for the NPCs...
-            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedNPCsSize() > 0)
+            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
             {
                 main.NPCSERVICE.of_showAllNPCs2Player(ps);
             }
@@ -63,13 +65,13 @@ public class ue_spieler implements Listener
             //  When we are using the tab-list manager we need to update/create the tab-list for the player :)!
             if(Settings.of_getInstance().of_isUsingTablist())
             {
-                main.TABLISTMANAGER.of_createOrUpdateTablist4AllPlayers();
+                TablistManager.of_getInstance().of_createOrUpdateTablist4AllPlayers();
             }
 
             //  If we use the joinQuitMessage, we send them into the chat.
             if(Settings.of_getInstance().of_isUsingJoinAndQuitMessage())
             {
-                e.setJoinMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getJoinMessage(), ps));
+                e.setJoinMessage(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getJoinMessage(), ps));
             }
         }
     }
@@ -89,7 +91,7 @@ public class ue_spieler implements Listener
             //  If we use the joinQuitMessage, we send them into the chat.
             if(Settings.of_getInstance().of_isUsingJoinAndQuitMessage())
             {
-                e.setQuitMessage(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getQuitMessage(), ps));
+                e.setQuitMessage(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(Settings.of_getInstance().of_getQuitMessage(), ps));
             }
 
             //  Remove the player from the IBlock-Setup.

@@ -31,20 +31,22 @@ import java.util.Collections;
 public class ScoreBoard extends Objekt
 {
     //  Attributes:
-    String[] scoreBoardLines;
+    private static final ScoreBoard instance = new ScoreBoard();
+    private String[] scoreBoardLines;
 
     /* ************************* */
-    /* CONSTRUCTOR */
+    /* LOADER */
     /* ************************* */
 
     /**
      * Define a scoreBoard which will be displayed to the player.
-     * @param lines Lines which should be displayed. The first line is the
-     *              title of the scoreBoard.
+     * @param args Lines which should be displayed. The first line is the
+     *             title of the scoreBoard.
      */
-    public ScoreBoard(String[] lines)
+    @Override
+    public void of_load(String[] args)
     {
-        this.scoreBoardLines = lines;
+        this.scoreBoardLines = args;
     }
 
     /**
@@ -81,7 +83,7 @@ public class ScoreBoard extends Objekt
 
                 //  Create a 1.18-ScoreBoard!
                 Scoreboard board = new Scoreboard();
-                String title = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(scoreBoardLines[0], ps);
+                String title = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(scoreBoardLines[0], ps);
 
                 //  The first argument is used to set the title.
                 ScoreboardObjective objective = board.a(Sys.of_getVersion(), IScoreboardCriteria.b, (IChatBaseComponent) new ChatMessage(title), IScoreboardCriteria.EnumScoreboardHealthDisplay.a);
@@ -121,7 +123,7 @@ public class ScoreBoard extends Objekt
                     boolean lb_addPlacement = tmpValue.contains("%") || tmpValue.equals("");
 
                     //  Replace current line with player stats...
-                    tmpValue = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(tmpValue, ps);
+                    tmpValue = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(tmpValue, ps);
 
                     if(lb_addPlacement)
                     {
@@ -160,5 +162,14 @@ public class ScoreBoard extends Objekt
             }
             catch (Exception ignored) { }
         }
+    }
+
+    /* **************************** */
+    /* GETTER */
+    /* *************************** */
+
+    public static ScoreBoard of_getInstance()
+    {
+        return instance;
     }
 }

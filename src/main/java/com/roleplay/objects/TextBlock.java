@@ -3,7 +3,8 @@ package com.roleplay.objects;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class TextBlock extends Objekt
     private ArrayList<String> interactiveChatMessages = null;
     private String[] cmds;
     private String[] placeholders;
-    private Datei datei;
+    private SimpleFile datei;
     private Spieler ps;
 
     /* ************************************* */
@@ -29,13 +30,13 @@ public class TextBlock extends Objekt
 
     public TextBlock(String fileName, Spieler ps)
     {
-        this.datei = new Datei(Sys.of_getMainFilePath() + "//TextBlocks//" + fileName);
+        this.datei = new SimpleFile(Sys.of_getMainFilePath() + "//TextBlocks//" + fileName);
         this.ps = ps;
     }
 
     public TextBlock(String fileName)
     {
-        this.datei = new Datei(Sys.of_getMainFilePath() + "//TextBlocks//" + fileName);
+        this.datei = new SimpleFile(Sys.of_getMainFilePath() + "//TextBlocks//" + fileName);
     }
 
     /* ************************************* */
@@ -103,7 +104,7 @@ public class TextBlock extends Objekt
                     }
 
                     //  Send the message.
-                    chatMessage = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(chatMessage, ps);
+                    chatMessage = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(chatMessage, ps);
                     p.sendMessage(chatMessage);
                 }
             }
@@ -138,13 +139,13 @@ public class TextBlock extends Objekt
                 if(text != null && hoverText != null && commandSet != null && commandSet.length > 0)
                 {
                     //  Translate all three strings.
-                    text = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(text, ps);
-                    hoverText = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(hoverText, ps);
+                    text = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(text, ps);
+                    hoverText = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(hoverText, ps);
 
                     //  Translate every command...
                     for(int i = 0; i < commandSet.length; i++)
                     {
-                        commandSet[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(commandSet[i], ps);
+                        commandSet[i] = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(commandSet[i], ps);
                     }
 
                     //  Build the CommandSet into a String with a ';' as separator.
@@ -364,12 +365,12 @@ public class TextBlock extends Objekt
 
                 if(ps == null)
                 {
-                    chatMessages[i] = main.MESSAGEBOARD.of_translateMessage(chatMessages[i]);
+                    chatMessages[i] = MessageBoard.of_getInstance().of_translateMessage(chatMessages[i]);
                 }
                 //  If the player is given, translate the stats :)
                 else
                 {
-                    chatMessages[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(chatMessages[i], ps);
+                    chatMessages[i] = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(chatMessages[i], ps);
                 }
             }
 

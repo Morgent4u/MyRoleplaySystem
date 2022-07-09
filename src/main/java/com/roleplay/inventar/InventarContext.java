@@ -3,7 +3,7 @@ package com.roleplay.inventar;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.extended.InventarDatei;
+import com.roleplay.extended.ExtendedFile;
 import com.roleplay.inventar.normal.inv_atm;
 import com.roleplay.inventar.normal.inv_menu;
 import com.roleplay.objects.CommandSet;
@@ -76,7 +76,7 @@ public class InventarContext extends Objekt
     }
 
     /* ************************************* */
-    /* OBJEKT ANWEISUNGEN */
+    /* OBJECT METHODS */
     /* ************************************* */
 
     /**
@@ -85,9 +85,8 @@ public class InventarContext extends Objekt
      * inventar.of_load() function to load all predefined settings
      * for the given inventory-instance.
      * @param inventar The inventory to load.
-     * @return 1 = OK, -1 = An error occurred.
      */
-    public int of_loadInventoryByFile(Inventar inventar, String fileName)
+    public void of_loadInventoryByFile(Inventar inventar, String fileName)
     {
         //  Set the fileName, if it's not set use the inventar-instance name instead.
         if(fileName == null)
@@ -96,7 +95,7 @@ public class InventarContext extends Objekt
         }
 
         //  Get the file or create it.
-        InventarDatei invFile = new InventarDatei(Sys.of_getMainFilePath() + "//Inventories//" + fileName);
+        ExtendedFile invFile = new ExtendedFile(Sys.of_getMainFilePath() + "//Inventories//" + fileName);
 
         if(invFile.of_fileExists())
         {
@@ -134,7 +133,7 @@ public class InventarContext extends Objekt
                     catch(Exception e)
                     {
                         inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The inventory type '" + invType + "' is not defined.");
-                        return -1;
+                        return;
                     }
                 }
                 //  Default inventory-type (chest)
@@ -185,13 +184,13 @@ public class InventarContext extends Objekt
                             catch (Exception e)
                             {
                                 inventar.of_sendErrorMessage(e, "InventarContext.of_loadInventoryByFile();", "There was an error while receiving data from the function: of_handleInventoryClassification4ItemStack(;");
-                                return -1;
+                                return;
                             }
 
                             //  If the handleInventoryFunction could not handle the given Inventory-Classification.
                             if(returnCode == -1)
                             {
-                                return -1;
+                                return;
                             }
                             //  We don't have to iterate through the item-stacks any longer.
                             else if(returnCode == -2)
@@ -294,7 +293,7 @@ public class InventarContext extends Objekt
             else
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the file-inventory: " + invFile.of_getFileName());
-                return -1;
+                return;
             }
         }
         // When the file does not exist, let the inventar-instance create a predefined inventory which
@@ -311,7 +310,7 @@ public class InventarContext extends Objekt
             if(errorMessage != null)
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", errorMessage);
-                return -1;
+                return;
             }
 
             //  After the inventory is created, save it to the file.
@@ -320,19 +319,18 @@ public class InventarContext extends Objekt
             if(rc != 1)
             {
                 inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "The file-inventory could not be saved: " + invFile.of_getFileName());
-                return -1;
+                return;
             }
 
             //  We load the inventory again...
             of_loadInventoryByFile(inventar, fileName);
-            return -1;
+            return;
         }
 
         //  Add the inventory to the inventar-context (inventories).
         inventar.of_setInfo(fileName.toLowerCase().replace(".yml", ""));
         inventar.of_setObjectId(inventories.size() + 1);
         inventories.put(inventar.of_getObjectId(), inventar);
-        return 1;
     }
 
     /**
@@ -340,7 +338,7 @@ public class InventarContext extends Objekt
      * @param inventar The inventory to save.
      * @return 1 if the inventory was saved successfully. -1 if the inventory was not saved.
      */
-    public int of_saveInventory2File(InventarDatei invFile, Inventar inventar)
+    public int of_saveInventory2File(ExtendedFile invFile, Inventar inventar)
     {
         //  Check if the inventory instance is valid.
         Inventory inventory = inventar.of_getInv();

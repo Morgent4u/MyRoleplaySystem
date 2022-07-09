@@ -1,14 +1,13 @@
 package com.roleplay.hologram;
 
 import com.basis.ancestor.Objekt;
+import com.basis.ancestor.ObjektContext;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.roleplay.extended.LocationDatei;
+import com.roleplay.extended.ExtendedFile;
 import org.bukkit.Location;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Created 07.05.2022
@@ -17,56 +16,27 @@ import java.util.Map;
  * This class is used to load holograms from a file or
  * save it into the file.
  */
-public class HologramContext extends Objekt
+public class HologramContext extends ObjektContext
 {
-    //  Attributes:
-    private Map<Integer, Hologram> holograms = new HashMap<>();
-
     /* ************************************* */
-    /* LOADER // UNLOADER */
+    /* CONSTRUCTOR // LOADER // UNLOADER */
     /* ************************************* */
 
     /**
-     * Get all hologram files in the holograms folder and load each.
-     * @return 1 = OK, -1 Error
+     * Is used to initialize the object.
+     * @param instanceName The name of the instance.
+     * @param mainFolder   The main-folder which contains all Object files.
      */
-    @Override
-    public int of_load()
+    public HologramContext(String instanceName, String mainFolder)
     {
-        //  Load holograms from files.
-        File directory = new File(Sys.of_getMainFilePath() + "//Holograms//");
-        File[] files = directory.listFiles();
-
-        if(files != null && files.length > 0)
-        {
-            for(File file : files)
-            {
-                if(file != null)
-                {
-                    int rc = of_loadHologramFromFile(new LocationDatei(file));
-
-                    //  If an error occurred, stop the loading process.
-                    if(rc != 1)
-                    {
-                        of_sendErrorMessage(null, "HologramContext.of_load();", "There was an error while loading the hologram from the following file: " + file.getName());
-                        return -1;
-                    }
-                }
-            }
-
-            return 1;
-        }
-
-        return -1;
+        super(instanceName, mainFolder);
     }
 
-    /**
-     * This function is used to load a hologram from a file.
-     * @param datei The file to load the hologram from.
-     * @return 1 if successful, -1 if an error occured.
-     */
-    public int of_loadHologramFromFile(LocationDatei datei)
+    @Override
+    public int of_loadObjectByFile(File file)
     {
+        ExtendedFile datei = new ExtendedFile(file);
+
         //  File exists, load it.
         if(datei.of_fileExists())
         {
@@ -92,8 +62,7 @@ public class HologramContext extends Objekt
 
                     //  Store the filepath, this is used to delete the hologram file.
                     hologram.of_setFilePath(datei.of_getFile().getAbsolutePath());
-                    of_addHologram2Context(hologram);
-                    return 1;
+                    return of_addObject2ContextList(hologram);
                 }
                 else
                 {
@@ -107,19 +76,6 @@ public class HologramContext extends Objekt
         }
 
         return -1;
-    }
-
-    /**
-     * This function is used to unload all loaded holograms.
-     * It only calls the of_unload() function of the hologram-object.
-     */
-    @Override
-    public void of_unload()
-    {
-        for(Hologram hologram : holograms.values())
-        {
-            hologram.of_unload();
-        }
     }
 
     /* ************************************* */
@@ -143,7 +99,7 @@ public class HologramContext extends Objekt
         fileName = fileName.toLowerCase();
 
         //  Create the file...
-        LocationDatei datei = new LocationDatei(new File(Sys.of_getMainFilePath() + "//Holograms//" + fileName));
+        ExtendedFile datei = new ExtendedFile(new File(Sys.of_getMainFilePath() + "//Holograms//" + fileName));
 
         if (!datei.of_fileExists())
         {
@@ -185,7 +141,7 @@ public class HologramContext extends Objekt
     public int of_updateHologram2File(Hologram holo)
     {
         //  Get the hologram-file.
-        LocationDatei datei = new LocationDatei(new File(holo.of_getFilePath()));
+        ExtendedFile datei = new ExtendedFile(new File(holo.of_getFilePath()));
 
         if(datei.of_fileExists())
         {
@@ -201,14 +157,11 @@ public class HologramContext extends Objekt
         return -2;
     }
 
-    /**
-     * This function is used to delete a hologram file.
-     * @param holo The hologram to delete.
-     * @return 1 if successful, -1 if an error occurred.
-     */
-    public int of_deleteHologram(Hologram holo)
+    @Override
+    public int of_deleteObjectFromFile(Objekt object)
     {
         // Call the unload function of the hologram object to delete all armor-stand entities.
+        Hologram holo = (Hologram) object;
         holo.of_unload();
 
         //  Now we can delete the file.
@@ -218,7 +171,7 @@ public class HologramContext extends Objekt
         {
             if(file.delete())
             {
-                holograms.remove(holo.of_getObjectId());
+                of_removeObjectFromContextList(holo);
                 return 1;
             }
         }
@@ -233,40 +186,6 @@ public class HologramContext extends Objekt
     @Override
     public void of_sendDebugDetailInformation()
     {
-        Sys.of_sendMessage("Loaded holograms: " + of_getHologramSize());
+        Sys.of_sendMessage("Loaded holograms: " + of_getLoadedObjects());
     }
-
-    /* ************************************* */
-    /* SETTER // ADDER // REMOVER */
-    /* ************************************* */
-
-    /**
-     * This function adds the given hologram to the context-list.
-     * @param hologram The hologram which should be added to the list.
-     */
-    public void of_addHologram2Context(Hologram hologram)
-    {
-        hologram.of_setObjectId(holograms.size() + 1);
-        holograms.put(hologram.of_getObjectId(), hologram);
-    }
-
-    /* ************************************* */
-    /* GETTER */
-    /* ************************************* */
-
-    public int of_getHologramSize()
-    {
-        return holograms.size();
-    }
-
-    public Hologram of_getHologramById(int id)
-    {
-        return holograms.get(id);
-    }
-
-    public Hologram[] of_getAllHolograms()
-    {
-        return holograms.values().toArray(new Hologram[0]);
-    }
-
 }

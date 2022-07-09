@@ -3,7 +3,7 @@ package com.roleplay.board;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
 import com.basis.utils.Settings;
 import com.roleplay.objects.TextBlock;
 import com.roleplay.position.Position;
@@ -23,9 +23,11 @@ import java.util.Map;
 public class MessageBoard extends Objekt
 {
     //  Attributse:
+    private static final MessageBoard instance = new MessageBoard();
+
     //  MessageKey - Message
     Map<String, String> messages = new HashMap<>();
-    Datei datei;
+    SimpleFile datei;
     String prefix;
 
     boolean ib_usePrefix;
@@ -37,9 +39,9 @@ public class MessageBoard extends Objekt
     /**
      * Constructor for the MessageBoard.
      */
-    public MessageBoard()
+    private MessageBoard()
     {
-        datei = new Datei(Sys.of_getMainFilePath() + "//Others//messagesSounds.yml");
+        datei = new SimpleFile(Sys.of_getMainFilePath() + "//Others//messagesSounds.yml");
     }
 
     /**
@@ -229,7 +231,7 @@ public class MessageBoard extends Objekt
         //  Check for the last Position-Object:
         if(ps.of_getPositionId() > 0)
         {
-            Position position = main.POSITIONSERVICE._CONTEXT.of_getPositionByObjectId(ps.of_getObjectId());
+            Position position = (Position) main.POSITIONSERVICE._CONTEXT.of_getObjectById(ps.of_getObjectId());
 
             if(position != null)
             {
@@ -343,6 +345,11 @@ public class MessageBoard extends Objekt
         }
 
         return of_translateMessage(message);
+    }
+
+    public static MessageBoard of_getInstance()
+    {
+        return instance;
     }
 
     /* ************************* */

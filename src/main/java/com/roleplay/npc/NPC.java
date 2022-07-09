@@ -23,6 +23,7 @@ public class NPC extends Objekt
 
     String[] cmds;
     String skinName;
+    int entityId;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -121,6 +122,11 @@ public class NPC extends Objekt
         this.skinName = skinName;
     }
 
+    public void of_setEntityId(int entityId)
+    {
+        this.entityId = entityId;
+    }
+
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -143,5 +149,10 @@ public class NPC extends Objekt
     public String[] of_getCommandSet()
     {
         return cmds;
+    }
+
+    public int of_getEntityId()
+    {
+        return entityId;
     }
 }

@@ -3,7 +3,8 @@ package com.roleplay.manager;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.basis.utils.SimpleFile;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,6 +25,8 @@ import java.util.Objects;
 public class TablistManager extends Objekt
 {
     //  Attributes:
+    private static final TablistManager instance = new TablistManager();
+
     //  IntegerId - Permissions
     private Map<Integer, String[]> teams = new HashMap<>();
     private String topLine;
@@ -36,10 +39,10 @@ public class TablistManager extends Objekt
     /**
      * This function is used to load a defined tab-list from the settings.yml file.
      * If no tab-list has been defined it will be added a predefined tab-list-design.
-     * @param datei The Datei-object which is used to load the settings.yml file.
+     * @param datei The SimpleFile-object which is used to load the settings.yml file.
      * @param configSection The section which is used to load the tab-list.
      */
-    public void of_loadPredefinedTeams(Datei datei, String configSection)
+    public void of_loadPredefinedTeams(SimpleFile datei, String configSection)
     {
         String[] keys = datei.of_getKeySectionsByKey(configSection);
 
@@ -152,9 +155,9 @@ public class TablistManager extends Objekt
                         if(team != null)
                         {
                             Player d = ds.of_getPlayer();
-                            d.setPlayerListName(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(label, ds));
-                            d.setPlayerListHeader(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(topLine, ds));
-                            d.setPlayerListFooter(main.MESSAGEBOARD.of_translateMessageWithPlayerStats(bottomLine, ds));
+                            d.setPlayerListName(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(label, ds));
+                            d.setPlayerListHeader(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(topLine, ds));
+                            d.setPlayerListFooter(MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(bottomLine, ds));
 
                             //  Add the player to the team.
                             team.addPlayer(ds.of_getPlayer());
@@ -191,5 +194,14 @@ public class TablistManager extends Objekt
                 board.registerNewTeam(teamPattern).setCanSeeFriendlyInvisibles(false);
             }
         }
+    }
+
+    /* ************************************* */
+    /* GETTER */
+    /* ************************************* */
+
+    public static TablistManager of_getInstance()
+    {
+        return instance;
     }
 }

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * This object is used to create or edit
  * fast '.YML'-Files.
  */
-public class Datei
+public class SimpleFile
 {
     private File file;
     public YamlConfiguration cfg;
@@ -29,18 +29,18 @@ public class Datei
     /**
      * Constructor
      */
-    public Datei() { }
+    public SimpleFile() { }
 
     /**
      * Constructor
      * @param absolutePath Absolute file path for example: 'plugins\\Plugin\\others\\settings.yml'
      */
-    public Datei(String absolutePath)
+    public SimpleFile(String absolutePath)
     {
         //	Korrektur, falls beim Absoluten FilePath etwas falsch angegeben wird!
         absolutePath = absolutePath.replace("\\", "//");
 
-        //	Wenn die Datei nicht auf .yml endet, wird dies hinzugef�gt.
+        //	Wenn die SimpleFile nicht auf .yml endet, wird dies hinzugef�gt.
         if(!absolutePath.contains(".yml"))
         {
             absolutePath += ".yml";
@@ -57,7 +57,7 @@ public class Datei
      * Constructor
      * @param file File object.
      */
-    public Datei(@NotNull File file)
+    public SimpleFile(@NotNull File file)
     {
         this.file = file;
         this.cfg = new YamlConfiguration();
@@ -80,11 +80,11 @@ public class Datei
             //  Create the backup file...
             if(of_createBackupFromCurrentFile() == 1)
             {
-                Sys.of_sendErrorMessage(null, "Datei", invokerName, "Error while reading the following file: " + file.getAbsolutePath() + " - Backup file has been created. :)! We try to fix the current file...");
+                Sys.of_sendErrorMessage(null, "SimpleFile", invokerName, "Error while reading the following file: " + file.getAbsolutePath() + " - Backup file has been created. :)! We try to fix the current file...");
             }
             else
             {
-                Sys.of_sendErrorMessage(null, "Datei", invokerName, "Error while creating the backup file for the following file: " + file.getAbsolutePath() + " - Backup file could not be created. :(");
+                Sys.of_sendErrorMessage(null, "SimpleFile", invokerName, "Error while creating the backup file for the following file: " + file.getAbsolutePath() + " - Backup file could not be created. :(");
             }
         }
     }
@@ -344,7 +344,7 @@ public class Datei
         }
         catch (Exception e)
         {
-            Sys.of_sendErrorMessage(e, "Datei", "of_save(String)", "Error while saving the file!");
+            Sys.of_sendErrorMessage(e, "SimpleFile", "of_save(String)", "Error while saving the file!");
         }
 
         return -1;
@@ -378,7 +378,7 @@ public class Datei
                 }
                 catch (IOException e)
                 {
-                    Sys.of_sendErrorMessage(e, "Datei", "of_createBackupFromCurrentFile()", "Error while creating the backup file!");
+                    Sys.of_sendErrorMessage(e, "SimpleFile", "of_createBackupFromCurrentFile()", "Error while creating the backup file!");
                 }
             }
             //  If the file is empty...
@@ -406,7 +406,7 @@ public class Datei
         {
             if(object == null)
             {
-                Sys.of_sendErrorMessage(null, "Datei", "of_set(String, Object);", "The config-section-path is not valid! "+configKey);
+                Sys.of_sendErrorMessage(null, "SimpleFile", "of_set(String, Object);", "The config-section-path is not valid! "+configKey);
                 return;
             }
 
@@ -564,7 +564,7 @@ public class Datei
         int key = of_getSetInt("KeyCount", 0);
         key++;
 
-        of_save("Datei.of_getNextKey();");
+        of_save("SimpleFile.of_getNextKey();");
 
         return key;
     }

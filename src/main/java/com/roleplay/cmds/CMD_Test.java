@@ -1,16 +1,13 @@
 package com.roleplay.cmds;
 
 import com.basis.main.main;
-import com.basis.sys.Sys;
-import com.basis.utils.Datei;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Created 16.04.2022
@@ -33,7 +30,7 @@ public class CMD_Test implements CommandExecutor
                 {
                     Player p = ps.of_getPlayer();
 
-                    if(main.PERMISSIONBOARD.of_isAdmin(ps))
+                    if(PermissionBoard.of_getInstance().of_isAdmin(ps))
                     {
                         if(args.length == 0)
                         {

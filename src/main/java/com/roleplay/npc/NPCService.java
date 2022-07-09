@@ -2,6 +2,7 @@ package com.roleplay.npc;
 
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
+import com.basis.sys.Sys;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
@@ -49,7 +50,7 @@ public class NPCService extends Objekt
 
     public NPCService()
     {
-        _CONTEXT = new NPCContext();
+        _CONTEXT = new NPCContext("NPCContext", Sys.of_getMainFilePath() + "//NPCs//");
     }
 
     @Override
@@ -68,14 +69,14 @@ public class NPCService extends Objekt
      */
     public void of_showAllNPCs2Player(Spieler ps)
     {
-        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        if(_CONTEXT.of_getLoadedObjects() > 0)
         {
             Player p = ps.of_getPlayer();
 
             //  Create the connection and the packet.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
-            for(NPC npc : _CONTEXT.of_getLoadedNPCs())
+            for(NPC npc : (NPC[]) _CONTEXT.of_getAllObjects())
             {
                 //  Create the connection to the player-client to send the packets.
                 EntityPlayer entityPlayer = npc.of_getEntityNPC();
@@ -130,14 +131,14 @@ public class NPCService extends Objekt
      */
     public void of_removeAllNPCsFromPlayer(Spieler ps)
     {
-        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        if(_CONTEXT.of_getLoadedObjects() > 0)
         {
             Player p = ps.of_getPlayer();
 
             //  Create the connection and the packet.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
-            for(NPC npc : _CONTEXT.of_getLoadedNPCs())
+            for(NPC npc : (NPC[]) _CONTEXT.of_getAllObjects())
             {
                 //  Send the destory-packet.
                 connection.a(new PacketPlayOutEntityDestroy(npc.of_getEntityNPC().ae()));
@@ -150,7 +151,7 @@ public class NPCService extends Objekt
      */
     public void of_showAllNPCs2AllOnlinePlayers()
     {
-        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        if(_CONTEXT.of_getLoadedObjects() > 0)
         {
             for(Spieler ps : main.SPIELERSERVICE._CONTEXT.of_getAllPlayers())
             {
@@ -164,7 +165,7 @@ public class NPCService extends Objekt
      */
     public void of_removeAllNPCsFromAllOnlinePlayers()
     {
-        if(_CONTEXT.of_getLoadedNPCsSize() > 0)
+        if(_CONTEXT.of_getLoadedObjects() > 0)
         {
             for(Spieler ps : main.SPIELERSERVICE._CONTEXT.of_getAllPlayers())
             {

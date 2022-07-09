@@ -3,6 +3,7 @@ package com.roleplay.objects;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
+import com.roleplay.board.MessageBoard;
 import com.roleplay.spieler.Spieler;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public class CommandSet extends Objekt
         //  Replace all commands with player stats...
         for(int i = 0; i < size; i++)
         {
-            commands[i] = main.MESSAGEBOARD.of_translateMessageWithPlayerStats(commands[i], ps);
+            commands[i] = MessageBoard.of_getInstance().of_translateMessageWithPlayerStats(commands[i], ps);
         }
 
         //  Iterate through all commands:
@@ -173,7 +174,7 @@ public class CommandSet extends Objekt
                 main.SPIELERSERVICE.of_sendMessageByMessageId(ps, command);
                 return 1;
             case "PLAYSOUND":
-                main.MESSAGEBOARD.of_playSoundByKey(command, ps);
+                MessageBoard.of_getInstance().of_playSoundByKey(command, ps);
                 return 1;
             case "POS":
             case "POSITION":
