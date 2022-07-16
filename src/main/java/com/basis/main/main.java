@@ -3,9 +3,6 @@ package com.basis.main;
 import com.basis.extern.MySQL;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
-import com.roleplay.board.MessageBoard;
-import com.roleplay.board.PermissionBoard;
-import com.roleplay.board.ScoreBoard;
 import com.roleplay.cmds.*;
 import com.roleplay.events.ue_iblocks;
 import com.roleplay.events.ue_inventory;
@@ -16,8 +13,6 @@ import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
 import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
-import com.roleplay.manager.TablistManager;
-import com.roleplay.module.deathcmds.DeathCmdSet;
 import com.roleplay.npc.NPCService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
@@ -59,9 +54,6 @@ public class main extends JavaPlugin
     public static IBlockService IBLOCKSERVICE;
     public static PositionService POSITIONSERVICE;
 
-    //  Modules:
-    public static DeathCmdSet MODULE_DEATHCMDSET;
-
     /* ************************* */
     /* ENABLE */
     /* ************************* */
@@ -75,12 +67,12 @@ public class main extends JavaPlugin
     @Override
     public void onEnable()
     {
-        //	Initalize the plugin.
+        //	Initialize the plugin.
         PLUGIN = this;
         ib_reload = true;
 
         //  Check if the plugin is compatible with the version.
-        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.04", "plugins");
+        boolean lb_continue = Sys.of_isSystemVersionCompatible(PLUGIN.getName(), "22.1.0.05", "plugins");
 
         if(lb_continue)
         {

@@ -1,10 +1,8 @@
-package com.roleplay.module.deathcmds;
+package com.roleplay.module;
 
-import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.utils.SimpleFile;
-import com.roleplay.objects.CommandSet;
-import com.roleplay.spieler.Spieler;
+import com.roleplay.ancestor.MRSModule;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,11 +20,17 @@ import org.bukkit.event.player.PlayerRespawnEvent;
  * With it, you can define the commands that will be executed
  * when a player dies.
  */
-public class DeathCmdSet extends Objekt implements Listener
+public class ModuleDeathCmdSet extends MRSModule implements Listener
 {
     //  Attributes:
-    private String[] commandSet;
+    private static final ModuleDeathCmdSet instance = new ModuleDeathCmdSet();
     private boolean ib_cmdSetOnRespawn;
+
+    /* ************************************* */
+    /* CONSTRUCTOR */
+    /* ************************************* */
+
+    private ModuleDeathCmdSet() { }
 
     /* ************************************* */
     /* LOADER // EVENT-LOADER */
@@ -34,47 +38,31 @@ public class DeathCmdSet extends Objekt implements Listener
 
     /**
      * This function is used to load module specified parameters to this object.
-     * @param simpleFile The file-object where the module-settings will be saved/loaded to/from.
      * @return 1 = OK, -1 = Error
      */
-    public int of_load(SimpleFile simpleFile)
+    public int of_load()
     {
+        SimpleFile sf = of_getConfig();
+
         //  Load module specified data.
-        ib_cmdSetOnRespawn = simpleFile.of_getSetBoolean("OnlyOnRespawn", false);
-        commandSet = simpleFile.of_getSetStringArray("CommandSet", new String[] {"CHATCLEAR","POS=respawn_location.yml", "TEXTBLOCK=txt_death_message.yml"});
-
-        if(!simpleFile.of_fileExists())
-        {
-            simpleFile.of_save("DeathCmdSet.of_load();");
-        }
-
-        //  Register this object-class as additional event-listeners.
-        return of_loadEvents();
+        ib_cmdSetOnRespawn = sf.of_getSetBoolean("OnlyOnRespawn", false);
+        of_setCommandSet(sf.of_getSetStringArray("CommandSet", new String[] {"CHATCLEAR","POS=respawn_location.yml", "TEXTBLOCK=txt_death_message.yml"}));
+        return 1;
     }
 
     /**
      * This method is used to register object specified events.
      * @return 1 = OK, -1 = An error occurred.
      */
-    private int of_loadEvents()
+    public int of_loadEvents()
     {
-        String errorMessage = of_validate();
-
-        //  Only continue when no error has been found...
-        if(errorMessage == null)
+        try
         {
-            try
-            {
-                Bukkit.getPluginManager().registerEvents(this, main.PLUGIN);
-                return 1;
-            }
-            catch (Exception e)
-            {
-                errorMessage = e.getMessage();
-            }
+            Bukkit.getPluginManager().registerEvents(this, main.PLUGIN);
+            return 1;
         }
+        catch (Exception ignored) { }
 
-        of_sendErrorMessage(null, "DeathCmdSet.of_load();", "Error while enabling the DeathCommandSet-Module: " + errorMessage);
         return -1;
     }
 
@@ -97,7 +85,7 @@ public class DeathCmdSet extends Objekt implements Listener
             if(((p.getHealth() - e.getDamage()) <= 0) && !of_isUsingCommandSetOnlyOnRespawn())
             {
                 e.setCancelled(true);
-                of_executeCommandSet4Player(p);
+                of_executeDefinedCommandSets4Player(main.SPIELERSERVICE._CONTEXT.of_getPlayer(p.getName()));
             }
         }
     }
@@ -117,7 +105,7 @@ public class DeathCmdSet extends Objekt implements Listener
             if(((p.getHealth() - e.getFinalDamage()) <= 0) && !of_isUsingCommandSetOnlyOnRespawn())
             {
                 e.setCancelled(true);
-                of_executeCommandSet4Player(p);
+                of_executeDefinedCommandSets4Player(main.SPIELERSERVICE._CONTEXT.of_getPlayer(p.getName()));
             }
         }
     }
@@ -131,7 +119,7 @@ public class DeathCmdSet extends Objekt implements Listener
     {
         if(of_isUsingCommandSetOnlyOnRespawn())
         {
-            of_executeCommandSet4Player(e.getPlayer());
+            of_executeDefinedCommandSets4Player(main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName()));
         }
     }
 
@@ -139,28 +127,14 @@ public class DeathCmdSet extends Objekt implements Listener
     /* OBJECT METHODS */
     /* ************************************* */
 
-    private void of_executeCommandSet4Player(Player p)
-    {
-        if(p != null)
-        {
-            Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(p.getName());
-
-            if(ps != null)
-            {
-                new CommandSet(commandSet, ps).of_executeAllCommands();
-            }
-        }
-    }
-
     @Override
     public String of_validate()
     {
-        if(commandSet == null)
+        if(of_getCommandSets() == null)
         {
             return "The CommandSet is null!";
         }
-
-        if(commandSet.length == 0)
+        else if(of_getCommandSets().length == 0)
         {
             return "The CommandSet is empty!";
         }
@@ -171,6 +145,11 @@ public class DeathCmdSet extends Objekt implements Listener
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
+
+    public static ModuleDeathCmdSet of_getInstance()
+    {
+        return instance;
+    }
 
     public boolean of_isUsingCommandSetOnlyOnRespawn()
     {

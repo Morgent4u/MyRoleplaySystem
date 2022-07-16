@@ -1,5 +1,6 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.PermissionBoard;
@@ -23,7 +24,7 @@ import java.util.List;
  * @Description
  * This command is used to accept the data protection.
  */
-public class CMD_DataProtection implements CommandExecutor, TabCompleter
+public class CMD_DataProtection extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -60,18 +61,39 @@ public class CMD_DataProtection implements CommandExecutor, TabCompleter
                         {
                             if(args[0].equalsIgnoreCase("accept"))
                             {
-                                //  Allow the player to move.
-                                ps.of_setBlockedMoving(false);
+                                //  Check if the player is whitelisted.
+                                String whitelisted_yn = main.SQL.of_getRowValue_suppress("SELECT whitelist_yn FROM mrs_user WHERE user = " + ps.of_getObjectId() + ";", "whitelist_yn");
 
-                                // Add the necessary attributes to the InternList.
-                                main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "DataProtection", Sys.of_getTimeStamp(true));
-                                main.SPIELERSERVICE.of_addDataEntry4PlayerInternList(ps, "IPLink", ps.of_getPlayerIPAsString());
+                                if(whitelisted_yn != null)
+                                {
+                                    int rc = -1;
 
-                                //  Send the accept message...
-                                new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection_accepted"}, ps).of_executeAllCommands();
+                                    if(whitelisted_yn.equals("N"))
+                                    {
+                                        //  Check for the double-ip-address.
+                                        rc = main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+                                    }
 
-                                // Check if the player has already played before.
-                                main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
+                                    if(rc == -1)
+                                    {
+                                        //  Allow the player to move.
+                                        ps.of_setBlockedMoving(false);
+
+                                        // Add the necessary attributes to the database.
+                                        main.SPIELERSERVICE.of_addEntry2UserData(ps, "dataProtectionTime", main.SQL.of_getTimeStamp());
+                                        main.SPIELERSERVICE.of_addEntry2UserData(ps, "dataProtection_yn", "Y");
+                                        main.SPIELERSERVICE.of_addEntry2UserData(ps, "ipAddress", ps.of_getPlayerIPAsString());
+
+                                        //  Send the accept message...
+                                        new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection_accepted"}, ps).of_executeAllCommands();
+                                        return true;
+                                    }
+                                }
+
+                                if(p.isOnline())
+                                {
+                                    main.SPIELERSERVICE.of_sendErrorMessage(ps, "There was an error by updating your data-protection-agreement.");
+                                }
                             }
                         }
 
@@ -93,6 +115,9 @@ public class CMD_DataProtection implements CommandExecutor, TabCompleter
 
         return false;
     }
+
+    @Override
+    public void of_sendCMDHelperText(Player p) { /* Do not implement code in here! */ }
 
     /* ************************* */
     /* TAB COMPLETE */

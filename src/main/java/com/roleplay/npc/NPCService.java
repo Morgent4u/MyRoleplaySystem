@@ -76,51 +76,62 @@ public class NPCService extends Objekt
             //  Create the connection and the packet.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
-            for(NPC npc : (NPC[]) _CONTEXT.of_getAllObjects())
+            Objekt[] objects = _CONTEXT.of_getAllObjects();
+
+            if(objects != null && objects.length > 0)
             {
-                //  Create the connection to the player-client to send the packets.
-                EntityPlayer entityPlayer = npc.of_getEntityNPC();
-
-                //  Create the Team which is used to hide the NameTag and the DataWatcher to build the full skin of the NPC.
-                ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard()).getHandle(), p.getName());
-                DataWatcher watcher = new DataWatcher(entityPlayer);
-
-                //  Disallow the NameTagVisibility of the team.
-                team.a(ScoreboardTeamBase.EnumNameTagVisibility.b);
-                //  DataWatcher is needed to build the full skin of the NPC.
-                watcher.a(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
-
-                //  This packet adds the NPC to the player.
-                connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer));
-                //  This packet shows the NPC to the player.
-                connection.a(new PacketPlayOutNamedEntitySpawn((EntityHuman) entityPlayer));
-                //  This packet corrects the NPC-head rotation.
-                connection.a(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (npc.of_getLocation().getYaw() * 256 / 360)));
-                //  This packet is used to build the full skin of the NPC.
-                connection.a(new PacketPlayOutEntityMetadata(entityPlayer.ae(), watcher, false));
-
-                //  Remove the NameTag of the NPC.
-                PacketPlayOutScoreboardTeam teamPacket1 = PacketPlayOutScoreboardTeam.a(team);
-                PacketPlayOutScoreboardTeam teamPacket2 = PacketPlayOutScoreboardTeam.a(team, true);
-                PacketPlayOutScoreboardTeam teamPacket3 = PacketPlayOutScoreboardTeam.a(team, entityPlayer.getBukkitEntity().getName(), PacketPlayOutScoreboardTeam.a.a);
-
-                //  Send the packets which hide the NameTag of the NPC.
-                connection.a(teamPacket1);
-                connection.a(teamPacket2);
-                connection.a(teamPacket3);
-
-                //  Remove the NPC-Name from the tab-list.
-                new BukkitRunnable()
+                for(Objekt objekt : objects)
                 {
-
-                    @Override
-                    public void run()
+                    if(objekt instanceof NPC)
                     {
-                        //  This packet must be sent a little later is used to remove then npc-name from the tab-list.
-                        connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer));
-                    }
+                        //  Parse the object to a NPC-object.
+                        NPC npc = (NPC) objekt;
 
-                }.runTaskLater(main.PLUGIN, 20L);
+                        //  Create the connection to the player-client to send the packets.
+                        EntityPlayer entityPlayer = npc.of_getEntityNPC();
+
+                        //  Create the Team which is used to hide the NameTag and the DataWatcher to build the full skin of the NPC.
+                        ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard()).getHandle(), p.getName());
+                        DataWatcher watcher = new DataWatcher(entityPlayer);
+
+                        //  Disallow the NameTagVisibility of the team.
+                        team.a(ScoreboardTeamBase.EnumNameTagVisibility.b);
+                        //  DataWatcher is needed to build the full skin of the NPC.
+                        watcher.a(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
+
+                        //  This packet adds the NPC to the player.
+                        connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer));
+                        //  This packet shows the NPC to the player.
+                        connection.a(new PacketPlayOutNamedEntitySpawn((EntityHuman) entityPlayer));
+                        //  This packet corrects the NPC-head rotation.
+                        connection.a(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (npc.of_getLocation().getYaw() * 256 / 360)));
+                        //  This packet is used to build the full skin of the NPC.
+                        connection.a(new PacketPlayOutEntityMetadata(entityPlayer.ae(), watcher, false));
+
+                        //  Remove the NameTag of the NPC.
+                        PacketPlayOutScoreboardTeam teamPacket1 = PacketPlayOutScoreboardTeam.a(team);
+                        PacketPlayOutScoreboardTeam teamPacket2 = PacketPlayOutScoreboardTeam.a(team, true);
+                        PacketPlayOutScoreboardTeam teamPacket3 = PacketPlayOutScoreboardTeam.a(team, entityPlayer.getBukkitEntity().getName(), PacketPlayOutScoreboardTeam.a.a);
+
+                        //  Send the packets which hide the NameTag of the NPC.
+                        connection.a(teamPacket1);
+                        connection.a(teamPacket2);
+                        connection.a(teamPacket3);
+
+                        //  Remove the NPC-Name from the tab-list.
+                        new BukkitRunnable()
+                        {
+
+                            @Override
+                            public void run()
+                            {
+                                //  This packet must be sent a little later is used to remove then npc-name from the tab-list.
+                                connection.a(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer));
+                            }
+
+                        }.runTaskLater(main.PLUGIN, 20L);
+                    }
+                }
             }
         }
     }
@@ -138,10 +149,18 @@ public class NPCService extends Objekt
             //  Create the connection and the packet.
             PlayerConnection connection = ((CraftPlayer) p).getHandle().b;
 
-            for(NPC npc : (NPC[]) _CONTEXT.of_getAllObjects())
+            Objekt[] objects = _CONTEXT.of_getAllObjects();
+
+            if(objects != null && objects.length > 0)
             {
-                //  Send the destory-packet.
-                connection.a(new PacketPlayOutEntityDestroy(npc.of_getEntityNPC().ae()));
+                for(Objekt object : objects)
+                {
+                    if(object instanceof NPC)
+                    {
+                        NPC npc = (NPC) object;
+                        connection.a(new PacketPlayOutEntityDestroy(npc.of_getEntityNPC().ae()));
+                    }
+                }
             }
         }
     }

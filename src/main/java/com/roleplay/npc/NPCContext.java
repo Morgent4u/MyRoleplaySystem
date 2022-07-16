@@ -223,11 +223,21 @@ public class NPCContext extends ObjektContext
     @Override
     public Objekt of_getObjectById(int objectId)
     {
-        for(NPC npc : (NPC[]) of_getAllObjects())
+        Objekt[] objects = main.NPCSERVICE._CONTEXT.of_getAllObjects();
+
+        if(objects != null && objects.length > 0)
         {
-            if(npc.of_getEntityId() == objectId)
+            for(Objekt objekt : objects)
             {
-                return npc;
+                if(objekt instanceof NPC)
+                {
+                    NPC npc = (NPC) objekt;
+
+                    if(npc.of_getEntityId() == objectId)
+                    {
+                        return npc;
+                    }
+                }
             }
         }
 

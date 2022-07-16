@@ -1,10 +1,10 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @Description
  * This command is used to test some functions of the plugin.
  */
-public class CMD_Test implements CommandExecutor
+public class CMD_Test extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -96,5 +96,11 @@ public class CMD_Test implements CommandExecutor
         }
 
         return false;
+    }
+
+    @Override
+    public void of_sendCMDHelperText(Player p)
+    {
+        p.sendMessage("§c/Test");
     }
 }

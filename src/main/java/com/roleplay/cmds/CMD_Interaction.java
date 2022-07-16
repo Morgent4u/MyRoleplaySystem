@@ -1,5 +1,6 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.objects.CommandSet;
@@ -17,9 +18,8 @@ import org.jetbrains.annotations.NotNull;
  * This command is used to translate the attributes from the command into
  * a CommandSet which can be executed.
  */
-public class CMD_Interaction implements CommandExecutor
+public class CMD_Interaction extends CMDExecutor
 {
-
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
     {
@@ -82,4 +82,7 @@ public class CMD_Interaction implements CommandExecutor
 
         return false;
     }
+
+    @Override
+    public void of_sendCMDHelperText(Player p){ /* Do not implement code in here! */ }
 }

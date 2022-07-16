@@ -1,5 +1,7 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.PermissionBoard;
@@ -26,7 +28,7 @@ import java.util.List;
  * This command is used to create, edit or delete a hologram.
  * A hologram can only be created by an admin.
  */
-public class CMD_Hologram implements CommandExecutor, TabCompleter
+public class CMD_Hologram extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -50,10 +52,9 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  Get all current loaded holograms and send a list into the players chat.
-                                Hologram[] holos = (Hologram[]) main.HOLOGRAMSERVICE._CONTEXT.of_getAllObjects();
-                                int size = holos.length;
+                                Objekt[] objects = main.HOLOGRAMSERVICE._CONTEXT.of_getAllObjects();
 
-                                if(size > 0)
+                                if(objects != null && objects.length > 0)
                                 {
                                     //  Messages
                                     p.sendMessage("§7═════════════════════════");
@@ -61,9 +62,13 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
                                     p.sendMessage("§8[§4§lHologram - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9TeleportId - DisplayName");
-                                    for(Hologram holo : holos)
+                                    for(Objekt objekt : objects)
                                     {
-                                        p.sendMessage("§f" + holo.of_getObjectId() + " §8- §7" + holo.of_getHologramTitles().get(0).replace("&", "§"));
+                                        if(objekt instanceof Hologram)
+                                        {
+                                            Hologram holo = (Hologram) objekt;
+                                            p.sendMessage("§f" + holo.of_getObjectId() + " §8- §7" + holo.of_getHologramTitles().get(0).replace("&", "§"));
+                                        }
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
@@ -377,8 +382,8 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
     /* SEND CMD-HELPER */
     /* ************************* */
 
-    //  Send the default CMD-HelperText if some command arguments are wrong.
-    private void of_sendCMDHelperText(Player p)
+    @Override
+    public void of_sendCMDHelperText(Player p)
     {
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");
@@ -408,17 +413,15 @@ public class CMD_Hologram implements CommandExecutor, TabCompleter
 
         if(id != -1)
         {
-            Hologram holo = (Hologram) main.HOLOGRAMSERVICE._CONTEXT.of_getObjectById(id);
+            Objekt object = main.HOLOGRAMSERVICE._CONTEXT.of_getObjectById(id);
 
-            if(holo != null)
+            if(object instanceof Hologram)
             {
-                return holo;
+                return (Hologram) object;
             }
-            //  If the hologram does not exist.
-            else
-            {
-                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram with the id §f" + id + " §cis not found.");
-            }
+
+            //  If the hologram-object could not be found.
+            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cHologram with the id §f" + id + " §cis not found.");
         }
         // An invalid id has been entered.
         else

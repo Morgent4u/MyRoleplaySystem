@@ -128,8 +128,8 @@ public class MessageBoard extends Objekt
         textBlock.of_addMessage2Block("§8[§4§lDouble IP-Address§8]");
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§d%p%§f, our system has detect that");
-        textBlock.of_addMessage2Block("§fyou are using the same §eIP-Address");
-        textBlock.of_addMessage2Block("§fas §c%otherPlayer%" + "§f.");
+        textBlock.of_addMessage2Block("§fyou already have played before on another");
+        textBlock.of_addMessage2Block("§cminecraft-account§f.");
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§fTo get a §awhitelist§f please contact");
         textBlock.of_addMessage2Block("§four staff members.");
@@ -154,6 +154,35 @@ public class MessageBoard extends Objekt
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§fIf your death was caused by a");
         textBlock.of_addMessage2Block("§fbug, please report it to us.");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        //  Database no connection error:
+        textBlock = new TextBlock("txt_kick_player_no_db_connection");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lDatabase connection§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fHey §d%p%§f we are sorry");
+        textBlock.of_addMessage2Block("§fthat we kicked you but there");
+        textBlock.of_addMessage2Block("§fwas an error while establishing the");
+        textBlock.of_addMessage2Block("§fdatabase connection!");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        //  A general db error.
+        textBlock = new TextBlock("txt_kick_player_db_error");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lDatabase error§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fHey §d%p%§f we are sorry");
+        textBlock.of_addMessage2Block("§fthat we kicked you but there");
+        textBlock.of_addMessage2Block("§fwas a fatal database-error!");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§c%errorMessage%");
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§7═════════════════════════");
         textBlock.of_save("MessageBoard.of_loadTextBlocks();");
@@ -209,7 +238,7 @@ public class MessageBoard extends Objekt
         //  Check for the DataProtectionDate...
         if(message.contains("%dataProtectionDate%"))
         {
-            String dataProtectionDate = main.SPIELERSERVICE.of_getPlayerInternListData(ps, "DataProtection");
+            String dataProtectionDate = main.SPIELERSERVICE.of_getEntryFromUserData(ps, "dataProtectionTime");
 
             if(dataProtectionDate != null)
             {
@@ -231,10 +260,11 @@ public class MessageBoard extends Objekt
         //  Check for the last Position-Object:
         if(ps.of_getPositionId() > 0)
         {
-            Position position = (Position) main.POSITIONSERVICE._CONTEXT.of_getObjectById(ps.of_getObjectId());
+            Objekt object = main.POSITIONSERVICE._CONTEXT.of_getObjectById(ps.of_getPositionId());
 
-            if(position != null)
+            if(object instanceof Position)
             {
+                Position position = (Position) object;
                 message = message.replace("%pos%", position.of_getPositionName());
                 message = message.replace("%position%", position.of_getPositionName());
             }

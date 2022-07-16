@@ -1,5 +1,7 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.utils.Settings;
 import com.roleplay.board.PermissionBoard;
@@ -21,7 +23,7 @@ import java.util.*;
  * This command is used to interact with IBlocks.
  * It also allows creating or delete IBlocks.
  */
-public class CMD_IBlock implements CommandExecutor, TabCompleter
+public class CMD_IBlock extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -58,18 +60,22 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
 
                             if(first.equalsIgnoreCase("list"))
                             {
-                                IBlock[] iblocks = (IBlock[]) main.IBLOCKSERVICE._CONTEXT.of_getAllObjects();
+                                Objekt[] objects = main.IBLOCKSERVICE._CONTEXT.of_getAllObjects();
 
-                                if(iblocks != null && iblocks.length > 0)
+                                if(objects != null && objects.length > 0)
                                 {
                                     p.sendMessage("§7═════════════════════════");
                                     p.sendMessage("");
                                     p.sendMessage("§8[§4§lIBlock - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9Id §f-§9 Name");
-                                    for (IBlock iblock : iblocks)
+                                    for(Objekt object : objects)
                                     {
-                                        p.sendMessage("§a" + iblock.of_getObjectId() + " §f- §a" + iblock.of_getInfo());
+                                        if(object instanceof IBlock)
+                                        {
+                                            IBlock iblock = (IBlock) object;
+                                            p.sendMessage("§a" + iblock.of_getObjectId() + " §f- §a" + iblock.of_getInfo());
+                                        }
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
@@ -168,7 +174,7 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
                         }
 
                         //  Send the default help-text.
-                        of_sendCMDHelperText(ps);
+                        of_sendCMDHelperText(p);
                     }
                     //  No permission
                     else
@@ -193,10 +199,9 @@ public class CMD_IBlock implements CommandExecutor, TabCompleter
     /* SEND CMD-HELPER */
     /* ************************* */
 
-    private void of_sendCMDHelperText(Spieler ps)
+    @Override
+    public void of_sendCMDHelperText(Player p)
     {
-        Player p = ps.of_getPlayer();
-
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");
         p.sendMessage("§8[§4§lIBlock - Help§8]");

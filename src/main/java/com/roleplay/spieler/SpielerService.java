@@ -3,7 +3,6 @@ package com.roleplay.spieler;
 import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
-import com.basis.utils.SimpleFile;
 import com.basis.utils.Settings;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.board.ScoreBoard;
@@ -240,67 +239,21 @@ public class SpielerService extends Objekt
      */
     public int of_playerHasDoubleIPAddress(Spieler ps)
     {
-        // We can only check the IP if the DataProtection has been accepted.
-        if(of_hasAlreadyAcceptedDataProtection(ps))
+        String currentUUID = ps.of_getUUID();
+        String otherUUID = main.SQL.of_getRowValue_suppress("SELECT uuid FROM mrs_v_user WHERE ipAddress = '"+ps.of_getPlayerIPAsString()+"';", "uuid");
+
+        if(currentUUID != null && otherUUID != null)
         {
-            // Get the IP of the player.
-            String ipAddress = ps.of_getPlayerIPAsString();
-            SimpleFile ipFile = _CONTEXT.of_getPlayerIPFile(ps);
-
-            if(!ipFile.of_fileExists())
+            //  If the UUIDs does not match, we kick the player!
+            if(!currentUUID.equals(otherUUID))
             {
-                // The file does not exist.
-                // Create the file and write the IP into it.
-                ipFile.of_set("UUID", ps.of_getUUID());
-                ipFile.of_set("IP", ipAddress);
-                ipFile.of_set("InsertTime", of_getPlayerInternListData(ps, "DataProtection"));
-                ipFile.of_save("SpielerContext.of_check4DoubleIPAddresses();");
-            }
-
-            String realUUID = ipFile.of_getString("UUID");
-
-            //  Check if the UUID and InsertTime match with the UserFile.
-            if(!of_getPlayerInternListData(ps, "DataProtection").equals(ipFile.of_getString("InsertTime")) || !ps.of_getUUID().equals(realUUID))
-            {
-                // Get the File of the player which is stored as the "real"-player.
-                SimpleFile realUser = _CONTEXT.of_getPlayerFileByUUID(realUUID);
-
-                if(realUser.of_fileExists())
-                {
-                    TextBlock textBlock = new TextBlock("txt_double_ipaddress", ps);
-                    String otherPlayer = realUser.of_getString("Player.Name");
-                    textBlock.of_addPlaceholder2TextBlock("%otherPlayer%", otherPlayer);
-
-                    //  Get the translated TextBlock.
-                    String[] messages = textBlock.of_getTranslatedTextBlockLines();
-
-                    //  Check if the messages are valid.
-                    if(messages == null || messages.length == 0)
-                    {
-                        messages = new String[] {"You have already used this IP address. Player: " + otherPlayer};
-                    }
-
-                    // Build the kickmessage...
-                    StringBuilder kickMessage = new StringBuilder();
-
-                    for(String message : messages)
-                    {
-                        kickMessage.append(message).append("\n");
-                    }
-
-                    //  Kick the player...
-                    ps.of_getPlayer().kickPlayer(kickMessage.toString());
-                    return 1;
-                }
-                //  An error occurred.
-                else
-                {
-                    Sys.of_sendErrorMessage(null, "SpielerService", "of_check4DoubleIPAddresses();", "The player file does not exist. The IPLink file is not valid.");
-                }
+                //  Kick the player by the defined text-block-object!
+                of_kickPlayerByUsingTextBlock(ps,  new TextBlock("txt_double_ipaddress", ps), "You have already used this IP address.");
+                return 1;
             }
         }
 
-        return  -1;
+        return -1;
     }
 
     /**
@@ -413,40 +366,91 @@ public class SpielerService extends Objekt
         }
     }
 
+
+    /**
+     * This method is used to kick the given player by using a defined text-block.
+     * If no text-block has been defined or an error occurs by the text-block it will use
+     * the defined default-message as fall-back!
+     * @param ps Player instance.
+     * @param text TextBlock object instance.
+     * @param defaultMessage4NoTextBlock Default fall-back message if the text-block is not valid!
+     */
+    public void of_kickPlayerByUsingTextBlock(Spieler ps, TextBlock text, String defaultMessage4NoTextBlock)
+    {
+        String[] messages = null;
+
+        //  Check if the text-block is valid!
+        if(text != null && !text.of_hasAnError())
+        {
+            messages = text.of_getTranslatedTextBlockLines();
+        }
+
+        //  Check if the messages are valid.
+        if(messages == null || messages.length == 0)
+        {
+            messages = new String[] {defaultMessage4NoTextBlock};
+        }
+
+        //  Build the kick-message!
+        StringBuilder kickMessage = new StringBuilder();
+
+        for(String message : messages)
+        {
+            kickMessage.append(message).append("\n");
+        }
+
+        //  Kick the player...
+        ps.of_getPlayer().kickPlayer(kickMessage.toString());
+    }
+
+    /**
+     * This method is used to kick the player by any database-error.
+     * The defined error-message will be used in the defined text-block
+     * 'txt_kick_player_db_error'.
+     * @param ps Player instance.
+     * @param errorMessage The db-error message.
+     */
+    public void of_kickPlayerByDatabaseError(Spieler ps, String errorMessage)
+    {
+        TextBlock text = new TextBlock("txt_kick_player_db_error", ps);
+        text.of_addPlaceholder2TextBlock("%errorMessage%", errorMessage);
+        of_kickPlayerByUsingTextBlock(ps, text, "A general database error occurred. We are sorry that we kicked you!");
+    }
+
     /* ************************************* */
     /* ADDER // SETTER // REMOVER */
     /* ************************************* */
 
     /**
-     * This function is used to add an entryKey and a value to the player InternList.
+     * This method is used to update user-data in the table mrs_user_data.
      * @param ps Player instance.
-     * @param entryKey The entryKey for example: 'IPLink'.
-     * @param entryValue The value for example: '/192.168.43.122'.
+     * @param columnName Column-name in which the value should be updated.
+     * @param entryValue The value which should be updated in the given column.
      */
-    public void of_addDataEntry4PlayerInternList(Spieler ps, String entryKey, String entryValue)
+    public void of_addEntry2UserData(Spieler ps, String columnName, Object entryValue)
     {
-        // Get the user file.
-        SimpleFile user = _CONTEXT.of_getPlayerFile(ps);
-        user.of_getSetString("System.InternList." + entryKey, entryValue);
+        String entryValueString = null;
 
-        //  Save the changes.
-        user.of_save("SpielerService.of_addDataEntry4PlayerInternList(); Adding the EntryKey to the InternList. EntryKey: " + entryKey + " EntryValue: " + entryValue);
+        //  Check for the specified entry-value-type.
+        if(entryValue instanceof Double || entryValue instanceof Integer || entryValue.toString().equals(main.SQL.of_getTimeStamp()))
+        {
+            entryValueString = entryValue.toString();
+        }
+        else
+        {
+            entryValueString = "'"+entryValue.toString()+"'";
+        }
+
+        main.SQL.of_run_update("UPDATE mrs_user_data SET " + columnName + " = " + entryValueString + " WHERE user = " + ps.of_getObjectId() + ";");
     }
 
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
 
-    /**
-     * This function is used to get a specific player data from the InternList.
-     * The InternList is used to check for example if the player has already accepted the data protection.
-     * @param ps Own instance of the player (Spieler).
-     * @param entryKey The value of the entry. (e.g. "IPLink")
-     * @return The value of the entry or null if the entry is not given.
-     */
-    public String of_getPlayerInternListData(Spieler ps, String entryKey)
+    public String of_getEntryFromUserData(Spieler ps, String columnName)
     {
-        return _CONTEXT.of_getPlayerFile(ps).of_getString("System.InternList." + entryKey);
+        return main.SQL.of_getRowValue_suppress("SELECT " + columnName + " FROM mrs_user_data WHERE user = " + ps.of_getObjectId() + ";", columnName);
     }
 
     /* ************************************* */
@@ -455,11 +459,6 @@ public class SpielerService extends Objekt
 
     public boolean of_hasAlreadyAcceptedDataProtection(Spieler ps)
     {
-        return of_getPlayerInternListData(ps, "DataProtection") != null;
-    }
-
-    public boolean of_hasAlreadyIPLink(Spieler ps)
-    {
-        return of_getPlayerInternListData(ps, "IPLink") != null;
+        return of_getEntryFromUserData(ps, "dataProtection_yn").equals("Y");
     }
 }

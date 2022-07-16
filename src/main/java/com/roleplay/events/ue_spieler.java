@@ -33,29 +33,6 @@ public class ue_spieler implements Listener
 
         if(ps != null)
         {
-            boolean lb_sendText4DataProtection = !( main.SPIELERSERVICE.of_hasAlreadyAcceptedDataProtection(ps) || main.SPIELERSERVICE.of_hasAlreadyIPLink(ps) );
-
-            if(lb_sendText4DataProtection && Settings.of_getInstance().of_isUsingDataProtection())
-            {
-                //  Disallow the player to move.
-                ps.of_setBlockedMoving(true);
-
-                //  Send the textBlock for the dataProtection agreement.
-                new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection"}, ps).of_executeAllCommands();
-            }
-            //  Check for the IP...
-            else
-            {
-                // Check if the player has already played before.
-                int rc = main.SPIELERSERVICE.of_playerHasDoubleIPAddress(ps);
-
-                //  Stop, when the player has been kicked...
-                if(rc == 1)
-                {
-                    return;
-                }
-            }
-
             //  Check for the NPCs...
             if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
             {

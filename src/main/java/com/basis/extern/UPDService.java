@@ -23,16 +23,16 @@ import java.util.Arrays;
 public class UPDService extends Objekt
 {
     //  Attributs:
-    File file;
-    ArrayList<String> sqlStatements = new ArrayList<String>();
+    private File file;
+    private ArrayList<String> sqlStatements = new ArrayList<>();
 
-    int lowestDbVersion;
-    int highestDbVersion;
+    private int lowestDbVersion;
+    private int highestDbVersion;
 
-    int sqlExecutions;
-    int sqlErrors;
-    int sqlSkipped;
-    int sqlStatementSize;
+    private int sqlExecutions;
+    private int sqlErrors;
+    private int sqlSkipped;
+    private int sqlStatementSize;
 
     /* ************************* */
     /* CONSTRUCTOR */
@@ -45,8 +45,29 @@ public class UPDService extends Objekt
     public UPDService(String searchDirectory)
     {
         //  Search path...
-        searchDirectory = searchDirectory + "//UPD//2022UPD_" + Sys.of_getPaket() + ".upd";
+        searchDirectory = searchDirectory + "//UPD//UPD_" + Sys.of_getPaket() + ".upd";
         file = new File(searchDirectory);
+
+        if(!file.exists())
+        {
+            String errorMessage = null;
+            boolean fileCreated = false;
+
+            try
+            {
+                fileCreated = file.createNewFile();
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.getMessage();
+            }
+
+            //  If the file could not be created, we send a debug-message.
+            if(!fileCreated)
+            {
+                of_sendErrorMessage(null, "UPDService.constructor()", "The UPD-File could not be created!\n" + errorMessage);
+            }
+        }
     }
 
     /* ************************* */
@@ -65,7 +86,7 @@ public class UPDService extends Objekt
             //  Load the file...
             try
             {
-                //  FileReader und BufferReader initialisieren!
+                //  Initialize the BufferedReader...
                 FileReader reader = new FileReader(file);
                 BufferedReader bufferReader = new BufferedReader(reader);
 
@@ -73,17 +94,15 @@ public class UPDService extends Objekt
                 String line;
                 String flagPattern = "=UPD_VERSION_NUMBER=";
 
-                //  Jede Zeile einlesen...
+                //  We read each line of the current file...
                 while((line = bufferReader.readLine()) != null)
                 {
                     if(!line.isEmpty())
                     {
-                        //  Wenn ein SQL-Statement gefunden wird oder die UPD-Versions-Nummer, darf
-                        //  dieses Statement hinzugefügt werden.
+                        //  We only add the SQL-Statement if it is a SQL-Statement or the UPD-Version-Number.
                         if(line.startsWith("-- UPDv=") || !line.startsWith("--"))
                         {
-                            //  Wenn es eine UPD-Versions-Nummer ist, eine Markierung setzen um beim auseinander parsen
-                            //  zu wissen, was der SQL-Statement Anteil und was der UPD-Versions-Nummern Anteil ist!
+                            //  If it's UPD-Version-Number we set a flag to know what is the SQL-Statement and what is the UPD-Version-Number.
                             if(line.startsWith("-- UPDv="))
                             {
                                 sqlStatementsInFile.append(line).append(flagPattern);
@@ -96,9 +115,7 @@ public class UPDService extends Objekt
                     }
                 }
 
-                //  Nach dem Zusammenbauen der gesamten UPD-File nun die SQL-Statements und die
-                //  UPD-Versions-Nummern in der richtigen Reihenfolge auslesen und zur ArrayList hinzufügen.
-
+                //  We split the SQL-Statements and the UPD-Version-Numbers...
                 String[] sqlStmts = sqlStatementsInFile.toString().split(";");
                 int noSqlStatements = 0;
 
@@ -106,12 +123,12 @@ public class UPDService extends Objekt
                 {
                     for (String sqlStmt : sqlStmts)
                     {
-                        //  Wenn es ein UPD-Version-Kennzeichen ist...
+                        //  If it's a UPD-Version-Number...
                         if(sqlStmt.contains(flagPattern))
                         {
                             String[] splitSQLParts = sqlStmt.split(flagPattern);
 
-                            //  Es muss die Länge 2 haben, ansonsten wurde ein falsches Flagkennzeichen gesetzt!
+                            //  It needs to be a length of 2, otherwise the wrong flag was set!
                             if(splitSQLParts.length == 2)
                             {
                                 //  UPD-Version
@@ -129,7 +146,7 @@ public class UPDService extends Objekt
                     }
                 }
 
-                //  Anzahl der SQL-Statements setzen...
+                //  Set the SQL-Statement size...
                 if(sqlStatements.size() > 0 && noSqlStatements < sqlStatements.size())
                 {
                     sqlStatementSize = sqlStatements.size() - noSqlStatements;
@@ -154,7 +171,7 @@ public class UPDService extends Objekt
     }
 
     /* ************************* */
-    /* OBJEKT-ANWEISUNGEN */
+    /* OBJECT METHODS */
     /* ************************* */
 
     /**
@@ -166,7 +183,7 @@ public class UPDService extends Objekt
     {
         if(sqlStatements.size() != 0)
         {
-            //  SQL-StatementSize anheben, da das Aktualisieren der DB auch als ein SQL-UPD gewertet wird!
+            //  We need to increase the SQL-StatementSize, because the update of the DB is also a SQL-UPD!
             sqlStatementSize++;
             int currentUPDVersionNumber = -1;
             int executedSQLCounter = 0;
@@ -174,21 +191,15 @@ public class UPDService extends Objekt
 
             of_sendMessage("========= UPD-Service ("+sqlStatementSize+") =========");
 
-            //  Iterate all sql-statements...
+            //  Iterate through all sql-statements...
             for (String sql : sqlStatements)
             {
-                //  Derzeitiges SQL-Statement ermitteln...
-                //  UPD-Version wurde ermittelt.. schauen ob die dazugehörigen
-                //  SQL-Statements ausgeführt werden müssen...
+                //  If it's a UPD-Version-Number...
                 if (sql.startsWith("-- UPDv="))
                 {
-                    executeCurrentStatement = false;
+                    //  We check if we can execute the following SQL-Statements which are defined for this UPD-Version...
                     currentUPDVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
-
-                    if (currentUPDVersionNumber != -1 && currentUPDVersionNumber > lowestDbVersion && currentUPDVersionNumber <= highestDbVersion)
-                    {
-                        executeCurrentStatement = true;
-                    }
+                    executeCurrentStatement = currentUPDVersionNumber != -1 && currentUPDVersionNumber > lowestDbVersion && currentUPDVersionNumber <= highestDbVersion;
                 }
                 //  Execute current SQL.
                 else if (executeCurrentStatement)
@@ -207,7 +218,7 @@ public class UPDService extends Objekt
                         sqlErrors++;
                     }
                 }
-                //  Skippe current SQL.
+                //  We skip the current SQL.
                 else
                 {
                     executedSQLCounter++;
@@ -216,7 +227,7 @@ public class UPDService extends Objekt
                 }
             }
 
-            //  Datenbank-Version aktualisieren.
+            //  We update the database-version.
             executedSQLCounter++;
             of_updateDatabaseVersion();
             of_sendMessage("SQL-Statement executed: " + executedSQLCounter + "/" + sqlStatementSize);
@@ -259,7 +270,7 @@ public class UPDService extends Objekt
     {
         int lastIndex4UpdVVersion = -1;
 
-        //  Aus den eingelesenen SQL-Statements das letzte UPD anhand der UPDVersion, ermitteln.
+        //  We need to find the last UPD-Version-Number in the SQL-Statements.
         for(int i = 0; i < sqlStatements.size(); i++)
         {
             if(sqlStatements.get(i).startsWith("-- UPDv="))
@@ -270,34 +281,34 @@ public class UPDService extends Objekt
 
         if(lastIndex4UpdVVersion != -1)
         {
-            //  Das Kennzeichen für die UPD-Version entfernen.
+            //  We remove the flag for the UPD-Version.
             String fileUpdVersion = sqlStatements.get(lastIndex4UpdVVersion).replace("-- UPDv=", "");
 
-            //  Check if the datbase needs to be updated.  If the database version is lower than the plugin version, the database needs to be updated.
+            //  Check if the database needs to be updated.  If the database version is lower than the plugin version, the database needs to be updated.
             String lastUPDVersion = null;
             String sqlSelect = "SELECT dbVersion FROM "+main.SQL.of_getTableNotation()+"dbversion;";
             String dbVersion = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
 
             if(dbVersion != null)
             {
-                //	Wenn die DB-Version gleich mit der PL-Verison ist, gibt es kein UPD zum einspielen!
+                //  If the database version is equal to the plugin version, there is no UPD to run!
                 if(dbVersion.equals(Sys.of_getVersion()))
                 {
                     return false;
                 }
-                //	Letzte UPD-Version...
+                //  Last UPD-Version...
                 else
                 {
                     lastUPDVersion = dbVersion;
                 }
             }
-            //	Grund-Version...
+            //  Base version.
             else
             {
                 lastUPDVersion = "22.1.0.00";
             }
 
-            //  Okay UPD muss eingespielt werden, Grenzbereich ermitteln...
+            //  We need to identify the range of the UPD-SQL-Statements.
             highestDbVersion = Sys.of_getString2Int(Sys.of_getVersion().split("\\.")[3]);
             lowestDbVersion = Sys.of_getString2Int(lastUPDVersion.split("\\.")[3]);
 

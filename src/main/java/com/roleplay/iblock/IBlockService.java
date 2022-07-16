@@ -82,15 +82,20 @@ public class IBlockService extends Objekt
      */
     public IBlock of_getIBlockByName(String name)
     {
-        IBlock[] iblocks = (IBlock[]) _CONTEXT.of_getAllObjects();
+        Objekt[] objects = main.IBLOCKSERVICE._CONTEXT.of_getAllObjects();
 
-        if(iblocks != null && iblocks.length > 0)
+        if(objects != null && objects.length > 0)
         {
-            for(IBlock iblock : iblocks)
+            for(Objekt objekt : objects)
             {
-                if(iblock.of_getInfo().equalsIgnoreCase(name))
+                if(objekt instanceof IBlock)
                 {
-                    return iblock;
+                    IBlock iblock = (IBlock) objekt;
+
+                    if(iblock.of_getInfo().equalsIgnoreCase(name))
+                    {
+                        return iblock;
+                    }
                 }
             }
         }
@@ -147,14 +152,21 @@ public class IBlockService extends Objekt
         Location loc = block.getLocation();
 
         //  Iterate through all defined IBlocks...
-        for(IBlock iblock : (IBlock[]) _CONTEXT.of_getAllObjects())
+        Objekt[] objects = _CONTEXT.of_getAllObjects();
+
+        for(Objekt object : objects)
         {
-            if(iblock.of_getMaterial() == block.getType())
+            if(object instanceof IBlock)
             {
-                if(iblock.of_getLocation().equals(loc))
+                IBlock iblock = (IBlock) object;
+
+                if(iblock.of_getMaterial() == block.getType())
                 {
-                    new CommandSet(iblock.of_getCommandSet(), ps).of_executeAllCommands();
-                    return true;
+                    if(iblock.of_getLocation().equals(loc))
+                    {
+                        new CommandSet(iblock.of_getCommandSet(), ps).of_executeAllCommands();
+                        return true;
+                    }
                 }
             }
         }

@@ -53,7 +53,12 @@ public class PositionService  extends Objekt
         if(posId != -1)
         {
             //  Get the position by the position-id.
-            pos = (Position) _CONTEXT.of_getObjectById(posId);
+            Objekt object = _CONTEXT.of_getObjectById(posId);
+
+            if(object instanceof Position)
+            {
+                pos = (Position) object;
+            }
         }
         else
         {
@@ -71,13 +76,21 @@ public class PositionService  extends Objekt
 
     public Position of_getPositionByPositionName(String positionName)
     {
-        Position[] positions = (Position[]) _CONTEXT.of_getAllObjects();
+        Objekt[] objects = _CONTEXT.of_getAllObjects();
 
-        for(Position pos : positions)
+        if(objects != null && objects.length > 0)
         {
-            if(pos.of_getPositionName().equalsIgnoreCase(positionName))
+            for(Objekt objekt : objects)
             {
-                return pos;
+                if(objekt instanceof Position)
+                {
+                    Position pos = (Position) objekt;
+
+                    if(pos.of_getPositionName().equalsIgnoreCase(positionName))
+                    {
+                        return pos;
+                    }
+                }
             }
         }
 
@@ -86,14 +99,22 @@ public class PositionService  extends Objekt
 
     public Position of_getPositionByFileName(String fileName)
     {
-        Position[] positions = (Position[]) _CONTEXT.of_getAllObjects();
+        Objekt[] objects = _CONTEXT.of_getAllObjects();
         fileName = fileName.toLowerCase().replace(".yml", "");
 
-        for(Position pos : positions)
+        if(objects != null && objects.length > 0)
         {
-            if(pos.of_getInfo().equalsIgnoreCase(fileName))
+            for(Objekt objekt : objects)
             {
-                return pos;
+                if(objekt instanceof Position)
+                {
+                    Position pos = (Position) objekt;
+
+                    if(pos.of_getInfo().equalsIgnoreCase(fileName))
+                    {
+                        return pos;
+                    }
+                }
             }
         }
 

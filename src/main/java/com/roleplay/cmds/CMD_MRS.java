@@ -1,14 +1,13 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ import java.util.List;
  * @Description
  * This command is used to accept the data protection.
  */
-public class CMD_MRS implements CommandExecutor, TabCompleter
+public class CMD_MRS extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -73,7 +72,7 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
                         }
 
                         //  If no arguments has been found or something is incorrect, we send the help message.
-                        of_sendCMDHelperText(ps);
+                        of_sendCMDHelperText(p);
                         return true;
                     }
                     else
@@ -97,10 +96,9 @@ public class CMD_MRS implements CommandExecutor, TabCompleter
     /* SEND CMD-HELPER */
     /* ************************* */
 
-    private void of_sendCMDHelperText(Spieler ps)
+    @Override
+    public void of_sendCMDHelperText(Player p)
     {
-        Player p = ps.of_getPlayer();
-
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");
         p.sendMessage("§8[§4§lMRS - Help§8]");

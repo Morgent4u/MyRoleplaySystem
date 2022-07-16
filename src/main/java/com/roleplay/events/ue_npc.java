@@ -1,5 +1,6 @@
 package com.roleplay.events;
 
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.roleplay.npc.NPC;
 import com.roleplay.spieler.Spieler;
@@ -38,23 +39,32 @@ public class ue_npc implements Listener
                 Location pLoc = ps.of_getPlayer().getLocation();
 
                 //  Iterate through all NPCs...
-                for(NPC npc : (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects())
+                Objekt[] objects = main.NPCSERVICE._CONTEXT.of_getAllObjects();
+
+                if(objects != null && objects.length > 0)
                 {
-                    Location npcLoc = npc.of_getLocation();
+                    for(Objekt objekt : objects)
+                    {
+                        if(objekt instanceof NPC)
+                        {
+                            NPC npc = (NPC) objekt;
+                            Location npcLoc = npc.of_getLocation();
 
-                    //  Check for the distance between the player and the NPC.
-                    if(pLoc.distance(npcLoc) > 5.0D)
-                        continue;
+                            //  Check for the distance between the player and the NPC.
+                            if(pLoc.distance(npcLoc) > 5.0D)
+                                continue;
 
-                    //  Get the npc-location to fix the head-rotation.
-                    npcLoc.setDirection(e.getPlayer().getLocation().subtract(npcLoc).toVector());
-                    float yaw = npcLoc.getYaw();
-                    float pitch = npcLoc.getPitch();
+                            //  Get the npc-location to fix the head-rotation.
+                            npcLoc.setDirection(e.getPlayer().getLocation().subtract(npcLoc).toVector());
+                            float yaw = npcLoc.getYaw();
+                            float pitch = npcLoc.getPitch();
 
-                    //  Send the player some packets to update the npc-head rotation.
-                    PlayerConnection connection = (((CraftPlayer)e.getPlayer()).getHandle()).b;
-                    connection.a(new PacketPlayOutEntity.PacketPlayOutEntityLook(npc.of_getEntityNPC().getBukkitEntity().getEntityId(), (byte) (int) (yaw % 360.0F * 256.0F / 360.0F), (byte) (int) (pitch % 360.0F * 256.0F / 360.0F), false));
-                    connection.a(new PacketPlayOutEntityHeadRotation(npc.of_getEntityNPC(), (byte)(int)(yaw % 360.0F * 256.0F / 360.0F)));
+                            //  Send the player some packets to update the npc-head rotation.
+                            PlayerConnection connection = (((CraftPlayer)e.getPlayer()).getHandle()).b;
+                            connection.a(new PacketPlayOutEntity.PacketPlayOutEntityLook(npc.of_getEntityNPC().getBukkitEntity().getEntityId(), (byte) (int) (yaw % 360.0F * 256.0F / 360.0F), (byte) (int) (pitch % 360.0F * 256.0F / 360.0F), false));
+                            connection.a(new PacketPlayOutEntityHeadRotation(npc.of_getEntityNPC(), (byte)(int)(yaw % 360.0F * 256.0F / 360.0F)));
+                        }
+                    }
                 }
             }
         }

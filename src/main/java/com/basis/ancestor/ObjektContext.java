@@ -85,9 +85,9 @@ public class ObjektContext extends Objekt
     @Override
     public void of_unload()
     {
-        for(Objekt objekt : of_getAllObjects())
+        for(Objekt objects : of_getAllObjects())
         {
-            objekt.of_unload();
+            objects.of_unload();
         }
     }
 

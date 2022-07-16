@@ -373,9 +373,9 @@ public class MySQL
     public int of_updateKey(String tableName)
     {
         //	Beide Strings muessen gesetzt worden sein!
-        if(!updateKeyTable.isEmpty() && !updateKeyColumn.isEmpty() && !updateTableColumn4Key.isEmpty() && tableNotation != null && !tableNotation.isEmpty())
+        if(!updateKeyTable.isEmpty() && !updateKeyColumn.isEmpty() && !updateTableColumn4Key.isEmpty() && tableNotation != null)
         {
-            String sqlSelect = "SELECT " + updateKeyColumn + " FROM " + updateKeyTable + " WHERE " + updateTableColumn4Key + " = '" + tableNotation + tableName+"';";
+            String sqlSelect = "SELECT " + updateKeyColumn + " FROM " + updateKeyTable + " WHERE " + updateTableColumn4Key + " = '"+tableName+"';";
             int key = -1;
 
             try
@@ -386,12 +386,12 @@ public class MySQL
 
             if(key == -1)
             {
-                Sys.of_sendErrorMessage(null, "MySQL", "of_updateKey("+tableNotation+tableName+");", "This is a SQL-problem might be the table entry doesn't exist! SQL: "+sqlSelect);
+                Sys.of_sendErrorMessage(null, "MySQL", "of_updateKey("+tableName+");", "This is a SQL-problem might be the table entry doesn't exist! SQL: "+sqlSelect);
                 return -1;
             }
 
             key++;
-            String sqlUpdate = "UPDATE "+updateKeyTable+" SET " + updateKeyColumn + " = " + key + " WHERE " + updateTableColumn4Key + " = '" + tableNotation + tableName + "';";
+            String sqlUpdate = "UPDATE "+updateKeyTable+" SET " + updateKeyColumn + " = " + key + " WHERE " + updateTableColumn4Key + " = '" + tableName + "';";
             of_run_update(sqlUpdate);
             return key;
         }
@@ -446,6 +446,11 @@ public class MySQL
     public String of_getTableNotation()
     {
         return tableNotation;
+    }
+
+    public String of_getTimeStamp()
+    {
+        return "CURRENT_TIMESTAMP()";
     }
 
     /* ****************************** */

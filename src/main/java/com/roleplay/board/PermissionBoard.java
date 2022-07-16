@@ -93,6 +93,13 @@ public class PermissionBoard extends Objekt
     /* BOOLS */
     /* *************************** */
 
+    /**
+     * This method is used to identify the permissions by the given permissions-key.
+     * The defined permissions are loaded from the permissions.yml file.
+     * @param ps The player.
+     * @param permKey The permissions-key.
+     * @return true if the permissions-key is defined, false if not.
+     */
     public boolean of_hasPermissions(Spieler ps, String permKey)
     {
         String permission = permissions.get(permKey);
@@ -104,6 +111,19 @@ public class PermissionBoard extends Objekt
         }
 
         return ps.of_getPlayer().hasPermission(permission);
+    }
+
+    /**
+     * This method is used to check if the player has the given permission.
+     * The special-part of this method is that it does not check the current permissions-list
+     * which has been defined in the permissions.yml.
+     * @param ps The player to check.
+     * @param permissions The permissions to check.
+     * @return True if the player has the given permission, false if not.
+     */
+    public boolean of_hasPermissionsByDefault(Spieler ps, String permissions)
+    {
+        return ps.of_getPlayer().hasPermission(permissions);
     }
 
     public boolean of_isAdmin(Spieler ps)

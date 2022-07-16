@@ -1,12 +1,12 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.objects.CommandSet;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import java.io.File;
  * @Description
  * This command is used to get a preview of the defined textblock-file.
  */
-public class CMD_Textblock implements CommandExecutor
+public class CMD_Textblock extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -38,8 +38,7 @@ public class CMD_Textblock implements CommandExecutor
                     {
                         if(args.length == 0)
                         {
-                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§c/Textblock list§a - Get a list of the textblock-files.");
-                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§c/Textblock <filename>§a - Get a preview of the defined textblock-file.");
+                            of_sendCMDHelperText(p);
                             return true;
                         }
 
@@ -98,5 +97,21 @@ public class CMD_Textblock implements CommandExecutor
         }
 
         return false;
+    }
+
+    /* ************************* */
+    /* SEND CMD-HELPER */
+    /* ************************* */
+
+    @Override
+    public void of_sendCMDHelperText(Player p)
+    {
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(p.getName());
+
+        if(ps != null)
+        {
+            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§c/Textblock list§a - Get a list of the textblock-files.");
+            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§c/Textblock <filename>§a - Get a preview of the defined textblock-file.");
+        }
     }
 }

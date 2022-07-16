@@ -103,12 +103,12 @@ public class NPC extends Objekt
             this.entityNpc = entityNpc;
 
             //  Update the EntityId to this object (ObjectId).
-            of_setObjectId(entityNpc.getBukkitEntity().getEntityId());
+            of_setEntityId(entityNpc.getBukkitEntity().getEntityId());
         }
         //  Else, set the EntityId to -1.
         else
         {
-            of_setObjectId(-1);
+            of_setEntityId(-1);
         }
     }
 

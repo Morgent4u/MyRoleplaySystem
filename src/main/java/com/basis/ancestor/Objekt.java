@@ -6,7 +6,7 @@ import com.basis.sys.Sys;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Objekt
+public abstract class Objekt
 {
     /*	Angelegt am: 20.03.2022
      * 	Erstellt von: Nihar

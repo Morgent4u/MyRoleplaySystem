@@ -1,5 +1,7 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.basis.utils.Settings;
@@ -7,9 +9,7 @@ import com.roleplay.board.PermissionBoard;
 import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ import java.util.*;
  * A position is similar to a location but in this system
  * you will be able to create safe-zones.
  */
-public class CMD_Position implements CommandExecutor, TabCompleter
+public class CMD_Position extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -53,19 +53,22 @@ public class CMD_Position implements CommandExecutor, TabCompleter
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  TODO: Need to be an GUI-System.
-                                Position[] positions = (Position[]) main.POSITIONSERVICE._CONTEXT.of_getAllObjects();
+                                Objekt[] objects = main.POSITIONSERVICE._CONTEXT.of_getAllObjects();
 
-                                //  Validate the positions
-                                if(positions != null && positions.length > 0)
+                                if(objects != null && objects.length > 0)
                                 {
                                     p.sendMessage("§7═════════════════════════");
                                     p.sendMessage("");
                                     p.sendMessage("§8[§4§lPosition - List§8]");
                                     p.sendMessage("");
                                     p.sendMessage("§9Id §f-§9 Name");
-                                    for (Position pos : positions)
+                                    for(Objekt objekt : objects)
                                     {
-                                        p.sendMessage("§a" + (pos.of_getObjectId()) + " §f- §a" + pos.of_getPositionName());
+                                        if(objekt instanceof Position)
+                                        {
+                                            Position pos = (Position) objekt;
+                                            p.sendMessage("§a" + (pos.of_getObjectId()) + " §f- §a" + pos.of_getPositionName());
+                                        }
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
@@ -172,7 +175,7 @@ public class CMD_Position implements CommandExecutor, TabCompleter
                         }
 
                         //  Send the default help-text.
-                        of_sendCMDHelperText(ps);
+                        of_sendCMDHelperText(p);
                     }
                     //  No permission
                     else
@@ -219,10 +222,9 @@ public class CMD_Position implements CommandExecutor, TabCompleter
     /* SEND CMD-HELPER */
     /* ************************* */
 
-    private void of_sendCMDHelperText(Spieler ps)
+    @Override
+    public void of_sendCMDHelperText(Player p)
     {
-        Player p = ps.of_getPlayer();
-
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");
         p.sendMessage("§8[§4§lPosition - Help§8]");

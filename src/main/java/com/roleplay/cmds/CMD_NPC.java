@@ -1,12 +1,13 @@
 package com.roleplay.cmds;
 
+import com.basis.ancestor.CMDExecutor;
+import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.PermissionBoard;
 import com.roleplay.npc.NPC;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * @Description
  * This command is used to create a NPC.
  */
-public class CMD_NPC implements CommandExecutor
+public class CMD_NPC extends CMDExecutor
 {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args)
@@ -48,10 +49,10 @@ public class CMD_NPC implements CommandExecutor
                             if(first.equalsIgnoreCase("list"))
                             {
                                 //  Get all current loaded NPCs and send a list into the players chat.
-                                NPC[] npcs = (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects();
-                                int size = npcs.length;
+                                Objekt[] objects = main.NPCSERVICE._CONTEXT.of_getAllObjects();
+                                int index = 1;
 
-                                if(size > 0)
+                                if(objects != null && objects.length > 0)
                                 {
                                     //  Messages
                                     p.sendMessage("§7═════════════════════════");
@@ -61,9 +62,14 @@ public class CMD_NPC implements CommandExecutor
                                     p.sendMessage("§9TeleportId - DisplayName");
                                     //  We do not work the object-id here because the object-id is the entity-player-id!
                                     //  So we use the array-index instead.
-                                    for(int i = 0; i < size; i++)
+                                    for(Objekt object : objects)
                                     {
-                                        p.sendMessage("§f" + (i + 1) + " §8- §7" + npcs[i].of_getInfo());
+                                        if(object instanceof NPC)
+                                        {
+                                            NPC npc = (NPC) object;
+                                            p.sendMessage("§f" + index + " §8- §7" + npc.of_getInfo());
+                                            index++;
+                                        }
                                     }
                                     p.sendMessage("");
                                     p.sendMessage("§7═════════════════════════");
@@ -128,19 +134,24 @@ public class CMD_NPC implements CommandExecutor
                                 if(objectId != -1)
                                 {
                                     // Get all loaded NPCs.
-                                    NPC[] npcs = (NPC[]) main.NPCSERVICE._CONTEXT.of_getAllObjects();
-                                    int size = npcs.length;
+                                    Objekt[] objects = main.NPCSERVICE._CONTEXT.of_getAllObjects();
 
-                                    if(size > 0)
+                                    if(objects != null && objects.length > 0)
                                     {
+                                        int size = objects.length;
+
                                         //  The objectId is the index value which is entered by the user.
                                         if(objectId > 0 && objectId <= size)
                                         {
-                                            NPC npc = npcs[objectId - 1];
-                                            p.teleport(npc.of_getLocation());
-                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aYou have been teleported to the NPC §d" + npc.of_getInfo() + "§a.");
+                                            Objekt object = objects[objectId - 1];
+
+                                            if(object instanceof NPC)
+                                            {
+                                                NPC npc = (NPC) object;
+                                                p.teleport(npc.of_getLocation());
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§aYou have been teleported to the NPC §d" + npc.of_getInfo() + "§a.");
+                                            }
                                         }
-                                        // If the given ID is out of range.
                                         else
                                         {
                                             main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fThe given ID §d" + second + "§f is out of range.");
@@ -180,8 +191,12 @@ public class CMD_NPC implements CommandExecutor
         return false;
     }
 
-    //  Send the default CMD-HelperText if some command arguments are wrong.
-    private void of_sendCMDHelperText(Player p)
+    /* ************************* */
+    /* SEND CMD-HELPER */
+    /* ************************* */
+
+    @Override
+    public void of_sendCMDHelperText(Player p)
     {
         p.sendMessage("§7═════════════════════════");
         p.sendMessage("");

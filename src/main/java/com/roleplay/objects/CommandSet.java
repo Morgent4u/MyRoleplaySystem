@@ -4,6 +4,7 @@ import com.basis.ancestor.Objekt;
 import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.MessageBoard;
+import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -111,8 +112,16 @@ public class CommandSet extends Objekt
                     i = index;
                 }
 
+                //  We need to set the executed-indicator to 0 to avoid the underlying else-block.
+                executed = 0;
+
                 //  Continue will increase the i-value by 1.
                 continue;
+            }
+            //  If the previous command was a permissions-check and failed, we do not continue!
+            else if(executed == -3)
+            {
+                return;
             }
 
             //  Get the commandData from the current command.
@@ -143,7 +152,7 @@ public class CommandSet extends Objekt
      * This function is used to execute the given command.
      * @param category The category of the command (CMD, SCMD, CLOSE e.g.)
      * @param command Specific parameters which are used for the command.
-     * @return 1 if the command was executed successfully, -1 if not, -2 if the command is not defined.
+     * @return 1 if the command was executed successfully, -1 if not, -2 if the command is not defined., -3 If the permissions-check failed.
      */
     private int of_executeCommand(String category, String command)
     {
@@ -187,6 +196,8 @@ public class CommandSet extends Objekt
                 return of_executeCommand4MoneySystem(command, "add");
             case "TAKE":
                 return of_executeCommand4MoneySystem(command, "remove");
+            case "PERM":
+                return PermissionBoard.of_getInstance().of_hasPermissionsByDefault(ps, command) ? 1 : -3;
         }
 
         return -2;

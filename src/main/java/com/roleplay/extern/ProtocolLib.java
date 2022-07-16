@@ -66,14 +66,16 @@ public class ProtocolLib extends Objekt
                         {
                             PacketContainer packet = e.getPacket();
 
-                            //  get Entity ID
+                            //  Get Entity ID
                             int entityId = packet.getIntegers().read(0);
 
                             // Get the NPC by using the EntityId.
-                            NPC npc = (NPC) main.NPCSERVICE._CONTEXT.of_getObjectById(entityId);
+                            Objekt object = main.NPCSERVICE._CONTEXT.of_getObjectById(entityId);
 
-                            if(npc != null)
+                            if(object instanceof NPC)
                             {
+                                NPC npc = (NPC) object;
+
                                 //  Only let the player interact when he is near the npc.
                                 if(npc.of_getLocation().distance(ps.of_getPlayer().getLocation()) <= 3)
                                 {

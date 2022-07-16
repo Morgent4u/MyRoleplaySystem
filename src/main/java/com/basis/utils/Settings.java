@@ -14,7 +14,8 @@ import com.roleplay.hologram.HologramService;
 import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.manager.TablistManager;
-import com.roleplay.module.deathcmds.DeathCmdSet;
+import com.roleplay.module.ModuleDeathCmdSet;
+import com.roleplay.module.ModuleIdCard;
 import com.roleplay.npc.NPCService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
@@ -58,7 +59,7 @@ public class Settings extends Objekt
     boolean ib_useDataProtection;
     boolean ib_usePosition;
 
-    //  Module-Attributes:
+    //  MRSModule-Attributes:
     boolean ib_moduleIDCard;
     boolean ib_moduleDeathCommandSet;
 
@@ -84,14 +85,13 @@ public class Settings extends Objekt
     /* LOADER // UNLOADER */
     /* ************************* */
 
+    /**
+     * This function is called when the plugin is getting enabled.
+     * @return 1 = OK, 0 = Plugin has been disabled, -1 = An error occurred.
+     */
     @Override
     public int of_load()
     {
-        //	RC:
-        //	 1: OK
-        //	 0: Nicht aktivieren.
-        //	-1: Fehler
-
         int rc;
 
         //	Settings:
@@ -99,7 +99,7 @@ public class Settings extends Objekt
 
         if(ib_usePlugin)
         {
-            //  Einstellungen einlesen...
+            //  We're going to read the settings...
             String apiSection = sectionKey + ".API.";
             ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", false);
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
@@ -133,6 +133,7 @@ public class Settings extends Objekt
 
             //  Load the tab-list setting (can we use the tab-list?):
             ib_useTablist = datei.of_getSetBoolean(rpSection + "Tablist.Use", true);
+
             //  Load the tab-list if it is enabled:
             if(of_isUsingTablist())
             {
@@ -155,13 +156,14 @@ public class Settings extends Objekt
 
             //  Enable or disable the Position-System:
             ib_usePosition = datei.of_getSetBoolean(rpSection + "Position.Use", true);
+
             if(of_isUsingPosition())
             {
                 main.POSITIONSERVICE = new PositionService();
                 main.POSITIONSERVICE.of_load();
             }
 
-            //	MySQL-Attribute einlesen:
+            //  Reading the SQL-Settings:
             String externalSection = sectionKey + ".External.";
             ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
             String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");
@@ -169,45 +171,44 @@ public class Settings extends Objekt
             String username = datei.of_getSetString(externalSection + "MySQL.Username", "user");
             String password = datei.of_getSetString(externalSection + "MySQL.Password", "pwd");
 
-            //  Speichern der Einstellungen.
+            //  Save the current settings.
             datei.of_save("Settings.of_load();");
 
-            //	Wenn MySQL verwendet werden soll, Instanz an der Main-Klasse initialisieren.
+            //	If MySQL can be used we create an object-instance for it.
             if(ib_useMySQL)
             {
-                //	SQL-Instanz erzeugen!
+                //	Create one SQL-instance.
                 main.SQL = new MySQL("Main");
 
-                //	Attribute zur DB setzen und Verbindung herstellen!
+                //	Set the connection-parameters.
                 main.SQL.of_setServer(hostName);
                 main.SQL.of_setDbName(database);
                 main.SQL.of_setUserName(username);
                 main.SQL.of_setPassword(password);
                 main.SQL.of_setUpdateKeyTableAndColumns("mrs_key", "lastKey", "tableName");
 
-                //	Verbindung zur DB herstellen und ggf. UPDSrv ansprechen!
+                //	Connect to the database and check for database updates by using the UPD-Service.
                 rc = main.SQL.of_createConnection();
 
-                //	DB-Zugriff bzw. Verbindung in die Settings.yml schreiben...
+                //	If we could connect to the database we can start the UPD-Service.
                 if(rc == 1)
                 {
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - Connected.");
 
-                    //  Überprüfen ob es ein neues UPD gibt, welches eingespielt werden muss...
+                    //  Check if the database is up-to-date.
                     UPDService updSrv = new UPDService(Sys.of_getMainFilePath());
 
-                    //  1 = UPD-File geladen und gefunden. -1 = keine UPD-File gefunden.
+                    //  1 = UPD-File could be found. -1 = No UPD-File could be found.
                     int updSrvRc = updSrv.of_load();
 
-                    //  Wenn ein UPD-File gefunden wurde, dann...
                     if(updSrvRc == 1)
                     {
                         updSrv.of_sendMessage("Search for database updates...");
 
-                        //  Wenn eine neue UPD-Version gefunden wurde...
+                        //  If a new UPD-Version is available...
                         if(updSrv.of_isNewUpdateAvailable())
                         {
-                            //  Neues Update vorhanden!
+                            //  Update the database.
                             updSrvRc = updSrv.of_runUPD();
 
                             if(updSrvRc != 1)
@@ -217,7 +218,7 @@ public class Settings extends Objekt
                         }
                         else
                         {
-                            //  Kein neues Update vorhanden!
+                            //  No new UPD-Version available.
                             updSrv.of_sendMessage("No new update available. Your database is up to date.");
                         }
                     }
@@ -440,32 +441,15 @@ public class Settings extends Objekt
     {
         //  Define some attributes for the module-system:
         String moduleFolder = Sys.of_getMainFilePath() + "Modules//";
-        configSection = configSection + "Module";
+        configSection = configSection + "MRSModule";
 
-        //  Check for the idCard-Module:
-        ib_moduleIDCard = datei.of_getSetBoolean(configSection + ".IDCard.Use", true);
+        //  Check for the ModuleIdCard-MRSModule:
+        ModuleIdCard.of_getInstance().of_init("ModuleIDCard", new SimpleFile(moduleFolder + "//IDCard//IDCard.yml"), configSection);
+        ib_moduleIDCard = ModuleIdCard.of_getInstance().of_isEnabled();
 
-        if(of_isUsingModuleIDCard())
-        {
-            //  Create the idCard-Module-Folder.
-            SimpleFile module = new SimpleFile(moduleFolder + "//IDCard//IDCard.yml");
-
-            if(!module.of_fileExists())
-            {
-                module.of_set("Test", "test");
-                module.of_save("Settings.of_check4Modules(); IDCard.yml");
-            }
-        }
-
-        //  Check for the death-CommandSet-Module:
-        ib_moduleDeathCommandSet = datei.of_getSetBoolean(configSection + ".DeathCommandSet.Use", true);
-        if(of_isUsingModuleDeathCommandSet())
-        {
-            main.MODULE_DEATHCMDSET = new DeathCmdSet();
-
-            //  Enable or disable this module if the load-process was successfully.
-            ib_moduleDeathCommandSet = main.MODULE_DEATHCMDSET.of_load(new SimpleFile(moduleFolder + "//DeathCommandSet//DeathCommandSet.yml")) == 1;
-        }
+        //  Check for the death-CommandSet-MRSModule:
+        ModuleDeathCmdSet.of_getInstance().of_init("DeathCommandSet", new SimpleFile(moduleFolder + "//DeathCommandSet//DeathCommandSet.yml"), configSection);
+        ib_moduleDeathCommandSet = ModuleDeathCmdSet.of_getInstance().of_isEnabled();
     }
 
     /**
