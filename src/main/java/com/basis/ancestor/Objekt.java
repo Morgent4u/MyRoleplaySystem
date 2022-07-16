@@ -152,7 +152,7 @@ public abstract class Objekt
      */
     public void of_sendErrorMessage(Exception exception, String invoker, String errorMessage)
     {
-        //	Farbcodes
+        //	Color codes.
         String red = "\u001B[31m";
         String white = "\u001B[0m";
         String yellow = "\u001B[33m";
@@ -231,5 +231,22 @@ public abstract class Objekt
     public boolean of_isAutoSaveEnabled()
     {
         return ib_autoSave;
+    }
+
+    /**
+     * This method is used to check if the given object is
+     * the same as the current object. To identify the
+     * object is equal to the given one, we use the objectId.
+     * @param object Object to check.
+     * @return TRUE = The same object. FALSE = Not the same object.
+     */
+    public boolean of_isEqual(Objekt object)
+    {
+        if(object != null)
+        {
+            return object.of_getObjectId() == of_getObjectId();
+        }
+
+        return false;
     }
 }

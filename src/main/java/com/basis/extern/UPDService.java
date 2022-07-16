@@ -6,67 +6,48 @@ import com.basis.sys.Sys;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @Created 02.04.2022
+ * @Rework  17.07.2022
  * @Author Nihar
  * @Description
- * This object is used to update the database
- * with this plugin version.
+ * This java-class is used to represent the object
+ * UPDService. The UPD-Service has been implemented as
+ * a singleton-pattern.
  *
- * This class has been created with the support of the
- * GitHub-CoPilot project.
- *
+ * The UPD-Service is used to update the database version
+ * and executed the necessary sql-statements for this plugin-version.
  */
 public class UPDService extends Objekt
 {
-    //  Attributs:
+    //  Attributes:
+    public static final UPDService instance = new UPDService();
     private File file;
-    private ArrayList<String> sqlStatements = new ArrayList<>();
-
-    private int lowestDbVersion;
-    private int highestDbVersion;
-
-    private int sqlExecutions;
-    private int sqlErrors;
-    private int sqlSkipped;
-    private int sqlStatementSize;
+    private String[] sqlStatements;
+    private String updVersion;
+    private int sqlStatementCounter;
+    private int updLow;
+    private int updHigh;
 
     /* ************************* */
-    /* CONSTRUCTOR */
+    /* CONSTRUCTOR // INIT */
     /* ************************* */
 
-    /**
-     * Constructor
-     * @param searchDirectory File path which will be used to find the upd-file.
-     */
-    public UPDService(String searchDirectory)
+    private UPDService() { }
+
+    public void of_init(String directoryPath)
     {
-        //  Search path...
-        searchDirectory = searchDirectory + "//UPD//UPD_" + Sys.of_getPaket() + ".upd";
-        file = new File(searchDirectory);
+        file = new File(directoryPath + "//UPD//UPD_" + Sys.of_getPaket() +".upd");
 
+        //  Create a template-file with no sql-statements in it.
         if(!file.exists())
         {
-            String errorMessage = null;
-            boolean fileCreated = false;
-
             try
             {
-                fileCreated = file.createNewFile();
+                file.createNewFile();
             }
-            catch (Exception e)
-            {
-                errorMessage = e.getMessage();
-            }
-
-            //  If the file could not be created, we send a debug-message.
-            if(!fileCreated)
-            {
-                of_sendErrorMessage(null, "UPDService.constructor()", "The UPD-File could not be created!\n" + errorMessage);
-            }
+            catch (Exception ignored) { }
         }
     }
 
@@ -74,92 +55,91 @@ public class UPDService extends Objekt
     /* LOADER */
     /* ************************* */
 
-    /**
-     * This function loads the SQL-Statements from the file.
-     * @return 1 = SQL-Statements loaded. -1 = SQL-Statements not loaded.
-     */
     @Override
     public int of_load()
     {
-        if(file.exists() && file.length() != 0)
+        if(file.exists() && file.length() > 0)
         {
-            //  Load the file...
             try
             {
-                //  Initialize the BufferedReader...
+                //  Initialize reader to read the file.
                 FileReader reader = new FileReader(file);
-                BufferedReader bufferReader = new BufferedReader(reader);
+                BufferedReader bufferedReader = new BufferedReader(reader);
 
-                StringBuilder sqlStatementsInFile = new StringBuilder();
-                String line;
-                String flagPattern = "=UPD_VERSION_NUMBER=";
+                //  Create a StringBuilder to collect the SQL-Statements to one large string.
+                StringBuilder sqlBuilder = new StringBuilder();
+                String versionPattern = "=UPD_VERSION_NUMBER=";
+                String currentLine;
 
-                //  We read each line of the current file...
-                while((line = bufferReader.readLine()) != null)
+                //  Read until the EOF is reached!
+                while((currentLine = bufferedReader.readLine()) != null)
                 {
-                    if(!line.isEmpty())
+                    if(!currentLine.isEmpty())
                     {
-                        //  We only add the SQL-Statement if it is a SQL-Statement or the UPD-Version-Number.
-                        if(line.startsWith("-- UPDv=") || !line.startsWith("--"))
+                        //  Check for a UPD-Version-Number or SQL-Statements.
+                        if(currentLine.startsWith("-- UPDv=") || !currentLine.startsWith("--"))
                         {
-                            //  If it's UPD-Version-Number we set a flag to know what is the SQL-Statement and what is the UPD-Version-Number.
-                            if(line.startsWith("-- UPDv="))
+                            //  UPD-Version...
+                            if(currentLine.startsWith("-- UPDv="))
                             {
-                                sqlStatementsInFile.append(line).append(flagPattern);
+                                sqlBuilder.append(currentLine).append(versionPattern);
                             }
+                            //  SQL-Statements...
                             else
                             {
-                                sqlStatementsInFile.append(line);
+                                sqlBuilder.append(currentLine);
                             }
                         }
                     }
                 }
 
-                //  We split the SQL-Statements and the UPD-Version-Numbers...
-                String[] sqlStmts = sqlStatementsInFile.toString().split(";");
-                int noSqlStatements = 0;
+                //  SPLIT-SQL-Statements by ';'
+                String[] sqlArray = sqlBuilder.toString().split(";");
+                int noSQLCounter = 0;
 
-                if(sqlStmts.length > 0)
+                if(sqlArray.length > 0)
                 {
-                    for (String sqlStmt : sqlStmts)
+                    //  Iterate through all SQL-Statements...
+                    for(String sql : sqlArray)
                     {
-                        //  If it's a UPD-Version-Number...
-                        if(sqlStmt.contains(flagPattern))
+                        //  If we find a UPD-Version-Pattern.
+                        if(sql.contains(versionPattern))
                         {
-                            String[] splitSQLParts = sqlStmt.split(flagPattern);
+                            String[] sqlFragments = sql.split(versionPattern);
 
-                            //  It needs to be a length of 2, otherwise the wrong flag was set!
-                            if(splitSQLParts.length == 2)
+                            if(sqlFragments.length == 2)
                             {
-                                //  UPD-Version
-                                sqlStatements.add(splitSQLParts[0]);
-                                noSqlStatements++;
+                                //  UPD-Version:
+                                sqlStatements = Sys.of_addArrayValue(sqlStatements, sqlFragments[0]);
+                                noSQLCounter++;
 
-                                //  SQL-Statement
-                                sqlStatements.add(splitSQLParts[1] + ";");
+                                //  SQL-Statement.
+                                sqlStatements = Sys.of_addArrayValue(sqlStatements, sqlFragments[1] + ";");
                             }
                         }
+                        //  SQL-Statement.
                         else
                         {
-                            sqlStatements.add(sqlStmt + ";");
+                            sqlStatements = Sys.of_addArrayValue(sqlStatements, sql + ";");
                         }
                     }
                 }
 
-                //  Set the SQL-Statement size...
-                if(sqlStatements.size() > 0 && noSqlStatements < sqlStatements.size())
+                //  Set the SQL-Statement counter.
+                if(sqlStatements.length > 0 && noSQLCounter < sqlStatements.length)
                 {
-                    sqlStatementSize = sqlStatements.size() - noSqlStatements;
+                    sqlStatementCounter = sqlStatements.length - noSQLCounter;
                 }
 
-                //  Close the file...
-                bufferReader.close();
+                //  Close the file-reader.
+                bufferedReader.close();
                 reader.close();
                 return 1;
             }
             catch (Exception e)
             {
-                Sys.of_sendErrorMessage(e, "UPDSrv", "of_load();", "Error while loading the file.");
+                of_sendErrorMessage(e, "UPDService.of_load();", "There was an error by reading the following upd-file: " + file.getAbsolutePath());
+                return -1;
             }
         }
         else
@@ -171,89 +151,83 @@ public class UPDService extends Objekt
     }
 
     /* ************************* */
-    /* OBJECT METHODS */
+    /* OBJECT - METHODS */
     /* ************************* */
 
-    /**
-     * This function is used to run all required sql-statements for this
-     * plugin version.
-     * @return 1 = OK. 0 = Nothing to do.
-     */
-    public int of_runUPD()
+    public void of_runUPD()
     {
-        if(sqlStatements.size() != 0)
+        //  Send information to the console...
+        of_sendMessage("Check UPD-File for new updates...");
+
+        //  Check for new database update...
+        if(of_isNewUpdateAvailable())
         {
-            //  We need to increase the SQL-StatementSize, because the update of the DB is also a SQL-UPD!
-            sqlStatementSize++;
-            int currentUPDVersionNumber = -1;
-            int executedSQLCounter = 0;
-            boolean executeCurrentStatement = false;
+            //  Initialize variables for the upd-process.
+            boolean lb_executeSQL = false;
+            int currentUPDVersion;
+            int executedSQLs = 0;
+            int skipSQLs = 0;
+            int errorSQLs = 0;
+            int triedSQLs = 0;
+            sqlStatementCounter++;
 
-            of_sendMessage("========= UPD-Service ("+sqlStatementSize+") =========");
+            of_sendMessage("...there are new updates available...");
+            of_sendMessage("...try to update the db-version to '"+updVersion+"'...");
+            of_sendMessage("========= UPD-Service ("+sqlStatementCounter+") =========");
 
-            //  Iterate through all sql-statements...
-            for (String sql : sqlStatements)
+            //  Add the Update-DB-Version Statement to the SQL-Statements.
+            sqlStatements = Sys.of_addArrayValue(sqlStatements, "UPDATE "+main.SQL.of_getTableNotation()+"dbversion SET dbVersion = '"+updVersion+"';");
+
+            //  Iterate through all SQL-Statements...
+            for(String sql : sqlStatements)
             {
-                //  If it's a UPD-Version-Number...
-                if (sql.startsWith("-- UPDv="))
+                //  Check for a UPD-Version...
+                if(sql.startsWith("-- UPDv="))
                 {
-                    //  We check if we can execute the following SQL-Statements which are defined for this UPD-Version...
-                    currentUPDVersionNumber = Sys.of_getString2Int(sql.replace("-- UPDv=", "").split("\\.")[3]);
-                    executeCurrentStatement = currentUPDVersionNumber != -1 && currentUPDVersionNumber > lowestDbVersion && currentUPDVersionNumber <= highestDbVersion;
+                    //  Check if the SQL-Statements to this UPD-Version needs to be executed.
+                    currentUPDVersion = of_getUPDNumber(sql.replace("-- UPDv=", ""));
+                    lb_executeSQL = ( currentUPDVersion != -1 && currentUPDVersion > updLow && currentUPDVersion <= updHigh );
                 }
-                //  Execute current SQL.
-                else if (executeCurrentStatement)
+                //  Execute some SQL-Statements...
+                else if(lb_executeSQL)
                 {
-                    executedSQLCounter++;
-                    boolean bool = main.SQL.of_run_update_suppress(sql);
+                    triedSQLs++;
 
-                    if (bool)
+                    //  Execute the given SQl-Statement.
+                    if(main.SQL.of_run_update_suppress(sql))
                     {
-                        of_sendMessage("SQL-Statement executed: " + executedSQLCounter + "/" + sqlStatementSize);
-                        sqlExecutions++;
+                        of_sendMessage("SQL-Statement executed: " + triedSQLs + "/" + sqlStatementCounter);
+                        executedSQLs++;
                     }
                     else
                     {
-                        of_sendMessage("SQL-Statement error: " + executedSQLCounter + "/" + sqlStatementSize);
-                        sqlErrors++;
+                        of_sendMessage("SQL-Statement error: " + triedSQLs + "/" + sqlStatementCounter);
+                        errorSQLs++;
                     }
                 }
-                //  We skip the current SQL.
                 else
                 {
-                    executedSQLCounter++;
-                    of_sendMessage("SQL-Statement skipped: " + executedSQLCounter + "/" + sqlStatementSize);
-                    sqlSkipped++;
+                    triedSQLs++;
+                    skipSQLs++;
+                    of_sendMessage("SQL-Statement skipped: " + triedSQLs + "/" + sqlStatementCounter);
                 }
             }
 
-            //  We update the database-version.
-            executedSQLCounter++;
-            of_updateDatabaseVersion();
-            of_sendMessage("SQL-Statement executed: " + executedSQLCounter + "/" + sqlStatementSize);
-
-            //  Conclusion anzeigen...
+            //  Display a conclusion about the db-update-process.
             of_sendMessage("========= UPD-Service: Conclusion =========");
-            of_sendMessage("SQL-Statements executed: " + sqlExecutions);
-            of_sendMessage("SQL-Statements skipped: " + sqlSkipped);
-            of_sendMessage("SQL-Statements errors: " + sqlErrors);
-            of_sendMessage("Database version: " + Sys.of_getVersion());
+            of_sendMessage("SQL-Statements executed: " + executedSQLs);
+            of_sendMessage("SQL-Statements skipped: " + skipSQLs);
+            of_sendMessage("SQL-Statements errors: " + errorSQLs);
+            of_sendMessage("Database version: " + updVersion);
             of_sendMessage("===========================================");
-            return 1;
+            return;
         }
 
-        return 0;
+        //  No updates found.
+        of_sendMessage("...no updates found! Database is up to date! :)");
     }
 
-    private void of_updateDatabaseVersion()
-    {
-        //  Update the database version...
-        String sqlUpdate = "UPDATE "+main.SQL.of_getTableNotation()+"dbversion SET dbVersion = '"+Sys.of_getVersion()+"';";
-        main.SQL.of_run_update(sqlUpdate);
-        sqlExecutions++;
-    }
-
-    public void of_sendMessage(String message)
+    private void of_sendMessage(String message)
     {
         Sys.of_sendMessage("[UPD-Service]: " + message);
     }
@@ -263,58 +237,82 @@ public class UPDService extends Objekt
     /* ************************* */
 
     /**
-     * This functions checks if the database needs to be updated.
-     * @return TRUE = Update is needed. FALSE = Update is not needed.
+     * This method is used to check if some sql-statements
+     * in the upd-file needs to be executed to the database.
+     * @return TRUE = Database needs to be updated. FALSE = No update needed!
      */
-    public boolean of_isNewUpdateAvailable()
+    private boolean of_isNewUpdateAvailable()
     {
-        int lastIndex4UpdVVersion = -1;
-
-        //  We need to find the last UPD-Version-Number in the SQL-Statements.
-        for(int i = 0; i < sqlStatements.size(); i++)
+        if(sqlStatements.length > 0)
         {
-            if(sqlStatements.get(i).startsWith("-- UPDv="))
+            String updVersionByFile = null;
+
+            //  Identify the latest UPD-Version in the UPD-File.
+            for(int i = sqlStatements.length - 1; i >= 0; i--)
             {
-                lastIndex4UpdVVersion = i;
-            }
-        }
-
-        if(lastIndex4UpdVVersion != -1)
-        {
-            //  We remove the flag for the UPD-Version.
-            String fileUpdVersion = sqlStatements.get(lastIndex4UpdVVersion).replace("-- UPDv=", "");
-
-            //  Check if the database needs to be updated.  If the database version is lower than the plugin version, the database needs to be updated.
-            String lastUPDVersion = null;
-            String sqlSelect = "SELECT dbVersion FROM "+main.SQL.of_getTableNotation()+"dbversion;";
-            String dbVersion = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
-
-            if(dbVersion != null)
-            {
-                //  If the database version is equal to the plugin version, there is no UPD to run!
-                if(dbVersion.equals(Sys.of_getVersion()))
+                if(sqlStatements[i].startsWith("-- UPDv="))
                 {
-                    return false;
+                    updVersionByFile = sqlStatements[i].replace("-- UPDv=", "");
+                    break;
                 }
-                //  Last UPD-Version...
+            }
+
+            if(updVersionByFile != null)
+            {
+                String sqlSelect = "SELECT dbVersion FROM "+ main.SQL.of_getTableNotation()+"dbversion;";
+                String updVersionByDb = main.SQL.of_getRowValue_suppress(sqlSelect, "dbVersion");
+
+                if(updVersionByDb != null)
+                {
+                    //  If the UPD-File-Version and the DB-Version are match, we do not
+                    //  need to update the database.
+                    if(updVersionByDb.equals(updVersionByFile))
+                    {
+                        return false;
+                    }
+                }
+                //  Set the base-version.
                 else
                 {
-                    lastUPDVersion = dbVersion;
+                    updVersionByDb = "22.1.0.00";
+                }
+
+                int updVersionNumberByFile = of_getUPDNumber(updVersionByFile);
+                int updVersionNumberByDb = of_getUPDNumber(updVersionByDb);
+                int updVersionNumberByPlugin = of_getUPDNumber(Sys.of_getVersion());
+
+                if(updVersionNumberByFile < updVersionNumberByPlugin)
+                {
+                    //  Store the current upd-version-range. Is needed for the of_runUPD()-method.
+                    updHigh = updVersionNumberByFile;
+                    updLow = updVersionNumberByDb;
+                    updVersion = updVersionByFile;
+
+                    //  Continue if the database is not on the same version as the UPD-File.
+                    return updVersionNumberByFile != -1 && updVersionNumberByDb != -1 && updVersionNumberByFile >= updVersionNumberByDb;
+                }
+                else
+                {
+                    of_sendErrorMessage(null, "UPDService.of_runUPD();", "The UPD-File is not compatible with this plugin-version!");
+                    return false;
                 }
             }
-            //  Base version.
-            else
-            {
-                lastUPDVersion = "22.1.0.00";
-            }
-
-            //  We need to identify the range of the UPD-SQL-Statements.
-            highestDbVersion = Sys.of_getString2Int(Sys.of_getVersion().split("\\.")[3]);
-            lowestDbVersion = Sys.of_getString2Int(lastUPDVersion.split("\\.")[3]);
-
-            return lowestDbVersion != -1 && highestDbVersion != -1 && highestDbVersion >= lowestDbVersion;
         }
 
         return false;
+    }
+
+    /* ************************* */
+    /* GETTER */
+    /* ************************* */
+
+    public static UPDService of_getInstance()
+    {
+        return instance;
+    }
+
+    private int of_getUPDNumber(String updVersion)
+    {
+        return Sys.of_getString2Int(updVersion.split("\\.")[3]);
     }
 }

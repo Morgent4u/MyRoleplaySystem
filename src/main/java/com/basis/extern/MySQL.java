@@ -372,9 +372,10 @@ public class MySQL
      */
     public int of_updateKey(String tableName)
     {
-        //	Beide Strings muessen gesetzt worden sein!
+        //	For this method the updateKey-Strings need to be set!
         if(!updateKeyTable.isEmpty() && !updateKeyColumn.isEmpty() && !updateTableColumn4Key.isEmpty() && tableNotation != null)
         {
+            //  Get the current-key value.
             String sqlSelect = "SELECT " + updateKeyColumn + " FROM " + updateKeyTable + " WHERE " + updateTableColumn4Key + " = '"+tableName+"';";
             int key = -1;
 
@@ -384,15 +385,23 @@ public class MySQL
             }
             catch (Exception ignored) { }
 
+            //  Error while getting the key-value, does the table has been inserted to the key-table?
             if(key == -1)
             {
                 Sys.of_sendErrorMessage(null, "MySQL", "of_updateKey("+tableName+");", "This is a SQL-problem might be the table entry doesn't exist! SQL: "+sqlSelect);
                 return -1;
             }
 
+            //  Increase the key-value and update the key-control table.
             key++;
             String sqlUpdate = "UPDATE "+updateKeyTable+" SET " + updateKeyColumn + " = " + key + " WHERE " + updateTableColumn4Key + " = '" + tableName + "';";
-            of_run_update(sqlUpdate);
+
+            //  If an error occurred we need to return -1 to avoid a primary-key problem!
+            if(!of_run_update(sqlUpdate))
+            {
+                key = -1;
+            }
+
             return key;
         }
 

@@ -11,7 +11,7 @@ import java.util.Map;
  * This is the ancestor-class for every ObjektContext.
  * It's used to load or store a defined Object into a file.
  */
-public class ObjektContext extends Objekt
+public abstract class ObjektContext extends Objekt
 {
     //  Attributes
     private Map<Integer, Objekt> objects = new HashMap<>();

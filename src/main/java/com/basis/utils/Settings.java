@@ -195,32 +195,12 @@ public class Settings extends Objekt
                 {
                     datei.of_set(sectionKey + ".MySQL.Status", Sys.of_getTimeStamp(true) + " - Connected.");
 
-                    //  Check if the database is up-to-date.
-                    UPDService updSrv = new UPDService(Sys.of_getMainFilePath());
+                    //  Use the UPDService to update the database-version if it's necessary.
+                    UPDService.of_getInstance().of_init(Sys.of_getMainFilePath());
 
-                    //  1 = UPD-File could be found. -1 = No UPD-File could be found.
-                    int updSrvRc = updSrv.of_load();
-
-                    if(updSrvRc == 1)
+                    if(UPDService.of_getInstance().of_load() == 1)
                     {
-                        updSrv.of_sendMessage("Search for database updates...");
-
-                        //  If a new UPD-Version is available...
-                        if(updSrv.of_isNewUpdateAvailable())
-                        {
-                            //  Update the database.
-                            updSrvRc = updSrv.of_runUPD();
-
-                            if(updSrvRc != 1)
-                            {
-                                updSrv.of_sendMessage("Error while updating database! No sql-statements found! (Is this okay?)");
-                            }
-                        }
-                        else
-                        {
-                            //  No new UPD-Version available.
-                            updSrv.of_sendMessage("No new update available. Your database is up to date.");
-                        }
+                        UPDService.of_getInstance().of_runUPD();
                     }
                 }
                 else

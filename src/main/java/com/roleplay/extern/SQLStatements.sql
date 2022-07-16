@@ -43,7 +43,7 @@ ALTER TABLE mrs_user_data ADD CONSTRAINT fk_mrs_user_data_user FOREIGN KEY (user
 INSERT INTO mrs_key ( tableName )
      VALUES ( 'mrs_user' );
 
--- UPDv=22.1.0.05
+-- UPDv=22.1.0.02
 -- Create the table 'mrs_label' to add many text-labels for every job.
 CREATE TABLE mrs_label (
              label INT(5)  NOT NULL
@@ -69,6 +69,7 @@ INSERT INTO mrs_key ( tableName )
 INSERT INTO mrs_key ( tableName )
      VALUES ( 'mrs_label_enum' );
 
+-- UPDv=22.1.0.03
 -- Create the view 'mrs_v_user' to get all necessary data for the join-process of a player.
 CREATE VIEW mrs_v_user
   AS SELECT mrs_user.user

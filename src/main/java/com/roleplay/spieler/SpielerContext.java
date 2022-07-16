@@ -92,7 +92,7 @@ public class SpielerContext extends Objekt
                 if(lb_sqlOk)
                 {
                     //  Create a table entry for the player in the table: mrs_user_data
-                    sqlInsert = "INSERT INTO mrs_user_data ( user ) VALUES( "+dbId+" );";
+                    sqlInsert = "INSERT INTO mrs_user_data ( user, money, atm ) VALUES( "+dbId+", "+Settings.of_getInstance().of_getDefaultMoneyCash()+", "+Settings.of_getInstance().of_getDefaultMoneyATM()+" );";
                     lb_sqlOk = main.SQL.of_run_update_suppress(sqlInsert);
                 }
 
@@ -102,6 +102,15 @@ public class SpielerContext extends Objekt
                     //  If the player information could not be inserted to the database-table.
                     main.SPIELERSERVICE.of_kickPlayerByDatabaseError(ps, "Could not insert the player-information to the given database-table. Player dbId: " + dbId);
                     return;
+                }
+
+                //  If we use the vault-economy-system, we need to add to the current-money-account
+                //  the default-money from the mrs-system.
+                if(Settings.of_getInstance().of_isUsingVaultMoneySystem())
+                {
+                    //  Set the money to the player instance.
+                    main.SPIELERSERVICE.of_editPlayerMoney(ps, "atm", "add", Settings.of_getInstance().of_getDefaultMoneyATM());
+                    main.SPIELERSERVICE.of_editPlayerMoney(ps, "cash", "add", Settings.of_getInstance().of_getDefaultMoneyCash());
                 }
             }
 
@@ -145,8 +154,15 @@ public class SpielerContext extends Objekt
             //  Set the defined attributes from the database to the current player-instance.
             ps.of_setRangId(rangId);
             ps.of_setJobId(jobId);
+
+            // If the server is not using the vault-economy-system, set the money to the player instance.
+            // We use our own money-system instead...
+            if(!Settings.of_getInstance().of_isUsingVaultMoneySystem())
+            {
+                ps.of_setMoneyATM(moneyAtm);
+            }
+
             ps.of_setMoneyCash(moneyCash);
-            ps.of_setMoneyATM(moneyAtm);
 
             //  Add the current player to the player-list.
             players.put(p.getName(), ps);
@@ -167,63 +183,6 @@ public class SpielerContext extends Objekt
                 //  Send the textBlock for the dataProtection agreement.
                 new CommandSet(new String[] {"TEXTBLOCK=txt_dataprotection"}, ps).of_executeAllCommands();
             }
-
-            /*
-            //  File-System...
-            SimpleFile user = of_getPlayerFile(ps);
-
-            //  Set playerHasPlayedBefore state.
-            if(!user.of_fileExists())
-            {
-                ps.of_setHasPlayedBefore(false);
-            }
-
-            //  Default-Stuff
-            String sectionKey = "System";
-            rangId = user.of_getSetInt(sectionKey + ".RangId", 999);
-            jobId = user.of_getSetInt(sectionKey + ".JobId", 999);
-
-            //  Player-Stuff
-            sectionKey = "Player";
-            user.of_set(sectionKey + ".Name", p.getName());
-            user.of_set(sectionKey + ".FirstConnection", Sys.of_getTimeStamp(true));
-            user.of_set(sectionKey + ".LastConnection", Sys.of_getTimeStamp(true));
-            moneyATM = user.of_getSetDouble(sectionKey + ".Money.ATM", Settings.of_getInstance().of_getDefaultMoneyATM());
-            moneyCash = user.of_getSetDouble(sectionKey + ".Money.Cash", Settings.of_getInstance().of_getDefaultMoneyCash());
-
-            int rc = user.of_save("SpielerContext.of_loadPlayer(Player);");
-
-            if(rc != 1)
-            {
-                //  Continue because the default values are used.
-                ps.of_sendErrorMessage(null, "SpielerContext.of_loadPlayer(Player);", "Error while saving the player data to the file-system.");
-            }
-
-            // Check if the player is new and the vault-economy-system is enabled.
-            if(!ps.of_hasPlayedBefore() && Settings.of_getInstance().of_isUsingVaultMoneySystem())
-            {
-                //  Set the money to the player instance.
-                main.SPIELERSERVICE.of_editPlayerMoney(ps, "atm", "add", moneyATM);
-                main.SPIELERSERVICE.of_editPlayerMoney(ps, "cash", "add", moneyCash);
-            }
-
-            //  Set player data to the player instance.
-            ps.of_setRangId(rangId);
-            ps.of_setJobId(jobId);
-
-            // If the server is not using the vault-economy-system, set the money to the player instance.
-            // We use our own system instead...
-            if(!Settings.of_getInstance().of_isUsingVaultMoneySystem())
-            {
-                ps.of_setMoneyATM(moneyATM);
-            }
-
-            ps.of_setMoneyCash(moneyCash);
-
-            //  Add the player instance to the player list.
-            ps.of_setObjectId(dbId);
-            players.put(p.getName(), ps);
-            */
         }
     }
 
