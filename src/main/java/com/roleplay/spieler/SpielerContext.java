@@ -61,6 +61,7 @@ public class SpielerContext extends Objekt
                 if(rc == -1)
                 {
                     main.SPIELERSERVICE.of_kickPlayerByUsingTextBlock(ps, new TextBlock("txt_kick_player_no_db_connection", ps), "There was an error while connecting to the database!");
+                    Settings.of_getInstance().of_setMaintenanceMode(true);
                     return;
                 }
             }

@@ -6,6 +6,7 @@ import com.basis.utils.Settings;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.objects.CommandSet;
+import com.roleplay.objects.TextBlock;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -90,6 +91,35 @@ public class ue_spieler implements Listener
     }
 
     /**
+     * This Event is used to listen to the player when
+     * he is trying to connect to the server. The event-call
+     * is earlier than the player-join-event.
+     * @param e Event instance.
+     */
+    @EventHandler
+    public void ue_playerLogin4MRS(PlayerLoginEvent e)
+    {
+        if(Settings.of_getInstance().of_isUsingMaintenanceMode())
+        {
+            //  Create a text-block and add a placeholder to it.
+            TextBlock text = new TextBlock("txt_maintenance_mode");
+            text.of_addPlaceholder2TextBlock("%p%", e.getPlayer().getName());
+
+            //  Build the kick-message.
+            String[] messages = text.of_getTranslatedTextBlockLines();
+            StringBuilder msgBuilder = new StringBuilder();
+
+            for(String message : messages)
+            {
+                msgBuilder.append(message).append("\n");
+            }
+
+            //  The result-parameter needs to be NULL.
+            e.disallow(null, msgBuilder.toString());
+        }
+    }
+
+    /**
      * This Event is used to interact with the player when he switches the item in his hands.
      * @param e Event instance.
      */
@@ -155,7 +185,7 @@ public class ue_spieler implements Listener
                 {
                     cmds = Sys.of_removeArrayValue(cmds, placeholder);
 
-                    if(cmds != null && cmds.length > 0)
+                    if(cmds.length > 0)
                     {
                         //  Create the new command-set with the rest of the commands.
                         CommandSet cmdSet = new CommandSet(cmds, ps);

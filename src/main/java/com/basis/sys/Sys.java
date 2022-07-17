@@ -251,6 +251,31 @@ public class Sys
     }
 
     /**
+     * This method is used to set the given value to the first
+     * position of the index-array.
+     * @param myArray String-Array.
+     * @param addValue The value which should be set to the first-index-value.
+     * @return The String-Array.
+     */
+    public static String[] of_addArrayValueToFirstField(String[] myArray, String addValue)
+    {
+        if(myArray != null)
+        {
+            String[] tmpArray = new String[myArray.length + 1];
+            tmpArray[0] = addValue;
+
+            for(int i = 1, j = 0; j < myArray.length; i++, j++)
+            {
+                tmpArray[i] = myArray[j];
+            }
+
+            return tmpArray;
+        }
+
+        return new String[] {addValue};
+    }
+
+    /**
      * This function removes an element from the given array.
      * @param myArray Array of type string.
      * @param removeValue The value which should be removed from the given array.

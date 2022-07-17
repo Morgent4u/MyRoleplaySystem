@@ -31,3 +31,6 @@ commands:
   Position:
     usuage: /Position
     aliases: [pos]
+  Select:
+    usuage: /Select
+    aliases: [db]

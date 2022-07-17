@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class MessageBoard extends Objekt
 {
-    //  Attributse:
+    //  Attribute:
     private static final MessageBoard instance = new MessageBoard();
 
     //  MessageKey - Message
@@ -186,6 +186,19 @@ public class MessageBoard extends Objekt
         textBlock.of_addMessage2Block("");
         textBlock.of_addMessage2Block("§7═════════════════════════");
         textBlock.of_save("MessageBoard.of_loadTextBlocks();");
+
+        //  When the server is in the maintenance-mode.
+        textBlock = new TextBlock("txt_maintenance_mode");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§8[§4§lMaintenance-Mode§8]");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§fHey §d%p%§f we are sorry");
+        textBlock.of_addMessage2Block("§fthat we kicked you but the");
+        textBlock.of_addMessage2Block("§fserver is in maintenance-mode!");
+        textBlock.of_addMessage2Block("");
+        textBlock.of_addMessage2Block("§7═════════════════════════");
+        textBlock.of_save("MessageBoard.of_loadTextBlocks();");
     }
 
     /* ************************* */
@@ -202,12 +215,6 @@ public class MessageBoard extends Objekt
         //  Replacements...
         message = message.replace("&", "§");
         message = message.replace("%prefix%", prefix);
-
-        //  If prefix is needed...
-        if(of_isUsingAlwaysPrefix())
-        {
-            message = prefix + " " + message;
-        }
 
         return message;
     }
@@ -372,6 +379,12 @@ public class MessageBoard extends Objekt
         if(message == null)
         {
             message = "This message is not defined in the config-file! MessageKey: " + messageKey;
+        }
+
+        //  If prefix is needed...
+        if(of_isUsingAlwaysPrefix())
+        {
+            message = prefix + " " + message;
         }
 
         return of_translateMessage(message);

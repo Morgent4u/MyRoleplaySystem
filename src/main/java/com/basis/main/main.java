@@ -102,6 +102,7 @@ public class main extends JavaPlugin
                 getCommand("IBlock").setExecutor(new CMD_IBlock());
                 getCommand("MRS").setExecutor(new CMD_MRS());
                 getCommand("Position").setExecutor(new CMD_Position());
+                getCommand("Select").setExecutor(new CMD_Select());
 
                 // Initialize own services or dependencies.
                 rc = Settings.of_getInstance().of_initSystemServices();
@@ -121,7 +122,7 @@ public class main extends JavaPlugin
             else
             {
                 Sys.of_sendWarningMessage("System has been disabled by 'settings.yml' or no database connection.");
-                Bukkit.getPluginManager().disablePlugin(this);
+                Bukkit.shutdown();
             }
 
             //  Print all stored messages.

@@ -58,6 +58,7 @@ public class Settings extends Objekt
     boolean ib_useIBlock;
     boolean ib_useDataProtection;
     boolean ib_usePosition;
+    boolean ib_maintenance;
 
     //  MRSModule-Attributes:
     boolean ib_moduleIDCard;
@@ -97,13 +98,80 @@ public class Settings extends Objekt
         //	Settings:
         ib_usePlugin = datei.of_getSetBoolean(sectionKey + ".Enabled", true);
 
+        //  We're going to read the settings...
         if(ib_usePlugin)
         {
-            //  We're going to read the settings...
+            /* ********************* */
+            /* API-SECTION */
+            /* ********************* */
+
             String apiSection = sectionKey + ".API.";
-            ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem", false);
+            ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem.Use", false);
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
             ib_useProtocolLib = datei.of_getSetBoolean(apiSection + "ProtocolLib.Use", true);
+
+            /* ********************* */
+            /* SETTINGS-SECTION */
+            /* ********************* */
+
+            //  Settings-section:
+            String settingsSection = sectionKey + ".Settings.";
+
+            //  Enable/Disable the maintenance mode.
+            ib_maintenance = datei.of_getSetBoolean(settingsSection + "Maintenance.Use", false);
+
+            //  Check for DataProtection while connecting or not!
+            ib_useDataProtection = datei.of_getSetBoolean(settingsSection + "Check4DataProtection.Use", true);
+
+            //  Load the Scoreboard-Settings:
+            ib_useScoreboard = datei.of_getSetBoolean(settingsSection + "Scoreboard.Use", true);
+            if(of_isUsingScoreboard())
+            {
+                String[] lines = new String[]{"&c"+Sys.of_getProgramVersion(), "&fThis is a test.", "&fChange me &e:)"};
+                scoreboardLines = datei.of_getSetStringArray(settingsSection + "Scoreboard.Lines", lines);
+
+                if(scoreboardLines == null || scoreboardLines.length == 0)
+                {
+                    ib_useScoreboard = false;
+                    Sys.of_debug("Deactivated the scoreboard-system because no lines are defined or the entry does not exist!");
+                }
+            }
+
+            //  Load the tab-list setting (can we use the tab-list?):
+            ib_useTablist = datei.of_getSetBoolean(settingsSection + "Tablist.Use", true);
+
+            //  Load the tab-list if it is enabled:
+            if(of_isUsingTablist())
+            {
+                //  Load the tab-list.
+                TablistManager.of_getInstance().of_loadPredefinedTeams(datei, settingsSection + "Tablist");
+            }
+
+            //  Enable or disable the join- and quit-message.
+            ib_useJoinQuitMsg = datei.of_getSetBoolean(settingsSection + "JoinQuitMsg.Use", true);
+
+            if(of_isUsingJoinAndQuitMessage())
+            {
+                joinQuitMessage = new String[2];
+                joinQuitMessage[0] = datei.of_getSetString(settingsSection + "JoinQuitMsg.Join", "&aWelcome to our server, &e%p%&a!");
+                joinQuitMessage[1] = datei.of_getSetString(settingsSection + "JoinQuitMsg.Quit", "&cGoodbye &e%p%&c!");
+            }
+
+            //  Enable or disable iBlock-System:
+            ib_useIBlock = datei.of_getSetBoolean(settingsSection + "IBlock.Use", true);
+
+            //  Enable or disable the Position-System:
+            ib_usePosition = datei.of_getSetBoolean(settingsSection + "Position.Use", true);
+
+            if(of_isUsingPosition())
+            {
+                main.POSITIONSERVICE = new PositionService();
+                main.POSITIONSERVICE.of_load();
+            }
+
+            /* ********************* */
+            /* RP-SECTION */
+            /* ********************* */
 
             //  RolePlay-Section:
             String rpSection = sectionKey + ".RolePlay.";
@@ -115,57 +183,14 @@ public class Settings extends Objekt
             moneyDefaultATM = datei.of_getSetDouble(rpSection + "StartMoney.ATM", 90000);
             moneyDefaultCash = datei.of_getSetDouble(rpSection + "StartMoney.Cash", 10000);
             ib_useMenuOnSwap = datei.of_getSetBoolean(rpSection + "Menu.UseOnSwap", true);
-            ib_useDataProtection = datei.of_getSetBoolean(rpSection + "Check4DataProtection", true);
 
-            //  Load the Scoreboard-Settings:
-            ib_useScoreboard = datei.of_getSetBoolean(rpSection + "Scoreboard.Use", true);
-            if(of_isUsingScoreboard())
-            {
-                String[] lines = new String[]{"&c"+Sys.of_getProgramVersion(), "&fThis is a test.", "&fChange me &e:)"};
-                scoreboardLines = datei.of_getSetStringArray(rpSection + "Scoreboard.Lines", lines);
-
-                if(scoreboardLines == null || scoreboardLines.length == 0)
-                {
-                    ib_useScoreboard = false;
-                    Sys.of_debug("Deactivated the scoreboard-system because no lines are defined or the entry does not exist!");
-                }
-            }
-
-            //  Load the tab-list setting (can we use the tab-list?):
-            ib_useTablist = datei.of_getSetBoolean(rpSection + "Tablist.Use", true);
-
-            //  Load the tab-list if it is enabled:
-            if(of_isUsingTablist())
-            {
-                //  Load the tab-list.
-                TablistManager.of_getInstance().of_loadPredefinedTeams(datei, rpSection + "Tablist");
-                TablistManager.of_getInstance().of_loadPredefinedTeams(datei, rpSection + "Tablist");
-            }
-
-            //  Enable or disable the join- and quit-message.
-            ib_useJoinQuitMsg = datei.of_getSetBoolean(rpSection + "JoinQuitMsg.Use", true);
-            if(of_isUsingJoinAndQuitMessage())
-            {
-                joinQuitMessage = new String[2];
-                joinQuitMessage[0] = datei.of_getSetString(rpSection + "JoinQuitMsg.Join", "&aWelcome to our server, &e%p%&a!");
-                joinQuitMessage[1] = datei.of_getSetString(rpSection + "JoinQuitMsg.Quit", "&cGoodbye &e%p%&c!");
-            }
-
-            //  Enable or disable iBlock-System:
-            ib_useIBlock = datei.of_getSetBoolean(rpSection + "IBlock.Use", true);
-
-            //  Enable or disable the Position-System:
-            ib_usePosition = datei.of_getSetBoolean(rpSection + "Position.Use", true);
-
-            if(of_isUsingPosition())
-            {
-                main.POSITIONSERVICE = new PositionService();
-                main.POSITIONSERVICE.of_load();
-            }
+            /* ********************* */
+            /* EXTERNAL-SECTION */
+            /* ********************* */
 
             //  Reading the SQL-Settings:
             String externalSection = sectionKey + ".External.";
-            ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", false);
+            ib_useMySQL = datei.of_getSetBoolean(externalSection + "MySQL.Use", true);
             String hostName = datei.of_getSetString(externalSection + "MySQL.Host", "localhost");
             String database = datei.of_getSetString(externalSection + "MySQL.Database", "database");
             String username = datei.of_getSetString(externalSection + "MySQL.Username", "user");
@@ -470,6 +495,7 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage("ProtocolLib-Enabled: "+of_isUsingProtocolLib());
+        Sys.of_sendMessage("Maintenance-Enabled: "+of_isUsingMaintenanceMode());
         Sys.of_sendMessage(blue+"[*] Permissions-board:"+white);
         PermissionBoard.of_getInstance().of_sendDebugDetailInformation();
         Sys.of_sendMessage(blue+"[*] Message-/Sound-board:"+white);
@@ -518,6 +544,11 @@ public class Settings extends Objekt
     public void of_setUseProtocolLib(boolean bool)
     {
         ib_useProtocolLib = bool;
+    }
+
+    public void of_setMaintenanceMode(boolean bool)
+    {
+        ib_maintenance = bool;
     }
 
     /* ************************* */
@@ -649,5 +680,10 @@ public class Settings extends Objekt
     public boolean of_isUsingModuleDeathCommandSet()
     {
         return ib_moduleDeathCommandSet;
+    }
+
+    public boolean of_isUsingMaintenanceMode()
+    {
+        return ib_maintenance;
     }
 }
