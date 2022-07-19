@@ -183,8 +183,8 @@ public class Inventar extends Objekt
     /**
      * This function is used to add dynamically a command to the inventory.
      * It will be called it the inventory-file has not been created yet.
-     * @param invSlot The ItemName to interact with.
-     * @param cmds The commands to execute.
+     * @param invSlot The inventory-slot on which the item has been set!
+     * @param cmds The command to execute.
      */
     public void of_addCommands2ItemSlot(int invSlot, String[] cmds)
     {
@@ -192,6 +192,17 @@ public class Inventar extends Objekt
         {
             commands.put(invSlot, cmds);
         }
+    }
+
+    /**
+     * This method is used to override/update the current CommandSet
+     * which has been set on the given InvSlot!
+     * @param invSlot The inventory-slot which the item has been set!
+     * @param cmds The command to execute.
+     */
+    public void of_updateCommandSet2ItemSlot(int invSlot, String[] cmds)
+    {
+        commands.put(invSlot, cmds);
     }
 
     /**

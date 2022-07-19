@@ -6,7 +6,7 @@ import com.basis.sys.Sys;
 import com.roleplay.extended.ExtendedFile;
 import com.roleplay.inventar.normal.inv_atm;
 import com.roleplay.inventar.normal.inv_menu;
-import com.roleplay.objects.CommandSet;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -107,7 +107,6 @@ public class InventarContext extends Objekt
             String invName = invFile.of_getSetString(section + ".Name", "&cNo Inventory name");
             invName = invName.replace("&", "§");
 
-            String invClassification = invFile.of_getSetString(section + ".Classification", "DEFAULT").toUpperCase();
             String invType = invFile.of_getSetString(section + ".Type", "CHEST").toUpperCase();
             boolean lb_useInventoryType = !invType.contains("CHEST");
             boolean lb_closeOnClick = invFile.of_getSetBoolean(section + ".CloseOnClick", true);
@@ -145,154 +144,67 @@ public class InventarContext extends Objekt
                 //  Create an array of ItemStacks.
                 ItemStack[] itemStacks = new ItemStack[invSize];
 
-                //  Get the inventory-items.
+                //  Load all ItemStacks...
                 for(int i = 0; i < invSize; i++)
                 {
                     ItemStack item = invFile.of_getItemStackByKey(section + ".Items." + i);
 
                     if(item != null)
                     {
-                        //  Check if the item has a defined command-set.
+                        //  Check for CommandSet and the current item.
                         String[] commandSet = invFile.of_getStringArrayByKey(section + ".Items." + i + ".CommandSet");
-                        boolean lb_hasCommandSet = commandSet != null && commandSet.length > 0;
-
-                        //  We need to handle the inventory-classification. The return is an object-array,
-                        //  Array-Index:
-                        //  0 => integer => 1 = OK, -1 Error, -2 Break here
-                        //  1 => item => modified-item-stack (for example replace some placeholder in the item-stack).
-                        //  2 => CommandSet => modified-command-set (for example replace some placeholder).
-                        //  3 => ItemStacks[] => If we break here, the itemStacks-Array has been filled in the Inventory-Class-Handle.
-                        //  4 => CommandSets[] => Is used to set to the defined ItemStacks which has been set by the handle-function, the right commandSet.
-
-                        Object[] objects = main.INVENTARSERVICE.of_handleInventoryClassification4ItemStack(inventory, invFile, section, item, i, invClassification, commandSet);
-
-                        if(objects != null && objects.length == 5)
-                        {
-                            ItemStack[] returnedItemStacks = null;
-                            CommandSet[] returnedCommandSets = null;
-                            int returnCode = -1;
-
-                            try
-                            {
-                                //  Get the important objects in the given order.
-                                returnCode = (Integer) objects[0];
-                                item = (ItemStack) objects[1];
-                                commandSet = (String[]) objects[2];
-                                returnedItemStacks = (ItemStack[]) objects[3];
-                                returnedCommandSets = (CommandSet[]) objects[4];
-                            }
-                            catch (Exception e)
-                            {
-                                inventar.of_sendErrorMessage(e, "InventarContext.of_loadInventoryByFile();", "There was an error while receiving data from the function: of_handleInventoryClassification4ItemStack(;");
-                                return;
-                            }
-
-                            //  If the handleInventoryFunction could not handle the given Inventory-Classification.
-                            if(returnCode == -1)
-                            {
-                                return;
-                            }
-                            //  We don't have to iterate through the item-stacks any longer.
-                            else if(returnCode == -2)
-                            {
-                                if(returnedItemStacks != null && returnedItemStacks.length > 0)
-                                {
-                                    //  Check if some CommandSets has been defined.
-                                    if(returnedCommandSets != null && returnedCommandSets.length > 0)
-                                    {
-                                        //  We iterate through the ItemStacks and check if we can find
-                                        //  a defined CommandSet for the given ItemStack.
-                                        int commandSetIndex = 0;
-
-                                        for(int itemStackIndex = 0; itemStackIndex < returnedItemStacks.length; itemStackIndex++)
-                                        {
-                                            //  Check if the current ItemStack is not NULL.
-                                            if(returnedItemStacks[itemStackIndex] != null)
-                                            {
-                                                if(commandSetIndex <= returnedCommandSets.length -1)
-                                                {
-                                                    CommandSet currentCommandSet = returnedCommandSets[commandSetIndex];
-
-                                                    //  If a CommandSet has been defined.
-                                                    if(currentCommandSet != null)
-                                                    {
-                                                        //  We need the Slot-Id (ItemStack-Index) and add the given String-Commands by of_getCommandSet().
-                                                        inventar.of_addCommands2ItemSlot(itemStackIndex, currentCommandSet.of_getCommandSets());
-                                                    }
-
-                                                    commandSetIndex++;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //  If no CommandSet has been defined for the given ItemStack-Array we use
-                                        //  the default (parent) CommandSet for every ItemStack.
-
-                                        //  Check if parent CommandSet exist.
-                                        if(lb_hasCommandSet)
-                                        {
-                                            //  Iterate through the ItemStacks and add it with
-                                            //  the parent CommandSet to the inventory.
-                                            for(int slot = 0; slot < returnedItemStacks.length; slot++)
-                                            {
-                                                //  Check if the ItemStack (Slot) is not NULL.
-                                                if(returnedItemStacks[slot] != null)
-                                                {
-                                                    inventar.of_addCommands2ItemSlot(slot, commandSet);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    //  Update the current ItemStacks with the one from the handle-function.
-                                    itemStacks = returnedItemStacks;
-                                }
-                                else
-                                {
-                                    Sys.of_debug("InventarContext.of_loadByInv() - Failed to handle the inventory-classification. The InventarContext has got an ItemStacks[] with NULL or no entries.");
-                                }
-
-                                break;
-                            }
-                        }
-
-                        //  Add the item to the array.
                         itemStacks[i] = item;
 
-                        if(lb_hasCommandSet)
+                        if(commandSet != null && commandSet.length > 0)
                         {
+                            //  Store the CommandSet in a local and the inventory-variable!
                             inventar.of_addCommands2ItemSlot(i, commandSet);
                         }
                     }
                 }
 
-                // Check if the inventory need to be a copyInv.
-                if(!inventar.of_isCopyInv())
-                {
-                    //  The inventory need to be a copyInv if one of the ItemStacks or the inventory-name contains a placeholder!
-                    boolean lb_copyInv = invName.contains("%");
+                //  Handle some Inventory-ItemStacks.
+                itemStacks = main.INVENTARSERVICE.of_handleItemStacksFromInventory(itemStacks, invFile, inventar, section);
 
-                    if(!lb_copyInv)
+                if(itemStacks != null)
+                {
+                    //  Set the ending attributes...
+                    inventory.setStorageContents(itemStacks);
+                    inventar.of_setInventarName(invName);
+                    inventar.of_setInventory(inventory);
+                    inventar.of_setCloseOnClickEnabled(lb_closeOnClick);
+
+                    // Check if the inventory need to be a copyInv.
+                    if(!inventar.of_isCopyInv())
                     {
-                        lb_copyInv = main.INVENTARSERVICE.of_check4ItemStacksWithSpecificPattern(itemStacks, "%");
+                        //  The inventory need to be a copyInv if one of the ItemStacks or the inventory-name contains a placeholder!
+                        boolean lb_copyInv = invName.contains("%");
+
+                        if(!lb_copyInv)
+                        {
+                            lb_copyInv = main.INVENTARSERVICE.of_check4ItemStacksWithSpecificPattern(itemStacks, "%");
+                        }
+
+                        //  Set the copyInv state.
+                        inventar.of_setCopyInv(lb_copyInv);
                     }
 
-                    //  Set the copyInv state.
-                    inventar.of_setCopyInv(lb_copyInv);
+                    //  Set the end-attributes for this object.
+                    inventory.setStorageContents(itemStacks);
+                    inventar.of_setInventarName(invName);
+                    inventar.of_setInventory(inventory);
+                    inventar.of_setCloseOnClickEnabled(lb_closeOnClick);
                 }
-
-                inventory.setStorageContents(itemStacks);
-                inventar.of_setInventarName(invName);
-                inventar.of_setInventory(inventory);
-                inventar.of_setInvClassification(invClassification);
-                inventar.of_setCloseOnClickEnabled(lb_closeOnClick);
+                else
+                {
+                    inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "There was an error while handling the inventory-type! Inventory-File:" + invFile.of_getFileName());
+                    return;
+                }
             }
             //  An error occurred. No invSlot-size was defined.
             else
             {
-                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the file-inventory: " + invFile.of_getFileName());
+                inventar.of_sendErrorMessage(null, "InventarContext.of_loadInventoryByFile();", "No invSlot-size was defined for the Inventory-File: " + invFile.of_getFileName());
                 return;
             }
         }
@@ -338,7 +250,7 @@ public class InventarContext extends Objekt
      * @param inventar The inventory to save.
      * @return 1 if the inventory was saved successfully. -1 if the inventory was not saved.
      */
-    public int of_saveInventory2File(ExtendedFile invFile, Inventar inventar)
+    private int of_saveInventory2File(ExtendedFile invFile, Inventar inventar)
     {
         //  Check if the inventory instance is valid.
         Inventory inventory = inventar.of_getInv();
@@ -349,10 +261,10 @@ public class InventarContext extends Objekt
             ItemStack[] items = inventory.getStorageContents();
             String inventoryName = inventar.of_getInventarName();
             String invClassification = inventar.of_getInvClassification();
-
-            boolean lb_moneyTransferInv = invClassification.equals("MONEY_TRANSFER");
+            String[] invClassifications = invClassification.split(",");
             int invSize = inventory.getSize();
 
+            //  Store inventory-attributes to the file.
             String section = "Inventory";
             invFile.of_set(section + ".Name", inventoryName.replace("§", "&"));
             invFile.of_set(section + ".Size", invSize);
@@ -362,6 +274,9 @@ public class InventarContext extends Objekt
 
             if(items.length > 0)
             {
+                boolean lb_moneyTransferInv = ArrayUtils.indexOf(invClassifications, "MONEY_TRANSFER") != -1;
+                boolean lb_positionInv = ArrayUtils.indexOf(invClassifications, "POSITION") != -1;
+
                 for(int i = 0; i < items.length; i++)
                 {
                     ItemStack item = items[i];
@@ -371,13 +286,18 @@ public class InventarContext extends Objekt
                         //  Save the item in the file.
                         item = invFile.of_getSetItemStack(section + ".Items." + i, item);
 
+                        //  If the item could be stored we check for inventory-classification
                         if(item != null)
                         {
-                            //  If the inventory-classification is a MONEY_TRANSFER-Inv, we add the entry: Price.
                             if(lb_moneyTransferInv)
                             {
                                 invFile.of_set(section + ".Items." + i + ".UseDefinedList", false);
                                 invFile.of_getSetDouble(section + ".Items." + i + ".Price", 999999);
+                            }
+
+                            if(lb_positionInv)
+                            {
+                                invFile.of_getSetString(section + ".Items." + i + ".Pos", "");
                             }
 
                             //  Check if the item has a defined command-set.
@@ -387,12 +307,6 @@ public class InventarContext extends Objekt
                             {
                                 invFile.of_set(section + ".Items." + i + ".CommandSet", commandSet);
                             }
-                        }
-                        //  An error occurred.
-                        else
-                        {
-                            inventar.of_sendErrorMessage(null, "InventarContext.of_saveInventory2File();", "The item-stack could not be saved on position: " + i);
-                            return -1;
                         }
                     }
                 }

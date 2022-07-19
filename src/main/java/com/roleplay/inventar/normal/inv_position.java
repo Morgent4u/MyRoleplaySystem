@@ -24,7 +24,7 @@ public class inv_position extends Inventar
     {
         //  Define some default attributes:
         of_setInventarName("§8[§4§lPosition - List§8]");
-        of_setInvClassification("TEMPLATE_ITEM");
+        of_setInvClassification("POSITION");
         of_setCloseOnClickEnabled(true);
 
         inv = Bukkit.createInventory(null, 54, of_getInventarName());

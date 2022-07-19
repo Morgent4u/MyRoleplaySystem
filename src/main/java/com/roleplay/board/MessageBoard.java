@@ -228,8 +228,9 @@ public class MessageBoard extends Objekt
     public String of_translateMessageWithPlayerStats(String message, Spieler ps)
     {
         //  Default translation... do not call of_translateMessage(String) here!
-        message = message.replace("&", "§");
-        message = message.replace("%prefix%", prefix);
+        //  But why?? - 2022-07-18
+        //  We do it. - 2022-07-19
+        message = of_translateMessage(message);
 
         //  Player Stats:
         message = message.replace("%p%", ps.of_getPlayer().getName());

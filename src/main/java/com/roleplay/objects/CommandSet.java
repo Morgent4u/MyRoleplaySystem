@@ -8,6 +8,11 @@ import com.roleplay.board.PermissionBoard;
 import com.roleplay.spieler.Spieler;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Created 15.04.2022
@@ -25,6 +30,7 @@ public class CommandSet extends Objekt
     Spieler ps;
 
     int executed = 0;
+    int commandIndex = 0;
 
     /* ************************************* */
     /* CONSTRUCTOR */
@@ -75,11 +81,12 @@ public class CommandSet extends Objekt
         for(int i = 0; i < size; i++)
         {
             String command = commands[i];
+            commandIndex = i;
 
             if(command.equals("=IF EXECUTED THEN="))
             {
                 //  Search for the ELSE-Statement...
-                int index = ArrayUtils.indexOf( commands, "=ELSE=");
+                int index = ArrayUtils.indexOf(commands, "=ELSE=");
 
                 //  Validate the index-value...
                 if(index != -1)
@@ -145,6 +152,11 @@ public class CommandSet extends Objekt
                 of_sendErrorMessage(null, "CommandSet.of_executeAllCommands();", "Command: '"+command+"' failed!");
                 return;
             }
+            //  We stop here!
+            else if(executed == -99)
+            {
+                break;
+            }
         }
     }
 
@@ -198,6 +210,10 @@ public class CommandSet extends Objekt
                 return of_executeCommand4MoneySystem(command, "remove");
             case "PERM":
                 return PermissionBoard.of_getInstance().of_hasPermissionsByDefault(ps, command) ? 1 : -3;
+            case "EFFECT":
+                return of_giveEffect2Player(command);
+            case "WAIT":
+                return of_handleWaitCommand(command);
         }
 
         return -2;
@@ -234,7 +250,7 @@ public class CommandSet extends Objekt
                 String[] replaceParameters = replacement.split("=");
 
                 //  Iterate trough all commands...
-                if(replaceParameters != null && replaceParameters.length == 2)
+                if(replaceParameters.length == 2)
                 {
                     for(int i = 0; i < commands.length; i++)
                     {
@@ -324,18 +340,109 @@ public class CommandSet extends Objekt
             //	ArrayCopy :)
             System.arraycopy(commands, arrayIndex, commandSet, 0, arraySize);
 
-            //  Print some debug stuff...
-            for(int i = 0; i < commandSet.length; i++)
-            {
-                Sys.of_debug("CMD-SET-DEBUG: " + i + " - " + commandSet[i]);
-            }
-
             ps.of_setPowerObject(commandSet);
             ps.of_setWaiting4Input(true);
         }
         else
         {
             Sys.of_debug("There was an error while executing the following INPUT-Statement: " + command + "'. No placeholder found!");
+        }
+
+        return -1;
+    }
+
+    /**
+     * This method is used to give the player a defined effect.
+     * @param command The current command.
+     * @return 1 = OK, -2 = Format-error!
+     */
+    private int of_giveEffect2Player(String command)
+    {
+        //  Get more command-information...
+        String[] commandData = command.split("=");
+
+        if(commandData.length == 3)
+        {
+            //  Get Potion-Information and give the effect to the player.
+            String potionName = commandData[0];
+            int potionDuration = Sys.of_getString2Int(commandData[1]);
+            int potionAmplifier = Sys.of_getString2Int(commandData[2]);
+
+            if(potionDuration != -1 && potionAmplifier != -1 && !potionName.isEmpty())
+            {
+                try
+                {
+                    ps.of_getPlayer().addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(potionName)), (potionDuration * 20), potionAmplifier));
+                    return 1;
+                }
+                catch (Exception ignored) { }
+            }
+        }
+
+        Sys.of_debug("There was an error by getting the Poison-Name, Poison-Duration or Poison-Amplifier!");
+        return -2;
+    }
+
+    /**
+     * This method is used to handle the WAIT-Command.
+     * The command is used to wait until the given seconds.
+     * After the time has been expired we continue executing the CommandSet.
+     * @param command The command-information.
+     * @return -1 = Error, -99 = Stop executing the CommandSet.
+     */
+    public int of_handleWaitCommand(String command)
+    {
+        int seconds = Sys.of_getString2Int(command);
+
+        if(seconds != -1)
+        {
+            new BukkitRunnable()
+            {
+
+                @Override
+                public void run()
+                {
+                    // *********************** //
+                    //  Example-CommandSet:
+                    //  We want to eliminate all CommandSets before the 'WAIT' and
+                    //  after the 'ELSE'-Part because no IF-Part is given!
+                    //  0 - =IF EXECUTED THEN=
+                    //  1 - NOTHING
+                    //  2 - WAIT=20 -> commandIndex
+                    //  3 - DEBUG
+                    //  4 - =ELSE=
+                    //  5 - DO SOMETHING
+                    // *********************** //
+
+                    String[] commandSet = Sys.of_getArrayElementsAfterGivenArrayIndex(commands, commandIndex);
+
+                    if(commandSet != null && commandSet.length > 0)
+                    {
+                        int posIf = ArrayUtils.indexOf(commandSet, "=IF EXECUTED THEN=");
+                        int posElse = ArrayUtils.indexOf(commandSet, "=ELSE=");
+
+                        //  If an else-statement could be found without the IF-Statement, remove the ELSE-Part!
+                        if(posIf == -1 && posElse > -1)
+                        {
+                            commandSet = Arrays.copyOf(commandSet, posElse);
+                        }
+                    }
+
+                    //  Execute the rest of the commands!
+                    if(commandSet != null && commandSet.length > 0)
+                    {
+                        new CommandSet(commandSet, ps).of_executeAllCommands();
+                    }
+                }
+
+            }.runTaskLater(main.PLUGIN, 20L * seconds);
+
+            //  We need to stop the next CommandSets.
+            return -99;
+        }
+        else
+        {
+            Sys.of_debug("Error while getting the seconds from the WAIT-Command! WAIT=" + command);
         }
 
         return -1;
@@ -384,7 +491,6 @@ public class CommandSet extends Objekt
         }
     }
 
-
     /* ************************************* */
     /* GETTER */
     /* ************************************* */
@@ -427,5 +533,4 @@ public class CommandSet extends Objekt
     {
         return ( replacements != null && replacements.length > 0);
     }
-
 }

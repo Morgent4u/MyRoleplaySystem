@@ -2,6 +2,7 @@ package com.basis.sys;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import com.basis.main.main;
 import com.basis.utils.SimpleFile;
@@ -200,7 +201,7 @@ public class Sys
      */
     public static void of_sendErrorMessage(Exception exception, String systemArea, String invoker, String errorMessage)
     {
-        //	Farbcodes
+        //	Color codes
         String red = "\u001B[31m";
         String white = "\u001B[0m";
         String yellow = "\u001B[33m";
@@ -318,6 +319,32 @@ public class Sys
         myArray = temp;
 
         return myArray;
+    }
+
+    /**
+     * This method is used get all array-elements after the given indexId.
+     * @param myArray The given array.
+     * @param indexId The index-value from which the after-elements should be got returned.
+     * @return The array which only contains the array-elements after the given indexId!
+     */
+    public static String[] of_getArrayElementsAfterGivenArrayIndex(String[] myArray, int indexId)
+    {
+        //  Check if index is valid.
+        if(myArray == null || indexId < 0 || indexId >= myArray.length)
+        {
+            return myArray;
+        }
+
+        //  We want the values after the given indexId!
+        indexId++;
+
+        //  If it's the last entry in the array, we remove the value!
+        if(indexId == myArray.length - 1)
+        {
+            return of_removeArrayValueByIndex(myArray, indexId);
+        }
+
+        return Arrays.copyOfRange(myArray, indexId, myArray.length);
     }
 
     /**

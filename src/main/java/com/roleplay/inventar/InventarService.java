@@ -1,9 +1,11 @@
 package com.roleplay.inventar;
 
 import com.basis.ancestor.Objekt;
+import com.basis.main.main;
 import com.basis.sys.Sys;
 import com.roleplay.board.MessageBoard;
 import com.roleplay.extended.ExtendedFile;
+import com.roleplay.position.Position;
 import com.roleplay.spieler.Spieler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -49,81 +51,72 @@ public class InventarService extends Objekt
     }
 
     /* ************************************* */
-    /* OBJEKT - ANWEISUNGEN */
+    /* OBJECT - METHODS */
     /* ************************************* */
 
     /**
-     * This function has been implemented to structure the sourcecode from the InventarContext
-     * to the InventarService.
-     *
-     * @param invFile The given inventory-file.
-     * @param section The given inventory--file-section.
-     * @param item The current itemStack.
-     * @param arrayIndex The current arrayIndex of the item which has been loaded.
-     * @param invClassification The inv-classification.
-     * @param commandSet Defined CommandSets.
-     * @return 1 = OK, -1 = ERROR, -2 = NO Error but the ItemStacks[]-Array has been filled by this function.
+     * This method is used to handle the given itemStack-usages.
+     * For example if an item should be used as a sell/buy item, we need
+     * to check for price-attributes on the given file.
+     * @param items The full list of ItemStacks which has been already handled with default-habits.
+     * @param invFile The file of the inventory.
+     * @param inv The inventory-instance.
+     * @param configSection The config-section of the inventory (this should be by default 'Inventory').
+     * @return The replacement ItemStack ready to handle it!
      */
-    public Object[] of_handleInventoryClassification4ItemStack(Inventory inv, ExtendedFile invFile, String section, ItemStack item, int arrayIndex, String invClassification, String[] commandSet)
+    public ItemStack[] of_handleItemStacksFromInventory(ItemStack[] items, ExtendedFile invFile, Inventar inv, String configSection)
     {
-        //  We need to handle the inventory-classification. The return is an object-array,
-        //  Array-Index:
-        //  0 => integer => 1 = OK, -1 Error, -2 Break here
-        //  1 => item => modified-item-stack (for example replace some placeholder in the item-stack).
-        //  2 => CommandSet => modified-command-set (for example replace some placeholder).
-        //  3 => ItemStacks[] => If we break here, the itemStacks-Array has been filled in the Inventory-Class-Handle.
-        //  4 => CommandSets[] => Is used to set to the defined ItemStacks which has been set by the handle-function, the right commandSet.
+        String sourceArea = "InventarService.of_handleItemStacksFromInventory();";
 
-        Object[] errorObject = new Object[] {-1, null, null, null, null};
-
-        //  Check for the inventory classification.
-        if(invClassification.equals("MONEY_TRANSFER"))
+        if(items != null)
         {
-            if(invFile.of_getConfig().isSet(section + ".Items." + arrayIndex + ".Price"))
+            for(int index = 0; index < items.length; index++)
             {
-                double price = invFile.of_getDoubleByKey(section + ".Items." + arrayIndex + ".Price");
-
-                if(price != -1)
+                if(items[index] != null)
                 {
-                    item = of_replaceItemStackValues(item, "%price%", String.valueOf(price));
-
-                    //  Iterate through the CommandSet and check if the placeholder is in the command.
-                    if(commandSet != null)
+                    //  Check if a price has been defined.
+                    if(invFile.of_getConfig().isSet(configSection + ".Items." + index + ".Price"))
                     {
-                        for(int j = 0; j < commandSet.length; j++)
+                        //  Get the price.
+                        double price = invFile.of_getDoubleByKey(configSection + ".Items." + index + ".Price");
+
+                        if(price != -1)
                         {
-                            if(commandSet[j].contains("%price%"))
-                            {
-                                commandSet[j] = commandSet[j].replace("%price%", String.valueOf(price));
-                            }
+                            items[index] = of_replaceItemStackAndCommandSetByHandling(items[index], inv, "%price%", String.valueOf(price), index);
+                        }
+                        //  If the price is not valid!
+                        else
+                        {
+                            Sys.of_debug(sourceArea + " - The price of the item is not valid. Config-key: " + configSection + ".Items." + index + ".Price");
                         }
                     }
 
-                    //  Return the needed objects in the correct order.
-                    return new Object[] {1, item, commandSet, null, null};
-                }
-                //  If the price is not valid.
-                else
-                {
-                    Sys.of_debug("InventarService.of_handleInventoryClassification4ItemStack();  - The price of the item is not valid. Config-key: " + section + ".Items." + arrayIndex + ".Price");
+                    //  Check if a position has been defined.
+                    if(invFile.of_getConfig().isSet(configSection + ".Items." + index + ".Pos"))
+                    {
+                        //  Get the position name/id.
+                        String position = invFile.of_getString(configSection + ".Items." + index + ".Pos");
+                        Position pos = main.POSITIONSERVICE.of_getPositionByAnything(position);
+
+                        if(pos != null)
+                        {
+                            items[index] = of_replaceItemStackAndCommandSetByHandling(items[index], inv, "%pos%", pos.of_getPositionName(), index);
+                        }
+                        //  If no position could be found!
+                        else
+                        {
+                            Sys.of_debug(sourceArea + " - The given position '"+position+"' does not exist! Config-key: " + configSection + ".Items." + index + ".Pos");
+                        }
+                    }
                 }
             }
-        }
-        else if(invClassification.startsWith("TEMPLATE_ITEM"))
-        {
-            String dataSource = invClassification.replace("TEMPLATE_ITEM", "");
 
-            //  TODO: Allgemeinesn Dienst erstellten, welcher jede Datensource annehmen kann.
-            //  Hier soll folgende Funktion hilfreich sein.
-            //  Sys.of_getStringWithoutPlaceholder()
-
-            return new Object[] {-2, item, commandSet, null, null};
+            return items;
         }
 
-        //  Send the default...
-        return new Object[] {1, null, null, null, null};
+        of_sendErrorMessage(null, sourceArea, "There was an error while handling the ItemStacks! File: " + invFile.of_getFileName());
+        return null;
     }
-
 
     /**
      * This function is used to create an itemStack by the given attributes.
@@ -308,6 +301,35 @@ public class InventarService extends Objekt
             }
 
             item.setItemMeta(meta);
+        }
+
+        return item;
+    }
+
+    /**
+     * This method is used to replace all necessary information
+     * (itemStack and CommandSet) with the replace-value of the given Inventory-handle.
+     * @param item The ItemStack
+     * @param inv The given inventory-instance.
+     * @param searchValue The search value for example: '%pos%'
+     * @param replaceValue The replacement value for example: 'Town 1'
+     * @param itemArrayIndex The array-field in which the item has been stored!
+     * @return Replaced ItemStack.
+     */
+    private ItemStack of_replaceItemStackAndCommandSetByHandling(ItemStack item, Inventar inv, String searchValue, String replaceValue, int itemArrayIndex)
+    {
+        //  Replace the itemStack-Value.
+        item = of_replaceItemStackValues(item, searchValue, replaceValue);
+        item = of_replaceItemStackValues(item, searchValue.toUpperCase(), replaceValue);
+
+        //  Check for a defined command-set.
+        String[] commandSet = inv.of_getCommandsByInvSlot(itemArrayIndex);
+
+        //  Only null-check needed!
+        if(commandSet != null)
+        {
+            commandSet =  Sys.of_getReplacedArrayString(commandSet, searchValue, replaceValue);
+            inv.of_updateCommandSet2ItemSlot(itemArrayIndex, Sys.of_getReplacedArrayString(commandSet, searchValue.toUpperCase(), replaceValue));
         }
 
         return item;

@@ -175,8 +175,12 @@ public class SpielerService extends Objekt
                 ps.of_getPlayer().teleport(pos.of_getLocation());
                 return 1;
             }
+
+            Sys.of_debug("The given position '" + posNameOrId + "' could not be found!");
+            return -1;
         }
 
+        Sys.of_debug("The Position-System is not enabled in the settings.yml!");
         return -1;
     }
 
