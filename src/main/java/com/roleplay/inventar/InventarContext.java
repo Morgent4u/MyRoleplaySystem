@@ -163,7 +163,7 @@ public class InventarContext extends Objekt
                     }
                 }
 
-                //  Handle some Inventory-ItemStacks.
+                //  Handle some Inventory-ItemStacks. Do not check for itemStacks.length!
                 itemStacks = main.INVENTARSERVICE.of_handleItemStacksFromInventory(itemStacks, invFile, inventar, section);
 
                 if(itemStacks != null)

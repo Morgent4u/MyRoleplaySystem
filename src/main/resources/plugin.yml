@@ -4,7 +4,7 @@ main: com.basis.main.main
 api-version: 1.18
 authors: [ Nihar ]
 
-softdepend: [Vault, PlaceholderAPI, ProtocolLib]
+softdepend: [Vault, PlaceholderAPI, ProtocolLib, WorldGuard]
 
 commands:
   Test:
@@ -13,24 +13,19 @@ commands:
     usuage: /Interaction
   Dataprotection:
     usuage: /Dataprotection
-    aliases: [Datenschutzerklärung,Datenschutz]
   Textblock:
     usuage: /Textblock
-    aliases: [text]
   Hologram:
     usuage: /Hologram
-    aliases: [holo, hd]
   MRS:
     usuage: /MRS
-    aliases: [MyRoleplaySystem]
   NPC:
     usuage: /NPC
   IBlock:
     usuage: /IBlock
-    aliases: [ifield]
   Position:
     usuage: /Position
-    aliases: [pos]
   Select:
     usuage: /Select
-    aliases: [db]
+  Plot:
+    usuage: /Plot

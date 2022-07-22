@@ -293,7 +293,7 @@ public class UPDService extends Objekt
                 }
                 else
                 {
-                    of_sendErrorMessage(null, "UPDService.of_runUPD();", "The UPD-File is not compatible with this plugin-version!");
+                    of_sendErrorMessage(null, "UPDService.of_isNewUpdateAvailable();", "The UPD-File is not compatible with this plugin-version!");
                     return false;
                 }
             }

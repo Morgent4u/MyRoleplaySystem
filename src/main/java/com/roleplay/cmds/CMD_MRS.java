@@ -65,6 +65,7 @@ public class CMD_MRS extends CMDExecutor
                                 p.sendMessage("");
                                 p.sendMessage("§5Current modules:");
                                 p.sendMessage("§b[*]§f DeathCommandSet: "+( Settings.of_getInstance().of_isUsingModuleDeathCommandSet() ? "§aEnabled" : "§cDisabled" ));
+                                p.sendMessage("§b[*]§f IDCard: "+( Settings.of_getInstance().of_isUsingModuleIDCard() ? "§aEnabled" : "§cDisabled" ));
                                 p.sendMessage("");
                                 p.sendMessage("§7═════════════════════════");
                                 return true;
@@ -111,7 +112,7 @@ public class CMD_MRS extends CMDExecutor
         p.sendMessage("");
         p.sendMessage("§7To show the help-text:");
         p.sendMessage("§c/MRS");
-        p.sendMessage("§fCheck the current enabled modules:");
+        p.sendMessage("§7Check the current enabled modules:");
         p.sendMessage("§c/MRS modules");
         p.sendMessage("§7To reload the whole MRS:");
         p.sendMessage("§c/MRS reload");

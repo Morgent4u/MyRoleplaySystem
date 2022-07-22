@@ -103,6 +103,7 @@ public class main extends JavaPlugin
                 getCommand("MRS").setExecutor(new CMD_MRS());
                 getCommand("Position").setExecutor(new CMD_Position());
                 getCommand("Select").setExecutor(new CMD_Select());
+                getCommand("Plot").setExecutor(new CMD_Plot());
 
                 // Initialize own services or dependencies.
                 rc = Settings.of_getInstance().of_initSystemServices();

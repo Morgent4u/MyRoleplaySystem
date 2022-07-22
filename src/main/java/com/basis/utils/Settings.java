@@ -13,6 +13,7 @@ import com.roleplay.extern.Vault;
 import com.roleplay.hologram.HologramService;
 import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
+import com.roleplay.manager.LabelManager;
 import com.roleplay.manager.TablistManager;
 import com.roleplay.module.ModuleDeathCmdSet;
 import com.roleplay.module.ModuleIdCard;
@@ -49,11 +50,12 @@ public class Settings extends Objekt
     boolean ib_useVault;
     boolean ib_usePlaceholderApi;
     boolean ib_useProtocolLib;
+    boolean ib_useWorldGuard;
 
     //  Setting-Attributes:
     boolean ib_useMenuOnSwap;
     boolean ib_useScoreboard;
-    boolean ib_useTablist;
+    boolean ib_useTabList;
     boolean ib_useJoinQuitMsg;
     boolean ib_useIBlock;
     boolean ib_useDataProtection;
@@ -109,6 +111,7 @@ public class Settings extends Objekt
             ib_useVaultMoney = datei.of_getSetBoolean(apiSection + "Vault.MoneySystem.Use", false);
             ib_usePlaceholderApi = datei.of_getSetBoolean(apiSection + "PlaceholderAPI.Use", false);
             ib_useProtocolLib = datei.of_getSetBoolean(apiSection + "ProtocolLib.Use", true);
+            ib_useWorldGuard = datei.of_getSetBoolean(apiSection + "WorldGuard.Use", false);
 
             /* ********************* */
             /* SETTINGS-SECTION */
@@ -125,6 +128,7 @@ public class Settings extends Objekt
 
             //  Load the Scoreboard-Settings:
             ib_useScoreboard = datei.of_getSetBoolean(settingsSection + "Scoreboard.Use", true);
+
             if(of_isUsingScoreboard())
             {
                 String[] lines = new String[]{"&c"+Sys.of_getProgramVersion(), "&fThis is a test.", "&fChange me &e:)"};
@@ -138,7 +142,7 @@ public class Settings extends Objekt
             }
 
             //  Load the tab-list setting (can we use the tab-list?):
-            ib_useTablist = datei.of_getSetBoolean(settingsSection + "Tablist.Use", true);
+            ib_useTabList = datei.of_getSetBoolean(settingsSection + "Tablist.Use", true);
 
             //  Load the tab-list if it is enabled:
             if(of_isUsingTablist())
@@ -304,6 +308,9 @@ public class Settings extends Objekt
             //  we have permissions for player-stuff.
             PermissionBoard.of_getInstance().of_load();
 
+            //  We need to define the LabelManager!
+            LabelManager.of_getInstance().of_load();
+
             //  Load all predefined messages...
             MessageBoard.of_getInstance().of_load();
 
@@ -388,7 +395,7 @@ public class Settings extends Objekt
     }
 
     /**
-     * This function checks while start up if
+     * This method checks while start up, if
      * required or soft depends plugins are on this server.
      * @return 1 = success, 0 = failure
      */
@@ -406,12 +413,13 @@ public class Settings extends Objekt
             //  If no error occurred we can check for the soft dependencies.
             if(!main.VAULT.of_hasAnError())
             {
-                //  Check for soft depends on plugins.
+                //  Check for Placeholder-API.
                 if(of_isUsingPlaceholderAPI())
                 {
                     ib_usePlaceholderApi = Sys.of_check4SpecificPluginOnServer("PlaceholderAPI");
                 }
 
+                //  Check for ProtocolLib is needed for NPCs.
                 if(of_isUsingProtocolLib())
                 {
                     ib_useProtocolLib = Sys.of_check4SpecificPluginOnServer("ProtocolLib");
@@ -429,6 +437,12 @@ public class Settings extends Objekt
                             ib_useProtocolLib = false;
                         }
                     }
+                }
+
+                //  Check for WorldGuard is needed to handle regions.
+                if(of_isUsingWorldGuard())
+                {
+                    ib_useWorldGuard = Sys.of_check4SpecificPluginOnServer("WorldGuard");
                 }
 
                 return 1;
@@ -495,6 +509,7 @@ public class Settings extends Objekt
         Sys.of_sendMessage("Vault-MoneySystem: "+of_isUsingVaultMoneySystem());
         Sys.of_sendMessage("PlaceholderAPI-Enabled: "+of_isUsingPlaceholderAPI());
         Sys.of_sendMessage("ProtocolLib-Enabled: "+of_isUsingProtocolLib());
+        Sys.of_sendMessage("WorldGuard-Enabled: "+of_isUsingWorldGuard());
         Sys.of_sendMessage("Maintenance-Enabled: "+of_isUsingMaintenanceMode());
         Sys.of_sendMessage(blue+"[*] Permissions-board:"+white);
         PermissionBoard.of_getInstance().of_sendDebugDetailInformation();
@@ -649,7 +664,7 @@ public class Settings extends Objekt
 
     public boolean of_isUsingTablist()
     {
-        return ib_useTablist;
+        return ib_useTabList;
     }
 
     public boolean of_isUsingJoinAndQuitMessage()
@@ -686,4 +701,10 @@ public class Settings extends Objekt
     {
         return ib_maintenance;
     }
+
+    public boolean of_isUsingWorldGuard()
+    {
+        return ib_useWorldGuard;
+    }
+
 }

@@ -72,6 +72,10 @@ public class CMD_Select extends CMDExecutor
                         of_sendMessage(sender, "There was an error while creating the database-connection!");
                     }
                 }
+                else if(main.SQL != null && main.SQL.of_isConnected())
+                {
+                    of_preCommand(sender, args);
+                }
 
                 //  If the connection has been established, we close it then.
                 if(rc == 1 && Bukkit.getOnlinePlayers().size() == 0)

@@ -111,6 +111,35 @@ public class InventarService extends Objekt
                 }
             }
 
+            //  After we handled some itemStacks successfully, we check for a inventory-filter...
+            if(invFile.of_getConfig().isSet(configSection + ".Filter") && items.length > 0)
+            {
+                String invFilter = invFile.of_getString(configSection + ".Filter");
+
+                if(invFilter != null && invFilter.isEmpty())
+                {
+                    String[] filterFragments = invFilter.split(",");
+
+                    for(String filter : filterFragments)
+                    {
+                        //  Iterate through all items and remove ItemStacks if it does not match the filter-pattern!
+                        for(int i = 0; i < items.length; i++)
+                        {
+                            ItemStack item = items[i];
+
+                            if(item != null)
+                            {
+                                //  If the itemStack does not contain the filter, we remove it!
+                                if(!of_check4ItemStackWithSpecificPattern(item, filter))
+                                {
+                                    items[i] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return items;
         }
 

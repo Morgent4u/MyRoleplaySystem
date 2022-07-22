@@ -35,6 +35,36 @@ public class CMD_Test extends CMDExecutor
                         if(args.length == 0)
                         {
                             /*
+                            DataStore data = new DataStore("DataStore4Test","SELECT uuid, user FROM mrs_user");
+
+                            if(data.of_retrieve() > 0)
+                            {
+                                int row = data.of_findRow("uuid", "test");
+                                Sys.of_debug("UserID: " + data.of_getItemInteger(row, "user"));
+                            }
+                             */
+                            /*
+                            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(p);
+
+                            if(localPlayer != null)
+                            {
+                                Location loc = BukkitAdapter.adapt(p.getLocation());
+                                RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                                RegionQuery query = container.createQuery();
+
+                                if (!query.testState(loc, localPlayer, Flags.BUILD))
+                                {
+                                    Sys.of_debug("You can not build in Here!");
+                                }
+                                else
+                                {
+                                    Sys.of_debug("You can build!");
+                                }
+                            }
+                            */
+
+
+                            /*
                             //create the book
                             ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
                             BookMeta bookMeta = (BookMeta) book.getItemMeta();
