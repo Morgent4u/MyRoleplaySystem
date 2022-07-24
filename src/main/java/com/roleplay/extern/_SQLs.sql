@@ -62,12 +62,12 @@ CREATE TABLE mrs_label_enum (
 ALTER TABLE mrs_label ADD CONSTRAINT fk_mrs_label_label_enum FOREIGN KEY (label_enum) REFERENCES mrs_label_enum(label_enum);
 
 -- Add the table mrs_label to the key-control-table.
-INSERT INTO mrs_key ( tableName )
-     VALUES ( 'mrs_label' );
+INSERT INTO mrs_key ( tableName, lastKey )
+     VALUES ( 'mrs_label', 2 );
 
 -- Add the table mrs_label_enum to the key-control-table.
-INSERT INTO mrs_key ( tableName )
-     VALUES ( 'mrs_label_enum' );
+INSERT INTO mrs_key ( tableName, lastKey )
+     VALUES ( 'mrs_label_enum', 1 );
 
 -- UPDv=22.1.0.03
 -- Create the view 'mrs_v_user' to get all necessary data for the join-process of a player.
@@ -84,3 +84,13 @@ CREATE VIEW mrs_v_user
 	   FROM mrs_user
 	      ,	mrs_user_data
 	  WHERE mrs_user.user = mrs_user_data.user;
+
+-- UPDv=22.1.0.04
+-- Add a default label-enum entry for the DataStore-mechanic.
+INSERT INTO mrs_label_enum ( label_enum, text, flag )
+     VALUES ( 1, '&9Plot categories', 'plotsystem' );
+
+-- Add some default label-entries for the DataStore-mechanic.
+INSERT INTO mrs_label ( label, label_enum, text, sort )
+     VALUES ( 1, 1, 'Modern', 1 )
+          , ( 2, 1, 'Old', 2 );

@@ -207,29 +207,38 @@ public class CMD_Select extends CMDExecutor
         {
             if(result != null)
             {
+                //  We need the ResultSetMetaData
+                ResultSetMetaData meta = result.getMetaData();
+                StringBuilder columnBuilder = new StringBuilder();
+                int columnCount = meta.getColumnCount();
+
+                //  Get all columns by its name!
+                for (int i = 1; i <= columnCount; i++ )
+                {
+                    String columName = meta.getColumnName(i);
+
+                    if(columName != null && !columName.isEmpty())
+                    {
+                        columnBuilder.append(" §l§c|§f ").append(columName);
+                    }
+                }
+
+                //  Add the column-header as first entry to the ResultList!
+                resultList.add(columnBuilder.toString());
+
                 //  Iterate through each row!
                 while(result.next())
                 {
-                    ResultSetMetaData resultMeta = result.getMetaData();
-                    StringBuilder columnBuilder = new StringBuilder();
                     StringBuilder resultBuilder = new StringBuilder();
-                    int columnCount = resultMeta.getColumnCount();
 
                     for (int i = 1; i <= columnCount; i++ )
                     {
-                        String columName = resultMeta.getColumnName(i);
+                        String columName = meta.getColumnName(i);
 
                         if(columName != null && !columName.isEmpty())
                         {
-                            columnBuilder.append(" | ").append(columName);
                             resultBuilder.append(" §l§8|§f ").append(result.getString(columName));
                         }
-                    }
-
-                    //  We only add the columnBuilder (Table-header) only ONCE to the ResultList!
-                    if(resultList.isEmpty())
-                    {
-                        resultList.add(columnBuilder.toString());
                     }
 
                     //  If some display/label-columns are selected we translate the result in color-codes!

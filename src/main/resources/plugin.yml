@@ -29,3 +29,5 @@ commands:
     usuage: /Select
   Plot:
     usuage: /Plot
+  Label:
+    usuage: /Label

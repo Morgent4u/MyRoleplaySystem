@@ -2,6 +2,8 @@ package com.roleplay.manager;
 
 import com.basis.ancestor.Objekt;
 import com.basis.extern.DataStore;
+import com.basis.main.main;
+import com.basis.sys.Sys;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -29,9 +31,10 @@ public class LabelManager extends Objekt
     @Override
     public int of_load()
     {
-        dataStoreLabel = new DataStore("DataStore4Labels", "SELECT label, label_enum, text, flag, sort FROM mrs_label ORDER BY sort;");
-
         //  Create a DataStore for the labels.
+        String sqlSelect = "SELECT label, label_enum, text, flag, sort FROM mrs_label ORDER BY sort;";
+        dataStoreLabel = new DataStore("DataStore4Labels", "mrs_label", "label", sqlSelect);
+
         if(dataStoreLabel.of_retrieve() == -1)
         {
             of_sendErrorMessage(null, "LabelManager.of_load();", "There was an error while retrieving data from the DataStore: " + dataStoreLabel.of_getInfo());
@@ -39,7 +42,8 @@ public class LabelManager extends Objekt
         }
 
         //  Create a DataStore for the enumLabels.
-        dataStoreLabelEnums = new DataStore("DataStore4LabelEnums", "SELECT label_enum, text, flag FROM mrs_label_enum;");
+        sqlSelect = "SELECT label_enum, text, flag FROM mrs_label_enum;";
+        dataStoreLabelEnums = new DataStore("DataStore4LabelEnums", "mrs_label_enum", "label_enum", sqlSelect);
 
         if(dataStoreLabelEnums.of_retrieve() == -1)
         {
@@ -48,6 +52,100 @@ public class LabelManager extends Objekt
         }
 
         return 1;
+    }
+
+    /* ************************************* */
+    /* OBJECT - METHODS */
+    /* ************************************* */
+
+    /**
+     * This method is used to create a new label-category.
+     * A label-category is used to group labels.
+     * @param categoryName The category-name.
+     * @return 1 = OK, 0 = Category already exists, -1 = An error occurred.
+     */
+    public int of_createNewLabelEnum(String categoryName)
+    {
+        //  Check if the category already exists.
+        categoryName = categoryName.replace("§", "&");
+        String flagText = Sys.of_getNormalizedString(categoryName).trim().toLowerCase();
+        int rowId = dataStoreLabelEnums.of_findRow("flag", flagText);
+
+        if(rowId == -1)
+        {
+            //  Create a new primary-key for the enum-table.
+            int enumId = main.SQL.of_updateKey("mrs_label_enum");
+
+            if(enumId != -1)
+            {
+                //  Update the dataStore with the new entry.
+                rowId = dataStoreLabelEnums.of_addRow();
+
+                if(rowId != -1)
+                {
+                    dataStoreLabelEnums.of_setItemString(rowId, "label_enum", String.valueOf(enumId));
+                    dataStoreLabelEnums.of_setItemString(rowId, "text", categoryName);
+                    dataStoreLabelEnums.of_setItemString(rowId, "flag", flagText);
+
+                    //  Execute a DataStore-Update.
+                    return ( dataStoreLabelEnums.of_update() > 0) ? 1 : -1;
+                }
+            }
+            //  Error while creating a new primary key.
+            else
+            {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * This method is used to create a new label.
+     * A label needs to have a defined label-category.
+     * @param enumId The label-enum category number.
+     * @param labelText The label-name.
+     * @return 1 = OK, 0 = The label-category does not exist, -1 = An error occurred.
+     */
+    public int of_createNewLabel(int enumId, String labelText)
+    {
+        //  Check if the enumId exist!
+        labelText = labelText.replace("§", "&");
+        int row = dataStoreLabelEnums.of_findRow("label_enum", enumId);
+
+        if(row != -1)
+        {
+            //  Create a new primary-key for the label-table.
+            int labelId = main.SQL.of_updateKey("mrs_label");
+
+            if(labelId != -1)
+            {
+                row = dataStoreLabel.of_addRow();
+
+                if(row != -1)
+                {
+                    dataStoreLabel.of_setItemString(row, "label", String.valueOf(labelId));
+                    dataStoreLabel.of_setItemString(row, "label_enum", String.valueOf(enumId));
+                    dataStoreLabel.of_setItemString(row, "text", labelText);
+
+                    //  Execute a DataStore-Update.
+                    return ( dataStoreLabel.of_update() > 0) ? 1 : -1;
+                }
+                //  If an add-row error occurs.
+                else
+                {
+                    return -2;
+                }
+            }
+            //  Error while creating a new primary key.
+            else
+            {
+                return -1;
+            }
+        }
+
+        return 0;
     }
 
     /* ************************************* */
@@ -95,6 +193,16 @@ public class LabelManager extends Objekt
     public String of_getLabelById(int labelId)
     {
         return dataStoreLabel.of_getItemString(dataStoreLabel.of_findRow("label", labelId), "label");
+    }
+
+    public DataStore of_getDataStore4LabelEnums()
+    {
+        return dataStoreLabelEnums;
+    }
+
+    public DataStore of_getDataStore4Labels()
+    {
+        return dataStoreLabel;
     }
 
     public static LabelManager of_getInstance()

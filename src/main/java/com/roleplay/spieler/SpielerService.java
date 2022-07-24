@@ -139,7 +139,7 @@ public class SpielerService extends Objekt
      */
     public void of_sendPluginMessage2Player(Spieler ps, String message)
     {
-        ps.of_getPlayer().sendMessage(MessageBoard.of_getInstance().of_translateMessage(message));
+        ps.of_getPlayer().sendMessage("§8[§cMRS§8]§f "+ MessageBoard.of_getInstance().of_translateMessage(message));
     }
 
     /**
