@@ -94,3 +94,22 @@ INSERT INTO mrs_label_enum ( label_enum, text, flag )
 INSERT INTO mrs_label ( label, label_enum, text, sort )
      VALUES ( 1, 1, 'Modern', 1 )
           , ( 2, 1, 'Old', 2 );
+
+-- Create a table for mrs_plots which has been defined with world-guard.
+CREATE TABLE mrs_plot (
+             plot INT(5) NOT NULL PRIMARY KEY
+           , user INT(5) NULL
+           , label INT(5) NOT NULL
+           , wg_region VARCHAR(40) NOT NULL
+           , price DECIMAL DEFAULT 999999
+           , sellPrice DECIMAL DEFAULT 999999
+           , text VARCHAR(255) NOT NULL
+           , location VARCHAR(255) NOT NULL );
+
+-- Define two primary-key columns for the mrs_plot-table.
+ALTER TABLE mrs_plot ADD CONSTRAINT fk_mrs_plot_user FOREIGN KEY (user) REFERENCES mrs_user(user);
+ALTER TABLE mrs_plot ADD CONSTRAINT fk_mrs_plot_label FOREIGN KEY (label) REFERENCES mrs_label(label);
+
+-- Add the table mrs_plot to the key-control-table.
+INSERT INTO mrs_key ( tableName )
+     VALUES ( 'mrs_plot' );

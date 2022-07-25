@@ -2,18 +2,23 @@ package com.roleplay.cmds;
 
 import com.basis.ancestor.CMDExecutor;
 import com.basis.main.main;
+import com.basis.sys.Sys;
 import com.basis.utils.Settings;
 import com.roleplay.board.PermissionBoard;
+import com.roleplay.manager.LabelManager;
+import com.roleplay.plot.Plot;
 import com.roleplay.spieler.Spieler;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Created 21.07.2022
@@ -45,7 +50,160 @@ public class CMD_Plot extends CMDExecutor
                             return true;
                         }
 
-                        //  Send the default help-text.
+                        if(args.length == 0)
+                        {
+                            of_sendCMDHelperText(p);
+                            return true;
+                        }
+
+                        //  Check for the create-word!
+                        if(args[0].equalsIgnoreCase("create"))
+                        {
+                            //  Build the plot-name.
+                            StringBuilder nameBuilder = new StringBuilder();
+
+                            for(int i = 1; i < args.length; i++)
+                            {
+                                nameBuilder.append(args[i]).append(" ");
+                            }
+
+                            //  Create a plot-object and set the info-attribute as plot-name.
+                            Plot plot = new Plot();
+                            plot.of_setInfo(nameBuilder.toString());
+                            ps.of_setPowerObject(plot);
+
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully created a §csetup-plot§f with the name §f'§a"+nameBuilder+"§f'.");
+                            return true;
+                        }
+
+                        //  Check if the player has a plot.
+                        Plot plot = of_getPlotObject(ps);
+
+                        if(plot == null)
+                        {
+                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cYou need to setup a plot first. Use: §7/plot create <plot-name [...]>");
+                            return true;
+                        }
+
+                        //  Save the current object.
+                        if(args[0].equalsIgnoreCase("save"))
+                        {
+                            String errorMessage = plot.of_validate();
+
+                            //  All ok :)
+                            if(errorMessage == null)
+                            {
+                                int rc = main.PLOTSERVICE._CONTEXT.of_createNewPlot(plot);
+
+                                switch (rc)
+                                {
+                                    case 1:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully created a the §cmrs-plot §f'§a"+plot.of_getInfo()+"§f'!");
+                                        ps.of_setPowerObject(null);
+                                        break;
+                                    case -1:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThere was an error while saving your plot-setup for '§e"+plot.of_getInfo()+"§c'!");
+                                        break;
+                                    case -2:
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThere was a validation-error for your plot-setup for '§e"+plot.of_getInfo()+"§c'!");
+                                        break;
+                                }
+                            }
+                            //  Validation error!
+                            else
+                            {
+                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§c"+errorMessage);
+                            }
+
+                            return true;
+                        }
+
+                        //  Set the spawn-point.
+                        if(args.length == 2)
+                        {
+                            String first = args[0];
+                            String second = args[1];
+
+                            if(first.equalsIgnoreCase("set") && second.equalsIgnoreCase("spawn"))
+                            {
+                                plot.of_setLocation(p.getLocation());
+                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully added a §aspawn-point§f to this plot.");
+                                return true;
+                            }
+                        }
+
+                        //  Set other important attributes (WorldGuard-Region, Category etc.)
+                        if(args.length == 3)
+                        {
+                            String first = args[0];
+                            String second = args[1].toLowerCase();
+                            String third = args[2];
+
+                            if(first.equalsIgnoreCase("set"))
+                            {
+                                switch (second)
+                                {
+                                    case "category":
+                                        int labelId = Sys.of_getString2Int(third);
+
+                                        if(labelId != -1)
+                                        {
+                                            if(LabelManager.of_getInstance().of_checkLabel4GivenLabelEnumFlag(labelId, "plotsystem"))
+                                            {
+                                                String labelName = LabelManager.of_getInstance().of_getLabelById(labelId);
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully set the category to '§a"+labelName+"§f'!");
+                                                plot.of_setLabelEnum(labelId);
+                                            }
+                                            //  The given label-id is not set for the plot-system category.
+                                            else
+                                            {
+                                                String categoryName = LabelManager.of_getInstance().of_getLabelEnumTextByFlag("plotsystem");
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThe given category/label is not set for the label-enum: '§e"+categoryName+"§c'.");
+                                            }
+                                        }
+                                        //  Invalid category-Id.
+                                        else
+                                        {
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cYou need to enter a valid label/plot-category!");
+                                        }
+                                        break;
+                                    case "region":
+                                        try
+                                        {
+                                            RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                                            World world = BukkitAdapter.adapt(Objects.requireNonNull(p.getLocation().getWorld()));
+                                            RegionManager regions = regionContainer.get(world);
+
+                                            if(regions != null && regions.getRegion(third) != null)
+                                            {
+                                                plot.of_setWorldGuardRegion(third);
+                                                main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully set the WorldGuard-Region '§a"+third+"§f' to this plot.");
+                                                return true;
+                                            }
+                                        }
+                                        catch (Exception ignored) { }
+
+                                        //  If an error occurred or the world-guard region does not exist.
+                                        main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cThe defined WorldGuard-Region: '§e"+third+"§c' does not exist!");
+                                        break;
+                                    case "price":
+                                        if(Sys.of_getString2Int(third) != -1)
+                                        {
+                                            plot.of_setPrice(Sys.of_getRoundedDouble(Double.parseDouble(third), 2));
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§fSuccessfully set the WorldGuard-Region '§a"+third+"§f' to this plot.");
+                                        }
+                                        else
+                                        {
+                                            main.SPIELERSERVICE.of_sendPluginMessage2Player(ps, "§cYou need to enter a valid price!");
+                                        }
+                                        break;
+                                }
+
+                                return true;
+                            }
+                        }
+
+                        //  Send CMD-Helper text.
                         of_sendCMDHelperText(p);
                     }
                     //  No permission
@@ -63,6 +221,21 @@ public class CMD_Plot extends CMDExecutor
         }
 
         return false;
+    }
+
+    /* ************************* */
+    /* COMMAND METHODS */
+    /* ************************* */
+
+    private Plot of_getPlotObject(Spieler ps)
+    {
+        try
+        {
+            return (Plot) ps.of_getPowerObject();
+        }
+        catch (Exception ignored) { }
+
+        return null;
     }
 
     /* ************************* */

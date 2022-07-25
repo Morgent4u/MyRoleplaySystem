@@ -6,7 +6,6 @@ import com.basis.sys.Sys;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -26,12 +25,11 @@ import java.util.Objects;
 public class DataStore extends Objekt
 {
     //  Attributes:
-    private ResultSet result = null;
     private String[] columns;
     private String[][] values;
-    private String tableName;
-    private String pkColumn;
-    private String sql;
+    private final String tableName;
+    private final String pkColumn;
+    private final String sql;
 
     //  ColumStatus: I = Insert, U = Update, R = Retrieved, D = Delete
     private String[] rowStatus;
@@ -62,76 +60,105 @@ public class DataStore extends Objekt
      */
     public int of_retrieve()
     {
-        result = main.SQL.of_getResultSet(sql, false);
+        //  Get all column-information.
+        String[] columnTypes = new String[0];
+        String sqlSelect = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"+of_getTableName()+"';";
 
+        //  Attributes:
+        ResultSet result = main.SQL.of_getResultSet(sqlSelect, false);
+        int columnCount = -1;
+
+        //  Get column-information from ResultSet.
         if(result != null)
         {
-            //  We want the column-types so we use the ResultMeta.
             try
             {
-                ResultSetMetaData data = result.getMetaData();
-                String[] columnTypes = new String[0];
-                int columnCount = data.getColumnCount();
-
-                //  Iterate through the column-header.
-                for(int dbRow = 1; dbRow <= columnCount; dbRow++)
-                {
-                    columns = Sys.of_addArrayValue(of_getColumns(), data.getColumnName(dbRow));
-                    columnTypes = Sys.of_addArrayValue(columnTypes, data.getColumnTypeName(dbRow));
-                }
-
-                //  Initialize the values-array.
-                columnCount = columns.length;
-                values = new String[columnCount][];
-
-                //  Add the first-row-entry into the DataStore.
-                int row = of_addRow();
-
-                for(int i = 0; i < columnCount; i++)
-                {
-                    of_setItemString(row, columns[i], columnTypes[i]);
-                }
-
-                //  Iterate through each row.
                 while(result.next())
                 {
-                    row = of_addRow();
-
-                    for(String columnName : Objects.requireNonNull(of_getColumns()))
-                    {
-                        Object dbValue = result.getObject(columnName);
-                        String value = null;
-
-                        if(dbValue instanceof Integer)
-                        {
-                            value = String.valueOf((int) dbValue);
-                        }
-                        else if(dbValue instanceof Double)
-                        {
-                            value = String.valueOf((double) dbValue);
-                        }
-                        else
-                        {
-                            value = String.valueOf(dbValue);
-                        }
-
-                        of_setItemString(row, columnName, value);
-                    }
+                    columns = Sys.of_addArrayValue(of_getColumns(), result.getString("COLUMN_NAME"));
+                    columnTypes = Sys.of_addArrayValue(columnTypes, result.getString("DATA_TYPE"));
                 }
-
-                //  We use the of_setItem-Method while we're retrieving data,
-                //  so we need to reset the status.
-                Arrays.fill(rowStatus, "R");
-
-                return of_getRowCount();
             }
-            catch (Exception exception)
+            catch (Exception ignored) { }
+
+            //  Store the column-count.
+            if(of_getColumns() != null)
             {
-                of_sendErrorMessage(exception, "DataStore.of_retrieve();", "There was an error while retrieving data from this DataStore!");
+                //  Store the column-count.
+                columnCount = Objects.requireNonNull(of_getColumns()).length;
             }
         }
 
-        return -1;
+        //  If the column-count is valid!
+        if(columnCount > 0)
+        {
+            //  Initialize the values-array.
+            values = new String[columnCount][];
+
+            //  Add the first-row-entry into the DataStore: DATA_TYPES
+            int row = of_addRow();
+
+            for(int i = 0; i < columnCount; i++)
+            {
+                of_setItemString(row, columns[i], columnTypes[i]);
+            }
+
+            //  Retrieve data from the database server.
+            result = main.SQL.of_getResultSet_suppress(sql, false);
+
+            if(result != null)
+            {
+                try
+                {
+                    //  Iterate through each row.
+                    while(result.next())
+                    {
+                        row = of_addRow();
+
+                        for(String columnName : Objects.requireNonNull(of_getColumns()))
+                        {
+                            Object dbValue = result.getObject(columnName);
+                            String value = null;
+
+                            if(dbValue instanceof Integer)
+                            {
+                                value = String.valueOf((int) dbValue);
+                            }
+                            else if(dbValue instanceof Double)
+                            {
+                                value = String.valueOf((double) dbValue);
+                            }
+                            else
+                            {
+                                value = String.valueOf(dbValue);
+                            }
+
+                            of_setItemString(row, columnName, value);
+                        }
+                    }
+
+                    //  We use the of_setItem-Method while we're retrieving data,
+                    //  so we need to reset the status.
+                    Arrays.fill(rowStatus, "R");
+
+                    return of_getRowCount();
+                }
+                //  SQL-Select error.
+                catch (Exception exception)
+                {
+                    of_sendErrorMessage(exception, "DataStore.of_retrieve();", "There was an error while retrieving data from this DataStore!");
+                    return -1;
+                }
+            }
+        }
+        else
+        {
+            //  General error.
+            return -1;
+        }
+
+        //  No rows selected.
+        return 0;
     }
 
     /**
@@ -147,82 +174,49 @@ public class DataStore extends Objekt
             return -1;
         }
 
-        String[] columns = of_getColumns();
-        int columnCount = Objects.requireNonNull(columns).length;
         int executedSQLs = 0;
 
-        //  Check the RowStatus:
-        for(int row = 1; row < rowStatus.length; row++)
+        //  Iterate through each row!
+        for(int row = 1; row < of_getRowCount(); row++)
         {
-            String sql = null;
-
-            switch (rowStatus[row])
+            if(of_update(row) == 1)
             {
-                case "U":
-                    //  UPDATE table SET column1 = 'value1' WHERE pkColumn = pkValue;
-                    StringBuilder sqlBuilder = new StringBuilder();
-                    sql = "UPDATE " + of_getTableName() + " SET ";
-
-                    for (int i = 0; i < columnCount; i++)
-                    {
-                        sqlBuilder.append(columns[i]).append(" = ").append(of_getColumnDataFormat4Value(columns[i], of_getItemString(row, columns[i])));
-
-                        if (i != (columnCount - 1))
-                        {
-                            sqlBuilder.append(", ");
-                        }
-                    }
-
-                    //  Build the SQL-Statement.
-                    String pkColumn = of_getPrimaryKeyColumn();
-                    sql += sqlBuilder + " WHERE " + of_getTableName() + "." + pkColumn + " = " + of_getColumnDataFormat4Value(pkColumn, of_getItemString(row, pkColumn) + ";");
-                    break;
-                case "I":
-                    //  INSERT INTO table( column1, column2, column3 ) VALUES( 'value1', 'value2', 'value3' );
-                    StringBuilder tableBuilder = new StringBuilder();
-                    StringBuilder valueBuilder = new StringBuilder();
-                    sql = "INSERT INTO " + of_getTableName() + " ( ";
-
-                    //  Build the table-list.
-                    for (int i = 0; i < columnCount; i++)
-                    {
-                        tableBuilder.append(columns[i]);
-                        valueBuilder.append(of_getColumnDataFormat4Value(columns[i], of_getItemString(row, columns[i])));
-
-                        if (i != (columnCount - 1))
-                        {
-                            tableBuilder.append(", ");
-                            valueBuilder.append(", ");
-                        }
-                    }
-
-                    //  Add it to the SQL.
-                    sql += tableBuilder + " ) VALUES ( " + valueBuilder + " );";
-                    break;
-                case "D":
-                    //  DELETE FROM table WHERE table.pkColumn = pkValue;
-                    sql = "DELETE FROM " + of_getTableName() + " WHERE " + of_getTableName() + "." + of_getPrimaryKeyColumn() + " = " + of_getColumnDataFormat4Value(of_getPrimaryKeyColumn(), of_getItemString(row, of_getPrimaryKeyColumn()));
-                    break;
-            }
-
-            //  Check if we have an SQL-Statement to execute.
-            if(sql != null)
-            {
-                //  Reset the RowStatus of the row.
-                rowStatus[row] = "R";
-
-                if(!main.SQL.of_run_update(sql))
-                {
-                    of_sendErrorMessage(null, "DataStore.of_update();", "There was an error while updating the DataStore to the database!\n Could not execute the following SQL:\n" + sql);
-                    return -1;
-                }
-
                 //  Increase the number of executed sql-statements.
                 executedSQLs++;
             }
         }
 
         return executedSQLs;
+    }
+
+    /**
+     * This method is used to update one row changes from a datastore
+     * to the database.
+     * @param row Only update one specific row.
+     * @return 1 = OK, 0 = Nothing to do, -1 = An error occurred.
+     */
+    public int of_update(int row)
+    {
+        //  If the validation-check does not pass!
+        if(of_validate() != null)
+        {
+            return -1;
+        }
+
+        String sql = of_generateSQLByRowStatus4Row(row);
+
+        if(sql != null)
+        {
+            if(!main.SQL.of_run_update(sql))
+            {
+                of_sendErrorMessage(null, "DataStore.of_update("+row+");", "There was an error while updating the row: '"+row+"' to the database!\n Could not execute the following SQL:\n" + sql);
+                return -1;
+            }
+
+            return 1;
+        }
+
+        return 0;
     }
 
     /* ************************************* */
@@ -330,6 +324,85 @@ public class DataStore extends Objekt
         return -1;
     }
 
+    /**
+     * This method is used to check for the row-status
+     * and create on base of the row-status a specified sql.
+     * @param row The row-number.
+     * @return A string which contains the defined SQL for the row. NULL = If an error occurs.
+     */
+    private String of_generateSQLByRowStatus4Row(int row)
+    {
+        String sql = null;
+        int columnCount = Objects.requireNonNull(columns).length;
+
+        //  Check the index-value.
+        if(row <= ( of_getRowCount() - 1 ))
+        {
+            switch (rowStatus[row])
+            {
+                case "U":
+                    //  UPDATE table SET column1 = 'value1' WHERE pkColumn = pkValue;
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sql = "UPDATE " + of_getTableName() + " SET ";
+
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        sqlBuilder.append(columns[i]).append(" = ").append(of_getColumnDataFormat4Value(columns[i], of_getItemString(row, columns[i])));
+
+                        if (i != (columnCount - 1))
+                        {
+                            sqlBuilder.append(", ");
+                        }
+                    }
+
+                    //  Build the SQL-Statement.
+                    String pkColumn = of_getPrimaryKeyColumn();
+                    sql += sqlBuilder + " WHERE " + of_getTableName() + "." + pkColumn + " = " + of_getColumnDataFormat4Value(pkColumn, of_getItemString(row, pkColumn) + ";");
+                    break;
+                case "I":
+                    //  INSERT INTO table( column1, column2, column3 ) VALUES( 'value1', 'value2', 'value3' );
+                    //  Create a primary-key by the given primary-key column.
+                    int key = main.SQL.of_updateKey(of_getTableName());
+
+                    if(key == -1)
+                    {
+                        of_sendErrorMessage(null, "DataStore.of_generateSQLByRowStatus4Row(); - INSERT", "There was an error while generating a primary-key for the table: " + of_getTableName());
+                        return null;
+                    }
+
+                    //  Update the current row with the new primary-key.
+                    of_setItemString(row, of_getPrimaryKeyColumn(), String.valueOf(key));
+
+                    StringBuilder tableBuilder = new StringBuilder();
+                    StringBuilder valueBuilder = new StringBuilder();
+                    sql = "INSERT INTO " + of_getTableName() + " ( ";
+
+                    //  Build the table-list.
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        tableBuilder.append(columns[i]);
+                        valueBuilder.append(of_getColumnDataFormat4Value(columns[i], of_getItemString(row, columns[i])));
+
+                        if (i != (columnCount - 1))
+                        {
+                            tableBuilder.append(", ");
+                            valueBuilder.append(", ");
+                        }
+                    }
+
+                    //  Add it to the SQL.
+                    sql += tableBuilder + " ) VALUES ( " + valueBuilder + " );";
+                    break;
+                case "D":
+                    //  DELETE FROM table WHERE table.pkColumn = pkValue;
+                    sql = "DELETE FROM " + of_getTableName() + " WHERE " + of_getTableName() + "." + of_getPrimaryKeyColumn() + " = " + of_getColumnDataFormat4Value(of_getPrimaryKeyColumn(), of_getItemString(row, of_getPrimaryKeyColumn()));
+                    break;
+            }
+        }
+
+        return sql;
+    }
+
     /* ************************************* */
     /* VALIDATION */
     /* ************************************* */
@@ -339,7 +412,7 @@ public class DataStore extends Objekt
     {
         String errorMessage = null;
 
-        if(result == null)
+        if(columns == null || columns.length == 0)
         {
             errorMessage = "You need to call of_retrieve(); before handling with a DataStore!";
             of_sendErrorMessage(null, "DataStore.of_validate();", errorMessage);
@@ -427,7 +500,7 @@ public class DataStore extends Objekt
         {
             String[] tmpValues = values[columnIndex];
             tmpValues[row] = value;
-            of_setRowStatus(row, "U");
+            of_setRowStatus(row, RowStatus.UPDATE);
             values[columnIndex] = tmpValues;
         }
     }
@@ -454,7 +527,7 @@ public class DataStore extends Objekt
 
         //  We need to update the RowStatus.
         int rowCount = of_getRowCount() - 1;
-        of_setRowStatus(rowCount, "I");
+        of_setRowStatus(rowCount, RowStatus.INSERT);
 
         return rowCount;
     }
@@ -463,24 +536,44 @@ public class DataStore extends Objekt
      * This method is used to set a RowStatus for the given row.
      * R = Retrieved from DB, I = Insert, U = Update, D = Delete
      * @param row The row which RowStatus should be changed.
-     * @param rowStatusString Needs to be R, I, U or D.
+     * @param state Needs to be a RowStatus like INSERT, DELETE, RETRIEVE or UPDATE.
      */
-    private void of_setRowStatus(int row, String rowStatusString)
+    public void of_setRowStatus(int row, RowStatus state)
     {
+        String rowStatusString = null;
+
+        //  Check for the right enumerate.
+        switch(state)
+        {
+            case INSERT:
+                rowStatusString = "I";
+                break;
+            case DELETE:
+                rowStatusString = "D";
+                break;
+            case RETRIEVE:
+                rowStatusString = "R";
+                break;
+            case UPDATE:
+                rowStatusString = "U";
+                break;
+        }
+
+        //  To avoid some array-problems.
         if(rowStatus == null || row > ( rowStatus.length - 1 ))
         {
             rowStatus = Sys.of_addArrayValue(rowStatus, rowStatusString);
         }
 
         //  We only change the RowStatus to UPDATE if it has been retrieved before!
-        if(rowStatusString.equals("U"))
+        if(state == RowStatus.UPDATE)
         {
-            if( rowStatus[row].equals("R"))
+            if(rowStatus[row].equals("R"))
             {
                 rowStatus[row] = "U";
             }
         }
-        //  R, I, D
+        //  RETRIEVE, INSERT, DELETE
         else
         {
             rowStatus[row] = rowStatusString;
@@ -556,15 +649,15 @@ public class DataStore extends Objekt
 
         if(columnType == null)
         {
-            columnType = "CHAR";
+            columnType = "char";
         }
 
         //  Return the specified column-format.
         switch (columnType)
         {
-            case "VARCHAR":
-            case "CHAR":
-            case "DATETIME":
+            case "varchar":
+            case "char":
+            case "datetime":
                 if(!value.equals("null"))
                 {
                     value = "'"+value+"'";
@@ -582,12 +675,6 @@ public class DataStore extends Objekt
 
     private String[] of_getColumns()
     {
-        //  If the validation-check does not pass!
-        if(of_validate() != null)
-        {
-            return null;
-        }
-
         return columns;
     }
 
@@ -604,5 +691,17 @@ public class DataStore extends Objekt
     public String of_getSQL()
     {
         return sql;
+    }
+
+    /* ************************************* */
+    /* ENUMERATES */
+    /* ************************************* */
+
+    public enum RowStatus
+    {
+        INSERT,
+        DELETE,
+        UPDATE,
+        RETRIEVE
     }
 }

@@ -73,28 +73,16 @@ public class LabelManager extends Objekt
 
         if(rowId == -1)
         {
-            //  Create a new primary-key for the enum-table.
-            int enumId = main.SQL.of_updateKey("mrs_label_enum");
+            //  Update the dataStore with the new entry.
+            rowId = dataStoreLabelEnums.of_addRow();
 
-            if(enumId != -1)
+            if(rowId != -1)
             {
-                //  Update the dataStore with the new entry.
-                rowId = dataStoreLabelEnums.of_addRow();
+                dataStoreLabelEnums.of_setItemString(rowId, "text", categoryName);
+                dataStoreLabelEnums.of_setItemString(rowId, "flag", flagText);
 
-                if(rowId != -1)
-                {
-                    dataStoreLabelEnums.of_setItemString(rowId, "label_enum", String.valueOf(enumId));
-                    dataStoreLabelEnums.of_setItemString(rowId, "text", categoryName);
-                    dataStoreLabelEnums.of_setItemString(rowId, "flag", flagText);
-
-                    //  Execute a DataStore-Update.
-                    return ( dataStoreLabelEnums.of_update() > 0) ? 1 : -1;
-                }
-            }
-            //  Error while creating a new primary key.
-            else
-            {
-                return -1;
+                //  Execute a DataStore-Update.
+                return ( dataStoreLabelEnums.of_update(rowId) == 1) ? 1 : -1;
             }
         }
 
@@ -116,32 +104,20 @@ public class LabelManager extends Objekt
 
         if(row != -1)
         {
-            //  Create a new primary-key for the label-table.
-            int labelId = main.SQL.of_updateKey("mrs_label");
+            row = dataStoreLabel.of_addRow();
 
-            if(labelId != -1)
+            if(row != -1)
             {
-                row = dataStoreLabel.of_addRow();
+                dataStoreLabel.of_setItemString(row, "label_enum", String.valueOf(enumId));
+                dataStoreLabel.of_setItemString(row, "text", labelText);
 
-                if(row != -1)
-                {
-                    dataStoreLabel.of_setItemString(row, "label", String.valueOf(labelId));
-                    dataStoreLabel.of_setItemString(row, "label_enum", String.valueOf(enumId));
-                    dataStoreLabel.of_setItemString(row, "text", labelText);
-
-                    //  Execute a DataStore-Update.
-                    return ( dataStoreLabel.of_update() > 0) ? 1 : -1;
-                }
-                //  If an add-row error occurs.
-                else
-                {
-                    return -2;
-                }
+                //  Execute a DataStore-Update.
+                return ( dataStoreLabel.of_update(row) == 1) ? 1 : -1;
             }
-            //  Error while creating a new primary key.
+            //  If an add-row error occurs.
             else
             {
-                return -1;
+                return -2;
             }
         }
 
@@ -190,9 +166,21 @@ public class LabelManager extends Objekt
         return null;
     }
 
+    public String of_getLabelEnumTextByFlag(String labelEnumFlag)
+    {
+        int row = dataStoreLabelEnums.of_findRow("flag", labelEnumFlag);
+
+        if(row != -1)
+        {
+            return dataStoreLabelEnums.of_getItemString(row, "text");
+        }
+
+        return null;
+    }
+
     public String of_getLabelById(int labelId)
     {
-        return dataStoreLabel.of_getItemString(dataStoreLabel.of_findRow("label", labelId), "label");
+        return dataStoreLabel.of_getItemString(dataStoreLabel.of_findRow("label", labelId), "text");
     }
 
     public DataStore of_getDataStore4LabelEnums()
@@ -208,5 +196,36 @@ public class LabelManager extends Objekt
     public static LabelManager of_getInstance()
     {
         return instance;
+    }
+
+    /* ************************************* */
+    /* BOOLS */
+    /* ************************************* */
+
+    public boolean of_checkLabel4GivenLabelEnumFlag(int labelId, String labelEnumFlag)
+    {
+        int row = dataStoreLabel.of_findRow("label", labelId);
+
+        if(row != -1)
+        {
+            int labelEnumId = dataStoreLabel.of_getItemInteger(row, "label_enum");
+
+            if(labelEnumId != -1)
+            {
+                row = dataStoreLabelEnums.of_findRow("flag", labelEnumFlag);
+
+                if(row != -1)
+                {
+                    return labelEnumId == dataStoreLabelEnums.of_getItemInteger(row, "label_enum");
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean of_check4LabelEnumExist(int labelEnumId)
+    {
+        return dataStoreLabelEnums.of_findRow("label_enum", labelEnumId) != -1;
     }
 }

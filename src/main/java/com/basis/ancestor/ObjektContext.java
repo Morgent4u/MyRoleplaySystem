@@ -1,5 +1,5 @@
 package com.basis.ancestor;
-
+import com.basis.utils.SimpleFile;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
  * @Created 09.07.2022
  * @Author Nihar
  * @Description
- * This is the ancestor-class for every ObjektContext.
+ * This is the ancestor-class for every ObjectContext.
  * It's used to load or store a defined Object into a file.
  */
 public abstract class ObjektContext extends Objekt
@@ -29,6 +29,16 @@ public abstract class ObjektContext extends Objekt
     public ObjektContext(String instanceName, String mainFolder)
     {
         this.mainFolder = mainFolder;
+        of_setInfo(instanceName);
+    }
+
+    /**
+     * This is the default-constructor when
+     * the object-data comes from the database for example!
+     * @param instanceName The name of the instance.
+     */
+    public ObjektContext(String instanceName)
+    {
         of_setInfo(instanceName);
     }
 
@@ -94,6 +104,19 @@ public abstract class ObjektContext extends Objekt
     /* ************************************* */
     /* OBJECT-METHODS */
     /* ************************************* */
+
+    /**
+     * This method is used to migrate the old SimpleFile
+     * into the new SimpleFile-Object-Format.
+     * This method needs to be called by the loading-method.
+     * @param simpleFile The old file.
+     * @return 1 = File has been migrated, 0 = Nothing to do, -1 = An error occurred.
+     */
+    public int of_migrateObjectFile(SimpleFile simpleFile)
+    {
+        of_sendErrorMessage(null, of_getInfo() + ".of_migrateObjectFile();", "This function needs to be override from the child-class.");
+        return -1;
+    }
 
     /**
      * This function is used to store a defined Object into a file.

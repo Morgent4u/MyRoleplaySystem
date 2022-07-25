@@ -116,7 +116,7 @@ public class InventarService extends Objekt
             {
                 String invFilter = invFile.of_getString(configSection + ".Filter");
 
-                if(invFilter != null && invFilter.isEmpty())
+                if(invFilter != null && !invFilter.isEmpty())
                 {
                     String[] filterFragments = invFilter.split(",");
 

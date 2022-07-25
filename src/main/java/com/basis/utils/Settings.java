@@ -18,6 +18,7 @@ import com.roleplay.manager.TablistManager;
 import com.roleplay.module.ModuleDeathCmdSet;
 import com.roleplay.module.ModuleIdCard;
 import com.roleplay.npc.NPCService;
+import com.roleplay.plot.PlotService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -346,6 +347,13 @@ public class Settings extends Objekt
             {
                 main.IBLOCKSERVICE = new IBlockService();
                 main.IBLOCKSERVICE.of_load();
+            }
+
+            //  We need to initialize the PLOT-Context.
+            if(of_isUsingWorldGuard())
+            {
+                main.PLOTSERVICE = new PlotService();
+                main.PLOTSERVICE.of_load();
             }
 
             //  We need to invoke the postInitSystemServices...

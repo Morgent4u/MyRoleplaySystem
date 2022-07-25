@@ -14,6 +14,7 @@ import com.roleplay.hologram.HologramService;
 import com.roleplay.iblock.IBlockService;
 import com.roleplay.inventar.InventarService;
 import com.roleplay.npc.NPCService;
+import com.roleplay.plot.PlotService;
 import com.roleplay.position.PositionService;
 import com.roleplay.spieler.SpielerService;
 import org.bukkit.Bukkit;
@@ -53,6 +54,7 @@ public class main extends JavaPlugin
     public static NPCService NPCSERVICE;
     public static IBlockService IBLOCKSERVICE;
     public static PositionService POSITIONSERVICE;
+    public static PlotService PLOTSERVICE;
 
     /* ************************* */
     /* ENABLE */

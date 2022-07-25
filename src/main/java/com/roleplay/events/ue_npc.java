@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
@@ -70,6 +71,28 @@ public class ue_npc implements Listener
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * This event is used to listen to the player
+     * while changing the world.
+     * @param e The event instance.
+     */
+    @EventHandler
+    public void ue_playerChangeWorld4MRS(PlayerChangedWorldEvent e)
+    {
+        Spieler ps = main.SPIELERSERVICE._CONTEXT.of_getPlayer(e.getPlayer().getName());
+
+        if(ps != null)
+        {
+            //  Check if the NPCService is valid and some NPCs are registered.
+            if(main.NPCSERVICE != null && main.NPCSERVICE._CONTEXT.of_getLoadedObjects() > 0)
+            {
+                //  Refresh the NPCs for the player.
+                main.NPCSERVICE.of_removeAllNPCsFromPlayer(ps);
+                main.NPCSERVICE.of_showAllNPCs2Player(ps);
             }
         }
     }
